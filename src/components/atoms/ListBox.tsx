@@ -41,7 +41,7 @@ export const itemStyles = tv({
     isSelected: {
       false:
         "text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 -outline-offset-2",
-      true: "bg-green-600 text-white forced-colors:bg-[Highlight] forced-colors:text-[HighlightText] [&:has(+[data-selected])]:rounded-b-none [&+[data-selected]]:rounded-t-none -outline-offset-4 outline-white dark:outline-white forced-colors:outline-[HighlightText]",
+      true: "bg-green-600 text-white forced-colors:bg-green-600 forced-colors:text-green-600 [&:has(+[data-selected])]:rounded-b-none [&+[data-selected]]:rounded-t-none -outline-offset-4 outline-white dark:outline-white forced-colors:outline-green-600",
     },
     isDisabled: {
       true: "text-slate-300 dark:text-slate-600 forced-colors:text-[GrayText]",
@@ -58,7 +58,7 @@ export function ListBoxItem(props: ListBoxItemProps) {
       {composeRenderProps(props.children, (children) => (
         <>
           {children}
-          <div className="absolute right-4 bottom-0 left-4 hidden h-px bg-white/20 forced-colors:bg-[HighlightText] [.group[data-selected]:has(+[data-selected])_&]:block" />
+          <div className="absolute right-4 bottom-0 left-4 hidden h-px bg-white/20 forced-colors:bg-green-600 [.group[data-selected]:has(+[data-selected])_&]:block" />
         </>
       ))}
     </AriaListBoxItem>
@@ -73,7 +73,7 @@ export const dropdownItemStyles = tv({
       true: "text-gray-300 dark:text-slate-600 forced-colors:text-[GrayText]",
     },
     isFocused: {
-      true: "bg-green-600 text-white forced-colors:bg-[Highlight] forced-colors:text-[HighlightText]",
+      true: "bg-green-600 text-white forced-colors:bg-green-600 forced-colors:text-green-600",
     },
   },
   compoundVariants: [

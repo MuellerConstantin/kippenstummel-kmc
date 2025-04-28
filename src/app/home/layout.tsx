@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { StackTemplate } from "@/components/templates/StackTemplate";
+import { AuthGuard } from "@/components/organisms/AuthGuard";
 
 export const metadata: Metadata = {
   title: "KMC | Home",
@@ -10,5 +11,9 @@ export default function HomeLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <StackTemplate>{children}</StackTemplate>;
+  return (
+    <AuthGuard>
+      <StackTemplate>{children}</StackTemplate>
+    </AuthGuard>
+  );
 }

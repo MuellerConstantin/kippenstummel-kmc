@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Lato } from "next/font/google";
 import { StoreProvider } from "@/store";
+import { AuthProvider } from "@/components/organisms/AuthProvider";
 
 import "./globals.css";
 
@@ -25,7 +26,9 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.svg" sizes="any" type="image/svg+xml" />
       </head>
       <body className={`${lato.variable} bg-white dark:bg-slate-800`}>
-        <StoreProvider>{children}</StoreProvider>
+        <AuthProvider>
+          <StoreProvider>{children}</StoreProvider>
+        </AuthProvider>
       </body>
     </html>
   );

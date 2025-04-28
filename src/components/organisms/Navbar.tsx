@@ -1,11 +1,13 @@
 "use client";
 
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo } from "react";
 import NextLink from "next/link";
 import Image from "next/image";
-import { Menu as MenuIcon, EllipsisVertical } from "lucide-react";
+import { useSession, signOut } from "next-auth/react";
+import { Menu as MenuIcon, EllipsisVertical, LogOut } from "lucide-react";
 import { MenuTrigger } from "react-aria-components";
 import { Button } from "@/components/atoms/Button";
+import { ListBox, ListBoxItem } from "@/components/atoms/ListBox";
 import { Link } from "@/components/atoms/Link";
 import { Switch } from "@/components/atoms/Switch";
 import { Menu, MenuItem } from "@/components/molecules/Menu";
@@ -64,12 +66,7 @@ export function Navbar<T extends object>(props: NavbarProps<T>) {
             ))}
           </div>
           <div className="self-end">
-            <MenuTrigger>
-              <Button variant="icon">
-                <EllipsisVertical className="h-6 w-6" />
-              </Button>
-              <NavbarOptionsMenu />
-            </MenuTrigger>
+            <NavbarOptionsMenu />
           </div>
         </div>
       </div>
@@ -77,10 +74,10 @@ export function Navbar<T extends object>(props: NavbarProps<T>) {
   );
 }
 
-interface NavbarOptionsMenuProps<T> {}
+interface NavbarUnauthenticatedOptionsMenuProps {}
 
-export function NavbarOptionsMenu<T extends object>(
-  props: NavbarOptionsMenuProps<T>,
+function NavbarUnauthenticatedOptionsMenu(
+  props: NavbarUnauthenticatedOptionsMenuProps,
 ) {
   const dispatch = useAppDispatch();
   const darkMode = useAppSelector((state) => state.theme.darkMode);
@@ -96,5 +93,74 @@ export function NavbarOptionsMenu<T extends object>(
         Dark Mode
       </Switch>
     </Popover>
+  );
+}
+
+interface NavbarAuthenticatedOptionsMenuProps {}
+
+function NavbarAuthenticatedOptionsMenu(
+  props: NavbarAuthenticatedOptionsMenuProps,
+) {
+  const { data: session } = useSession();
+  const dispatch = useAppDispatch();
+
+  const darkMode = useAppSelector((state) => state.theme.darkMode);
+
+  return (
+    <Popover className="entering:animate-in entering:fade-in entering:placement-bottom:slide-in-from-top-1 entering:placement-top:slide-in-from-bottom-1 exiting:animate-out exiting:fade-out exiting:placement-bottom:slide-out-to-top-1 exiting:placement-top:slide-out-to-bottom-1 fill-mode-forwards origin-top-left overflow-auto rounded-lg bg-white p-2 shadow-lg ring-1 ring-black/10 outline-hidden dark:bg-zinc-950 dark:ring-white/15">
+      <div className="flex w-[15rem] flex-col gap-4 overflow-hidden p-2">
+        <div className="flex gap-4 overflow-hidden">
+          <div className="flex flex-col gap-2 overflow-hidden">
+            <div className="flex flex-col gap-1">
+              <div className="truncate text-[1rem] font-bold text-slate-900 dark:text-slate-100">
+                {session?.user?.name}
+              </div>
+            </div>
+          </div>
+        </div>
+        <Switch
+          isSelected={darkMode}
+          onChange={(newDarkMode) =>
+            dispatch(themeSlice.actions.setDarkMode(newDarkMode))
+          }
+        >
+          Dark Mode
+        </Switch>
+        <ListBox>
+          <ListBoxItem onAction={() => signOut({ callbackUrl: "/signin" })}>
+            <div className="flex w-full items-center gap-2">
+              <LogOut className="h-4 w-4" />
+              <span>Logout</span>
+            </div>
+          </ListBoxItem>
+        </ListBox>
+      </div>
+    </Popover>
+  );
+}
+
+interface NavbarOptionsMenuProps<T> {}
+
+export function NavbarOptionsMenu<T extends object>(
+  props: NavbarOptionsMenuProps<T>,
+) {
+  const { data: session, status } = useSession();
+
+  const isAuthenticated = useMemo(
+    () => status !== "loading" && session,
+    [session, status],
+  );
+
+  return (
+    <MenuTrigger>
+      <Button variant="icon">
+        <EllipsisVertical className="h-6 w-6" />
+      </Button>
+      {isAuthenticated ? (
+        <NavbarAuthenticatedOptionsMenu />
+      ) : (
+        <NavbarUnauthenticatedOptionsMenu />
+      )}
+    </MenuTrigger>
   );
 }
