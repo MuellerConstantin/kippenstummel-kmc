@@ -1,6 +1,6 @@
 "use client";
 
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -13,18 +13,20 @@ export function AuthGuard({
   const { data: session, status } = useSession();
 
   useEffect(() => {
-    if (status === "loading") return;
+    if (status === "loading") {
+      return;
+    }
 
-    if (!session) {
+    if (status === "unauthenticated") {
       router.push("/signin");
       return;
     }
 
     if (session?.error === "RefreshTokenError") {
-      router.push("/signin");
+      signOut();
       return;
     }
-  }, [session, status]);
+  }, [session, status, router]);
 
   if (
     status === "loading" ||

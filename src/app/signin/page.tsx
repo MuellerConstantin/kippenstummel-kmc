@@ -8,10 +8,10 @@ import { useRouter } from "next/navigation";
 
 export default function SignIn() {
   const router = useRouter();
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
 
   useEffect(() => {
-    if (session) {
+    if (status === "authenticated") {
       router.push("/");
     }
   }, [session, router]);
