@@ -4,19 +4,20 @@ import KeycloakProvider from "next-auth/providers/keycloak";
 declare module "next-auth" {
   interface Session {
     error?: "RefreshTokenError";
+    accessToken?: string;
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT {
-    access_token?: string;
-    expires_at?: number;
-    refresh_token?: string;
+    accessToken?: string;
+    expiresAt?: number;
+    refreshToken?: string;
     error?: "RefreshTokenError";
   }
 }
 
-const authOptions: AuthOptions = {
+export const authOptions: AuthOptions = {
   providers: [
     KeycloakProvider({
       clientId: process.env.OAUTH2_CLIENT_ID!,
@@ -24,16 +25,17 @@ const authOptions: AuthOptions = {
       issuer: process.env.OAUTH2_ISSUER,
     }),
   ],
+  session: { strategy: "jwt" },
   callbacks: {
     async jwt({ token, account }) {
       if (account) {
         return {
           ...token,
-          access_token: account.access_token,
-          expires_at: account.expires_at,
-          refresh_token: account.refresh_token,
+          accessToken: account.access_token,
+          expiresAt: account.expires_at,
+          refreshToken: account.refresh_token,
         };
-      } else if (Date.now() < token.expires_at! * 1000) {
+      } else if (Date.now() < token.expiresAt! * 1000) {
         return token;
       } else {
         if (!token.refresh_token) throw new TypeError("Missing refresh_token");
@@ -45,7 +47,7 @@ const authOptions: AuthOptions = {
               client_id: process.env.OAUTH2_CLIENT_ID!,
               client_secret: process.env.OAUTH2_CLIENT_SECRET!,
               grant_type: "refresh_token",
-              refresh_token: token.refresh_token!,
+              refresh_token: token.refreshToken!,
             }),
           });
 
@@ -76,6 +78,7 @@ const authOptions: AuthOptions = {
     },
     async session({ session, token }) {
       session.error = token.error;
+      session.accessToken = token.accessToken;
       return session;
     },
   },
