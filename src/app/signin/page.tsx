@@ -14,7 +14,7 @@ export default function SignIn() {
     if (status === "authenticated") {
       router.push("/");
     }
-  }, [session, router]);
+  }, [session, router, status]);
 
   const onSignIn = useCallback(async () => {
     await signIn("keycloak");

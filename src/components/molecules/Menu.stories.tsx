@@ -1,4 +1,4 @@
-import type { Meta } from "@storybook/react";
+import type { Meta, StoryFn } from "@storybook/react";
 import { MoreHorizontal } from "lucide-react";
 import React from "react";
 import { MenuTrigger, SubmenuTrigger } from "react-aria-components";
@@ -20,7 +20,7 @@ const meta: Meta<typeof Menu> = {
 
 export default meta;
 
-export const Default = (args: any) => (
+export const Default: StoryFn<typeof Menu> = (args) => (
   <MenuTrigger>
     <Button variant="secondary" className="px-2">
       <MoreHorizontal className="h-5 w-5" />
@@ -37,13 +37,28 @@ export const Default = (args: any) => (
   </MenuTrigger>
 );
 
-export const DisabledItems = (args: any) => <Default {...args} />;
+export const DisabledItems: StoryFn<typeof Menu> = (args) => (
+  <MenuTrigger>
+    <Button variant="secondary" className="px-2">
+      <MoreHorizontal className="h-5 w-5" />
+    </Button>
+    <Menu {...args}>
+      <MenuItem id="new">New…</MenuItem>
+      <MenuItem id="open">Open…</MenuItem>
+      <MenuSeparator />
+      <MenuItem id="save">Save</MenuItem>
+      <MenuItem id="saveAs">Save as…</MenuItem>
+      <MenuSeparator />
+      <MenuItem id="print">Print…</MenuItem>
+    </Menu>
+  </MenuTrigger>
+);
 
 DisabledItems.args = {
   disabledKeys: ["save"],
 };
 
-export const Sections = (args: any) => (
+export const Sections: StoryFn<typeof Menu> = (args) => (
   <MenuTrigger>
     <Button variant="secondary" className="px-2">
       <MoreHorizontal className="h-5 w-5" />
@@ -65,7 +80,7 @@ export const Sections = (args: any) => (
   </MenuTrigger>
 );
 
-export const Submenu = (args: any) => (
+export const Submenu: StoryFn<typeof Menu> = (args) => (
   <MenuTrigger>
     <Button variant="secondary" className="px-2">
       <MoreHorizontal className="h-5 w-5" />

@@ -1,7 +1,8 @@
 import { Button } from "@/components/atoms/Button";
 import { Info } from "lucide-react";
+import type { Meta, StoryFn } from "@storybook/react";
 
-export default {
+const meta: Meta<typeof Button> = {
   title: "Atoms/Button",
   component: Button,
   parameters: {
@@ -19,6 +20,8 @@ export default {
   },
 };
 
+export default meta;
+
 export const Primary = {
   args: {
     variant: "primary",
@@ -31,7 +34,7 @@ export const Secondary = {
   },
 };
 
-export const Icon = (args: any) => (
+export const Icon: StoryFn<typeof Button> = (args) => (
   <Button {...args}>
     <Info className="h-6 w-6" />
   </Button>

@@ -1,4 +1,4 @@
-import type { Meta } from "@storybook/react";
+import type { Meta, StoryFn } from "@storybook/react";
 import { HelpCircle } from "lucide-react";
 import React from "react";
 import { DialogTrigger, Heading } from "react-aria-components";
@@ -19,7 +19,7 @@ const meta: Meta<typeof Popover> = {
 
 export default meta;
 
-export const Default = (args: any) => (
+export const Default: StoryFn<typeof Popover> = (args) => (
   <DialogTrigger>
     <Button variant="icon" aria-label="Help">
       <HelpCircle className="h-4 w-4" />

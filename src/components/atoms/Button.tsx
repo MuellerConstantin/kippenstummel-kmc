@@ -11,7 +11,7 @@ export interface ButtonProps extends RACButtonProps {
   variant?: "primary" | "secondary" | "icon";
 }
 
-let button = tv({
+const button = tv({
   extend: focusRing,
   base: "px-5 py-2 text-sm text-center transition rounded-lg border border-black/10 dark:border-white/10 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)] dark:shadow-none cursor-pointer",
   variants: {

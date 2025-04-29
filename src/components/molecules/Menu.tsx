@@ -32,7 +32,7 @@ export function Menu<T extends object>(props: MenuProps<T>) {
 }
 
 export function MenuItem(props: MenuItemProps) {
-  let textValue =
+  const textValue =
     props.textValue ||
     (typeof props.children === "string" ? props.children : undefined);
   return (
@@ -74,7 +74,6 @@ export function MenuSeparator(props: SeparatorProps) {
 
 export interface MenuSectionProps<T> extends AriaMenuSectionProps<T> {
   title?: string;
-  items?: any;
 }
 
 export function MenuSection<T extends object>(props: MenuSectionProps<T>) {

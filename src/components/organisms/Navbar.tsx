@@ -15,9 +15,7 @@ import { Popover } from "@/components/atoms/Popover";
 import { useAppSelector, useAppDispatch } from "@/store";
 import themeSlice from "@/store/slices/theme";
 
-interface NavbarProps<T> {}
-
-export function Navbar<T extends object>(props: NavbarProps<T>) {
+export function Navbar() {
   const navigation = useMemo(() => {
     return [{ name: "Home", href: "/" }];
   }, []);
@@ -74,11 +72,7 @@ export function Navbar<T extends object>(props: NavbarProps<T>) {
   );
 }
 
-interface NavbarUnauthenticatedOptionsMenuProps {}
-
-function NavbarUnauthenticatedOptionsMenu(
-  props: NavbarUnauthenticatedOptionsMenuProps,
-) {
+function NavbarUnauthenticatedOptionsMenu() {
   const dispatch = useAppDispatch();
   const darkMode = useAppSelector((state) => state.theme.darkMode);
 
@@ -96,11 +90,7 @@ function NavbarUnauthenticatedOptionsMenu(
   );
 }
 
-interface NavbarAuthenticatedOptionsMenuProps {}
-
-function NavbarAuthenticatedOptionsMenu(
-  props: NavbarAuthenticatedOptionsMenuProps,
-) {
+function NavbarAuthenticatedOptionsMenu() {
   const { data: session } = useSession();
   const dispatch = useAppDispatch();
 
@@ -139,11 +129,7 @@ function NavbarAuthenticatedOptionsMenu(
   );
 }
 
-interface NavbarOptionsMenuProps<T> {}
-
-export function NavbarOptionsMenu<T extends object>(
-  props: NavbarOptionsMenuProps<T>,
-) {
+export function NavbarOptionsMenu() {
   const { data: session, status } = useSession();
 
   const isAuthenticated = useMemo(

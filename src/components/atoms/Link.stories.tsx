@@ -1,4 +1,4 @@
-import type { Meta } from "@storybook/react";
+import type { Meta, StoryFn } from "@storybook/react";
 import React from "react";
 import { Link } from "@/components/atoms/Link";
 
@@ -12,21 +12,27 @@ const meta: Meta<typeof Link> = {
 
 export default meta;
 
-export const Primary = (args: any) => <Link {...args}>Link</Link>;
+export const Primary: StoryFn<typeof Link> = (args) => (
+  <Link {...args}>Link</Link>
+);
 
 Primary.args = {
   href: "/",
   variant: "primary",
 };
 
-export const Secondary = (args: any) => <Link {...args}>Link</Link>;
+export const Secondary: StoryFn<typeof Link> = (args) => (
+  <Link {...args}>Link</Link>
+);
 
 Secondary.args = {
   href: "/",
   variant: "secondary",
 };
 
-export const Disabled = (args: any) => <Link {...args}>Link</Link>;
+export const Disabled: StoryFn<typeof Link> = (args) => (
+  <Link {...args}>Link</Link>
+);
 
 Disabled.args = {
   href: "/",

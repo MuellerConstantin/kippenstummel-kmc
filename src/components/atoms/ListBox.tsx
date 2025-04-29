@@ -14,6 +14,7 @@ import {
 import { tv } from "tailwind-variants";
 import { composeTailwindRenderProps, focusRing } from "@/components/utils";
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface ListBoxProps<T>
   extends Omit<AriaListBoxProps<T>, "layout" | "orientation"> {}
 
@@ -50,7 +51,7 @@ export const itemStyles = tv({
 });
 
 export function ListBoxItem(props: ListBoxItemProps) {
-  let textValue =
+  const textValue =
     props.textValue ||
     (typeof props.children === "string" ? props.children : undefined);
   return (
@@ -86,7 +87,7 @@ export const dropdownItemStyles = tv({
 });
 
 export function DropdownItem(props: ListBoxItemProps) {
-  let textValue =
+  const textValue =
     props.textValue ||
     (typeof props.children === "string" ? props.children : undefined);
   return (
@@ -111,7 +112,6 @@ export function DropdownItem(props: ListBoxItemProps) {
 
 export interface DropdownSectionProps<T> extends SectionProps<T> {
   title?: string;
-  items?: any;
 }
 
 export function DropdownSection<T extends object>(
