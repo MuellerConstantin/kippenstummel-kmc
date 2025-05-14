@@ -23,8 +23,8 @@ export function ApiLogoutInterceptor({
         if (
           err.response &&
           err.response.status === 401 &&
-          (err.response.data?.error === "BFF_PROXY_AUTHENICATION_ERROR" ||
-            err.response.data?.error === "UNAUTHENTICATED_ERROR")
+          (err.response.data?.code === "BFF_PROXY_AUTHENICATION_ERROR" ||
+            err.response.data?.code === "UNAUTHENTICATED_ERROR")
         ) {
           router.push("/signin");
         }
