@@ -45,6 +45,9 @@ function CopyButton(props: CopyButtonProps) {
 interface LocationMarkerPopupProps {
   position: [number, number];
   score: number;
+  imported: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 function LocationMarkerPopup(props: LocationMarkerPopupProps) {
@@ -81,6 +84,12 @@ function LocationMarkerPopup(props: LocationMarkerPopupProps) {
             </div>
             <CopyButton text={`${props.position[0]},${props.position[1]}`} />
           </div>
+          <div className="text-sm font-semibold">Details</div>
+          <div className="text-xs">
+            <div>Imported: {props.imported ? "Yes" : "No"}</div>
+            <div>Created At: {new Date(props.createdAt).toLocaleString()}</div>
+            <div>Updated At: {new Date(props.updatedAt).toLocaleString()}</div>
+          </div>
           <Link
             href={`https://www.google.com.sa/maps/search/${props.position[0]},${props.position[1]}`}
             target="_blank"
@@ -96,6 +105,9 @@ function LocationMarkerPopup(props: LocationMarkerPopupProps) {
 interface LocationMarkerProps {
   position: [number, number];
   score: number;
+  imported: boolean;
+  createdAt: string;
+  updatedAt: string;
   selected: boolean;
 }
 

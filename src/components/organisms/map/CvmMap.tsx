@@ -55,7 +55,15 @@ export function CvmMap(props: CvmMapProps) {
 
   const { data } = useSWR<
     (
-      | { id: string; longitude: number; latitude: number; score: number }
+      | {
+          id: string;
+          longitude: number;
+          latitude: number;
+          score: number;
+          imported: boolean;
+          createdAt: string;
+          updatedAt: string;
+        }
       | {
           id: string;
           cluster: true;
@@ -68,7 +76,7 @@ export function CvmMap(props: CvmMapProps) {
     string | null
   >(
     !!bottomLeft && !!topRight && !!zoom
-      ? `/cvms?bottomLeft=${bottomLeft?.[0]},${bottomLeft?.[1]}&topRight=${topRight?.[0]},${topRight?.[1]}&zoom=${zoom}`
+      ? `/kmc/cvms/within?bottomLeft=${bottomLeft?.[0]},${bottomLeft?.[1]}&topRight=${topRight?.[0]},${topRight?.[1]}&zoom=${zoom}`
       : null,
     (url) => api.get(url).then((res) => res.data),
     { keepPreviousData: true },
@@ -81,6 +89,9 @@ export function CvmMap(props: CvmMapProps) {
         longitude: number;
         latitude: number;
         score: number;
+        imported: boolean;
+        createdAt: string;
+        updatedAt: string;
       }[],
     [data],
   );
@@ -123,6 +134,9 @@ export function CvmMap(props: CvmMapProps) {
           key={marker.id}
           position={[marker.latitude, marker.longitude]}
           score={marker.score}
+          imported={marker.imported}
+          createdAt={marker.createdAt}
+          updatedAt={marker.updatedAt}
           selected={marker.id === props.selectedCvm?.id}
         />
       ))}
