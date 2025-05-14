@@ -17,7 +17,10 @@ import themeSlice from "@/store/slices/theme";
 
 export function Navbar() {
   const navigation = useMemo(() => {
-    return [{ name: "Home", href: "/" }];
+    return [
+      { name: "Home", href: "/" },
+      { name: "CVMs", href: "/cvms" },
+    ];
   }, []);
 
   return (
