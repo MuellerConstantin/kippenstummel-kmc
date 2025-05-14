@@ -95,7 +95,7 @@ export function CvmList(props: CvmListProps) {
             ))}
           </ListBox>
         </div>
-      ) : (
+      ) : data && data.content.length > 0 ? (
         <div className="flex flex-col gap-4">
           <ListBox
             className="max-h-[40rem] min-h-[20rem] w-[22rem] max-w-full space-y-1 overflow-y-auto"
@@ -142,6 +142,10 @@ export function CvmList(props: CvmListProps) {
             currentPage={page}
             onPageChange={setPage}
           />
+        </div>
+      ) : (
+        <div className="max-h-[40rem] min-h-[20rem] w-[22rem] max-w-full">
+          <div className="text-sm italic">No CVMs found</div>
         </div>
       )}
     </div>
