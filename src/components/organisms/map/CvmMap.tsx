@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import useSWR from "swr";
 import Leaflet from "leaflet";
 import useApi from "@/hooks/useApi";
@@ -9,14 +9,18 @@ import { ClusterMarker } from "@/components/molecules/map/ClusterMarker";
 import { LocationMarker } from "@/components/molecules/map/LocationMarker";
 
 export interface CvmMapProps {
-  onReport?: (position: Leaflet.LatLng) => void;
-  onUpvote?: (id: string, position: Leaflet.LatLng) => void;
-  onDownvote?: (id: string, position: Leaflet.LatLng) => void;
+  selectedCvm: {
+    id: string;
+    longitude: number;
+    latitude: number;
+    score: number;
+  } | null;
 }
 
 export function CvmMap(props: CvmMapProps) {
   const api = useApi();
 
+  const [map, setMap] = useState<Leaflet.Map | null>(null);
   const [zoom, setZoom] = useState<number>();
   const [bottomLeft, setBottomLeft] = useState<[number, number]>();
   const [topRight, setTopRight] = useState<[number, number]>();
@@ -27,6 +31,8 @@ export function CvmMap(props: CvmMapProps) {
     setBottomLeft([mapBounds.getSouthWest().lat, mapBounds.getSouthWest().lng]);
     setTopRight([mapBounds.getNorthEast().lat, mapBounds.getNorthEast().lng]);
     setZoom(map.getZoom());
+
+    setMap(map);
   }, []);
 
   const onZoomEnd = useCallback((event: Leaflet.LeafletEvent) => {
@@ -91,6 +97,15 @@ export function CvmMap(props: CvmMapProps) {
     [data],
   );
 
+  useEffect(() => {
+    if (props.selectedCvm) {
+      map?.setView(
+        [props.selectedCvm.latitude, props.selectedCvm.longitude],
+        18,
+      );
+    }
+  }, [props.selectedCvm, map]);
+
   return (
     <LeafletMap
       tileLayerUrl="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -108,12 +123,7 @@ export function CvmMap(props: CvmMapProps) {
           key={marker.id}
           position={[marker.latitude, marker.longitude]}
           score={marker.score}
-          onUpvote={(voterPosition) =>
-            props.onUpvote?.(marker.id, voterPosition)
-          }
-          onDownvote={(voterPosition) =>
-            props.onDownvote?.(marker.id, voterPosition)
-          }
+          selected={marker.id === props.selectedCvm?.id}
         />
       ))}
       {clusters?.map((marker, index) => (

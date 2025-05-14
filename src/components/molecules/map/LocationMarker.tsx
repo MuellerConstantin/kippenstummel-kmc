@@ -96,8 +96,7 @@ function LocationMarkerPopup(props: LocationMarkerPopupProps) {
 interface LocationMarkerProps {
   position: [number, number];
   score: number;
-  onUpvote?: (voterPosition: Leaflet.LatLng) => void;
-  onDownvote?: (voterPosition: Leaflet.LatLng) => void;
+  selected: boolean;
 }
 
 export function LocationMarker(props: LocationMarkerProps) {
@@ -106,7 +105,9 @@ export function LocationMarker(props: LocationMarkerProps) {
       position={Leaflet.latLng(props.position[0], props.position[1])}
       icon={LeafletDivIcon({
         source: (
-          <div className="relative z-[50] h-fit w-fit">
+          <div
+            className={`relative z-[50] h-fit w-fit ${props.selected ? "animate-bounce" : ""}`}
+          >
             {props.score < -99 ? (
               <div className="absolute top-1 right-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-red-500">
                 <ChevronDown className="h-2.5 w-2.5 text-white" />
