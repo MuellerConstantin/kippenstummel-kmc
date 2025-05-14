@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Lato } from "next/font/google";
 import { StoreProvider } from "@/store";
 import { AuthProvider } from "@/components/organisms/AuthProvider";
+import { ApiLogoutInterceptor } from "@/hooks/useApi";
 
 import "./globals.css";
 
@@ -42,7 +43,9 @@ export default function RootLayout({
       </head>
       <body className={`${lato.variable} bg-white dark:bg-slate-800`}>
         <AuthProvider>
-          <StoreProvider>{children}</StoreProvider>
+          <StoreProvider>
+            <ApiLogoutInterceptor>{children}</ApiLogoutInterceptor>
+          </StoreProvider>
         </AuthProvider>
       </body>
     </html>
