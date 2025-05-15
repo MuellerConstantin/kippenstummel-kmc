@@ -10,7 +10,7 @@ const Plot = createPlotlyComponent(Plotly);
 
 export interface LineChartProps {
   title: string;
-  values: { x: string[]; y: number[] };
+  traces: { x: string[]; y: number[]; lineColor: string; name: string }[];
   loading: boolean;
   errored: boolean;
 }
@@ -30,15 +30,14 @@ export function LineChart(props: LineChartProps) {
           <Plot
             useResizeHandler
             style={{ width: "100%", height: "100%" }}
-            data={[
-              {
-                type: "scatter",
-                mode: "lines+markers",
-                x: props.values.x,
-                y: props.values.y,
-                line: { color: "#16a34a", width: 2 },
-              },
-            ]}
+            data={props.traces.map((trace) => ({
+              type: "scatter",
+              mode: "lines+markers",
+              x: trace.x,
+              y: trace.y,
+              line: { color: trace.lineColor, width: 2 },
+              name: trace.name,
+            }))}
             layout={{
               autosize: true,
               margin: { t: 0, b: 40, l: 40, r: 0 },
