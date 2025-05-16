@@ -204,7 +204,7 @@ export default function Stats() {
             </div>
             <div className="col-span-12 h-96 w-full">
               <LineChart
-                title="CVMs Votes Last Days"
+                title="CVMs Voted Last Days"
                 traces={[
                   {
                     x: data?.votes.upvotes.history.map((r) => r.date) || [],

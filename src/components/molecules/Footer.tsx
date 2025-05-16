@@ -3,7 +3,11 @@ import { Link } from "@/components/atoms/Link";
 
 export function Footer() {
   const navigation = useMemo(() => {
-    return [{ name: "Home", href: "/" }];
+    return [
+      { name: "Home", href: "/" },
+      { name: "CVMs", href: "/cvms" },
+      { name: "Stats", href: "/stats" },
+    ];
   }, []);
 
   return (
