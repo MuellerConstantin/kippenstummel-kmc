@@ -38,7 +38,7 @@ export const authOptions: AuthOptions = {
       } else if (Date.now() < token.expiresAt! * 1000) {
         return token;
       } else {
-        if (!token.refresh_token) throw new TypeError("Missing refresh_token");
+        if (!token.refreshToken) throw new TypeError("Missing refresh_token");
 
         try {
           const response = await fetch(process.env.OAUTH2_TOKEN_URL!, {
@@ -57,17 +57,17 @@ export const authOptions: AuthOptions = {
 
           const newTokens = tokensOrError as {
             access_token: string;
-            expires_in: number;
+            expires_at: number;
             refresh_token?: string;
           };
 
           return {
             ...token,
-            access_token: newTokens.access_token,
-            expires_at: Math.floor(Date.now() / 1000 + newTokens.expires_in),
-            refresh_token: newTokens.refresh_token
+            accessToken: newTokens.access_token,
+            expiresAt: newTokens.expires_at,
+            refreshToken: newTokens.refresh_token
               ? newTokens.refresh_token
-              : token.refresh_token,
+              : token.refreshToken,
           };
         } catch (error) {
           console.error("Error refreshing access_token", error);
