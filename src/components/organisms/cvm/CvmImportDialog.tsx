@@ -298,6 +298,13 @@ function CvmImportOsm(props: CvmImportOsmProps) {
   const { close } = props;
 
   const api = useApi();
+
+  const [isOsmLoading, setIsOsmLoading] = useState(false);
+  const [osmError, setOsmError] = useState<string | null>(null);
+  const [cvmAddress, setCvmAddress] = useState<string | null>(null);
+  const [cvmData, setCvmData] = useState<
+    { longitude: number; latitude: number }[] | null
+  >(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -339,6 +346,8 @@ function CvmImportOsm(props: CvmImportOsmProps) {
 
     const osmId = parseInt(result.osm_id);
     const osmType = result.osm_type;
+
+    setCvmAddress(result.display_name);
 
     switch (osmType) {
       case "relation":
@@ -392,10 +401,12 @@ function CvmImportOsm(props: CvmImportOsmProps) {
     return response.data;
   }, []);
 
-  const onImport = useCallback(
+  const onLoad = useCallback(
     ({ region }: { region: string }) => {
-      setIsLoading(true);
-      setError(null);
+      setIsOsmLoading(true);
+      setOsmError(null);
+      setCvmAddress(null);
+      setCvmData(null);
 
       fetchOsmAreaId(region)
         .then((areaId) => fetchOsmData(areaId))
@@ -407,59 +418,93 @@ function CvmImportOsm(props: CvmImportOsmProps) {
 
           return cvms;
         })
-        .then((cvms) =>
-          api.post("/kmc/cvms", {
-            cvms,
-          }),
-        )
-        .then(close)
+        .then((cvms) => setCvmData(cvms))
         .catch(() => {
-          setError("An unexpected error occurred, please retry!");
+          setOsmError("The specified region was not found!");
         })
         .finally(() => {
-          setIsLoading(false);
+          setIsOsmLoading(false);
         });
     },
-    [close, api, fetchOsmAreaId, fetchOsmData],
+    [fetchOsmAreaId, fetchOsmData],
   );
+
+  const onImport = useCallback(() => {
+    setIsLoading(true);
+    setError(null);
+
+    api
+      .post("/kmc/cvms", {
+        cvms: cvmData,
+      })
+      .then(close)
+      .catch(() => setError("An unexpected error occurred, please retry!"))
+      .finally(() => setIsLoading(false));
+  }, [api, close, cvmData]);
 
   return (
     <div className="flex flex-col gap-4">
       <Formik<{ region: string }>
         initialValues={{ region: "" }}
         validationSchema={schema}
-        onSubmit={(values) => onImport(values)}
+        onSubmit={(values) => onLoad(values)}
       >
         {(props) => (
           <Form onSubmit={props.handleSubmit} validationBehavior="aria">
-            {error && <p className="text-center text-red-500">{error}</p>}
-            <TextField
-              label="Region"
-              name="region"
-              type="text"
-              value={props.values.region}
-              onBlur={props.handleBlur}
-              isDisabled={isLoading}
-              onChange={(value) => props.setFieldValue("region", value)}
-              isInvalid={!!props.touched.region && !!props.errors.region}
-              errorMessage={props.errors.region}
-            />
-            <div className="flex justify-start gap-4">
-              <Button variant="secondary" onPress={close} className="w-full">
-                Cancel
-              </Button>
+            {osmError && <p className="text-center text-red-500">{osmError}</p>}
+            <div className="flex items-end gap-4">
+              <TextField
+                label="Region"
+                name="region"
+                type="text"
+                className="grow"
+                value={props.values.region}
+                onBlur={props.handleBlur}
+                isDisabled={isOsmLoading}
+                onChange={(value) => props.setFieldValue("region", value)}
+                isInvalid={!!props.touched.region && !!props.errors.region}
+                errorMessage={props.errors.region}
+              />
               <Button
                 type="submit"
-                className="flex w-full justify-center"
-                isDisabled={!(props.isValid && props.dirty) || isLoading}
+                className="flex justify-center"
+                isDisabled={!(props.isValid && props.dirty) || isOsmLoading}
               >
-                {!isLoading && <span>Import</span>}
-                {isLoading && <Spinner />}
+                {!isOsmLoading && <span>Load</span>}
+                {isOsmLoading && <Spinner />}
               </Button>
             </div>
           </Form>
         )}
       </Formik>
+      <div className="flex flex-col gap-4">
+        {error && <p className="text-center text-red-500">{error}</p>}
+        {cvmData && (
+          <div className="text-sm">
+            <div className="flex gap-1">
+              <span className="font-semibold">Region:</span>
+              <span>{cvmAddress}</span>
+            </div>
+            <div className="flex gap-1">
+              <span className="font-semibold">Amount:</span>
+              <span>{cvmData.length}</span>
+            </div>
+          </div>
+        )}
+      </div>
+      <div className="flex justify-start gap-4">
+        <Button variant="secondary" onPress={close} className="w-full">
+          Cancel
+        </Button>
+        <Button
+          className="flex w-full justify-center"
+          isDisabled={isLoading || isOsmLoading}
+          onClick={onImport}
+        >
+          {!isLoading && <span>Import</span>}
+          {isLoading && <Spinner />}
+        </Button>
+      </div>
     </div>
   );
 }
