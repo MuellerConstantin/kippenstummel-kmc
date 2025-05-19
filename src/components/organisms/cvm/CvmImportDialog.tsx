@@ -498,7 +498,7 @@ function CvmImportOsm(props: CvmImportOsmProps) {
         </Button>
         <Button
           className="flex w-full justify-center"
-          isDisabled={isLoading || isOsmLoading}
+          isDisabled={isLoading || isOsmLoading || !cvmData}
           onClick={onImport}
         >
           {!isLoading && <span>Import</span>}
