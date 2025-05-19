@@ -35,7 +35,7 @@ export function Spinner(props: SpinnerProps) {
         cx={center}
         cy={center}
         r={r}
-        className="stroke-amber-500"
+        className="stroke-green-600"
         strokeDasharray={`${c} ${c}`}
         strokeDashoffset={offset}
         transform="rotate(-90 16 16)"
