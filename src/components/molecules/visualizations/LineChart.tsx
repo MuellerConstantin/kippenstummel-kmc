@@ -17,7 +17,7 @@ export interface LineChartProps {
 
 export function LineChart(props: LineChartProps) {
   return (
-    <div className="flex h-full w-full flex-col gap-2 overflow-hidden rounded-md border border-slate-200 bg-slate-100 p-2 dark:border-slate-700 dark:bg-slate-900">
+    <div className="flex h-full w-full flex-col gap-2 overflow-hidden rounded-md border border-slate-200 bg-slate-100 p-2 shadow dark:border-slate-700 dark:bg-slate-900">
       <h5 className="truncate font-semibold text-slate-900 dark:text-slate-100">
         {props.title}
       </h5>
@@ -29,7 +29,7 @@ export function LineChart(props: LineChartProps) {
         <div className="w-full grow overflow-hidden rounded-md">
           <Plot
             useResizeHandler
-            style={{ width: "100%", height: "100%" }}
+            className="h-full w-full"
             data={props.traces.map((trace) => ({
               type: "scatter",
               mode: "lines+markers",
