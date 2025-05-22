@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import useSWR from "swr";
 import { ListBox, ListBoxItem } from "@/components/atoms/ListBox";
 import useApi from "@/hooks/useApi";
-import { Cigarette, Vote } from "lucide-react";
+import { Cigarette, Vote, Fingerprint } from "lucide-react";
 
 const Kpi = dynamic(
   () =>
@@ -38,6 +38,11 @@ export function Sidebar() {
           name: "Voting Statistics",
           icon: Vote,
           path: `#section-voting-stats`,
+        },
+        {
+          name: "Ident Statistics",
+          icon: Fingerprint,
+          path: `#section-ident-stats`,
         },
       ],
     };
@@ -116,6 +121,14 @@ export default function Stats() {
             count: number;
           }[];
         };
+      };
+      idents: {
+        total: number;
+        totalNewLast7Days: number;
+        newHistory: {
+          date: string;
+          count: number;
+        }[];
       };
     },
     unknown,
@@ -286,6 +299,47 @@ export default function Stats() {
                           [],
                         lineColor: "#dc2626",
                         name: "Downvotes",
+                      },
+                    ]}
+                    loading={isLoading}
+                    errored={!!error}
+                  />
+                </div>
+              </div>
+            </section>
+            <section
+              id="section-ident-stats"
+              className="flex w-full flex-col gap-4"
+            >
+              <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
+                Ident Statistics
+              </h1>
+              <div className="grid w-full grid-cols-12 gap-4">
+                <div className="col-span-12 h-48 w-full md:col-span-6 lg:col-span-3">
+                  <Kpi
+                    title="Total Idents"
+                    value={data?.idents.total || 0}
+                    loading={isLoading}
+                    errored={!!error}
+                  />
+                </div>
+                <div className="col-span-12 h-48 w-full md:col-span-6 lg:col-span-3">
+                  <Kpi
+                    title="Total New Idents Last 7 Days"
+                    value={data?.idents.totalNewLast7Days || 0}
+                    loading={isLoading}
+                    errored={!!error}
+                  />
+                </div>
+                <div className="col-span-12 h-96 w-full">
+                  <LineChart
+                    title="New Idents Last Days"
+                    traces={[
+                      {
+                        x: data?.idents.newHistory.map((r) => r.date) || [],
+                        y: data?.idents.newHistory.map((r) => r.count) || [],
+                        lineColor: "#65a30d",
+                        name: "New Idents",
                       },
                     ]}
                     loading={isLoading}
