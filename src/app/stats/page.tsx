@@ -25,7 +25,7 @@ const LineChart = dynamic(
   },
 );
 
-export function Sidebar() {
+function Sidebar() {
   const navigation = useMemo(() => {
     return {
       content: [
