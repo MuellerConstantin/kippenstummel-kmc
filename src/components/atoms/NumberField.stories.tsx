@@ -5,6 +5,7 @@ import { Button } from "./Button";
 import { NumberField } from "./NumberField";
 
 const meta: Meta<typeof NumberField> = {
+  title: "Atoms/NumberField",
   component: NumberField,
   parameters: {
     layout: "centered",
