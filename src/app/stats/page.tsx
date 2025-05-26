@@ -124,6 +124,7 @@ export default function Stats() {
       };
       idents: {
         total: number;
+        averageCredibility: number;
         totalNewLast7Days: number;
         newHistory: {
           date: string;
@@ -327,6 +328,14 @@ export default function Stats() {
                   <Kpi
                     title="Total New Idents Last 7 Days"
                     value={data?.idents.totalNewLast7Days || 0}
+                    loading={isLoading}
+                    errored={!!error}
+                  />
+                </div>
+                <div className="col-span-12 h-48 w-full md:col-span-6 lg:col-span-3">
+                  <Kpi
+                    title="Average Credibility"
+                    value={data?.idents.averageCredibility || 0}
                     loading={isLoading}
                     errored={!!error}
                   />
