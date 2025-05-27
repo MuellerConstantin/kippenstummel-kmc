@@ -148,7 +148,7 @@ export default function Stats() {
               id="section-cvm-stats"
               className="flex w-full flex-col gap-4"
             >
-              <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
+              <h1 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
                 CVM Statistics
               </h1>
               <div className="grid w-full grid-cols-12 gap-4">
@@ -236,7 +236,7 @@ export default function Stats() {
               id="section-voting-stats"
               className="flex w-full flex-col gap-4"
             >
-              <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
+              <h1 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
                 Voting Statistics
               </h1>
               <div className="grid w-full grid-cols-12 gap-4">
@@ -312,7 +312,7 @@ export default function Stats() {
               id="section-ident-stats"
               className="flex w-full flex-col gap-4"
             >
-              <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
+              <h1 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
                 Ident Statistics
               </h1>
               <div className="grid w-full grid-cols-12 gap-4">
