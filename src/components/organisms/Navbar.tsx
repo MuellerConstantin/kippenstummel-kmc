@@ -21,6 +21,7 @@ export function Navbar() {
       { name: "Home", href: "/" },
       { name: "CVMs", href: "/cvms" },
       { name: "Ident", href: "/ident" },
+      { name: "Jobs", href: "/jobs" },
       { name: "Stats", href: "/stats" },
     ];
   }, []);
