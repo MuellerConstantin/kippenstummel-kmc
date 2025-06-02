@@ -14,6 +14,7 @@ import { Pagination } from "@/components/molecules/Pagination";
 import { Key, Selection, TableBody } from "react-aria-components";
 
 export interface JobsTableProps {
+  distinct: boolean;
   onSelect?: (
     jobs: {
       jobId: string;
@@ -70,8 +71,9 @@ export function JobsTable(props: JobsTableProps) {
     },
     unknown,
     string | null
-  >(`/kmc/jobs?page=${page - 1}&perPage=${perPage}`, (url) =>
-    api.get(url).then((res) => res.data),
+  >(
+    `/kmc/jobs?page=${page - 1}&perPage=${perPage}&distinct=${props.distinct}`,
+    (url) => api.get(url).then((res) => res.data),
   );
 
   const handleSelect = useCallback(
