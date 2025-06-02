@@ -68,7 +68,7 @@ function CvmImportForm(props: CvmImportFormProps) {
       setError(null);
 
       api
-        .post("/kmc/cvms", {
+        .post("/kmc/cvms/import/manual", {
           cvms: [
             {
               longitude: parseFloat(longitude),
@@ -232,7 +232,7 @@ function CvmImportJson(props: CvmImportJsonProps) {
       setError(null);
 
       api
-        .post("/kmc/cvms", {
+        .post("/kmc/cvms/import/manual", {
           cvms: parsed,
         })
         .then(close)
@@ -434,7 +434,7 @@ function CvmImportOsm(props: CvmImportOsmProps) {
     setError(null);
 
     api
-      .post("/kmc/cvms", {
+      .post("/kmc/cvms/import/manual", {
         cvms: cvmData,
       })
       .then(close)
