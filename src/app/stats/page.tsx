@@ -5,7 +5,8 @@ import dynamic from "next/dynamic";
 import useSWR from "swr";
 import { ListBox, ListBoxItem } from "@/components/atoms/ListBox";
 import useApi from "@/hooks/useApi";
-import { Cigarette, Vote, Fingerprint } from "lucide-react";
+import { Cigarette, Vote, Fingerprint, ListTodo } from "lucide-react";
+import { PieChart } from "@/components/molecules/visualizations/PieChart";
 
 const Kpi = dynamic(
   () =>
@@ -39,10 +40,17 @@ function Sidebar() {
           icon: Vote,
           path: `#section-voting-stats`,
         },
+      ],
+      platform: [
         {
           name: "Ident Statistics",
           icon: Fingerprint,
           path: `#section-ident-stats`,
+        },
+        {
+          name: "Job Statistics",
+          icon: ListTodo,
+          path: `#section-job-stats`,
         },
       ],
     };
@@ -60,6 +68,25 @@ function Sidebar() {
           </div>
           <ListBox className="space-y-1">
             {navigation["content"].map((item) => (
+              <ListBoxItem
+                id={`stats-sidebar-${item.name}`}
+                key={item.name}
+                href={item.path}
+              >
+                <div className="inline-flex items-center space-x-2">
+                  <item.icon className="h-5 w-5" />
+                  <span>{item.name}</span>
+                </div>
+              </ListBoxItem>
+            ))}
+          </ListBox>
+        </div>
+        <div className="space-y-2">
+          <div className="text-sm font-semibold text-gray-900 dark:text-white">
+            Platform
+          </div>
+          <ListBox className="space-y-1">
+            {navigation["platform"].map((item) => (
               <ListBoxItem
                 id={`stats-sidebar-${item.name}`}
                 key={item.name}
@@ -127,6 +154,20 @@ export default function Stats() {
         averageCredibility: number;
         totalNewLast7Days: number;
         newHistory: {
+          date: string;
+          count: number;
+        }[];
+      };
+      jobs: {
+        total: number;
+        differentTypes: number;
+        statusCounts: {
+          running: number;
+          completed: number;
+          failed: number;
+        };
+        totalRunLast7Days: number;
+        runHistory: {
           date: string;
           count: number;
         }[];
@@ -349,6 +390,73 @@ export default function Stats() {
                         y: data?.idents.newHistory.map((r) => r.count) || [],
                         lineColor: "#65a30d",
                         name: "New Idents",
+                      },
+                    ]}
+                    loading={isLoading}
+                    errored={!!error}
+                  />
+                </div>
+              </div>
+            </section>
+            <section
+              id="section-job-stats"
+              className="flex w-full flex-col gap-4"
+            >
+              <h1 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+                Job Statistics
+              </h1>
+              <div className="grid w-full grid-cols-12 gap-4">
+                <div className="col-span-12 h-48 w-full md:col-span-6 lg:col-span-3">
+                  <Kpi
+                    title="Total Jobs Run"
+                    value={data?.jobs.total || 0}
+                    loading={isLoading}
+                    errored={!!error}
+                  />
+                </div>
+                <div className="col-span-12 h-48 w-full md:col-span-6 lg:col-span-3">
+                  <Kpi
+                    title="Total Jobs Run Last 7 Days"
+                    value={data?.jobs.totalRunLast7Days || 0}
+                    loading={isLoading}
+                    errored={!!error}
+                  />
+                </div>
+                <div className="col-span-12 h-48 w-full md:col-span-6 lg:col-span-3">
+                  <Kpi
+                    title="Number of Different Job Types"
+                    value={data?.jobs.differentTypes || 0}
+                    loading={isLoading}
+                    errored={!!error}
+                  />
+                </div>
+                <div className="col-span-12 h-96 w-full">
+                  <LineChart
+                    title="Jobs Run Last Days"
+                    traces={[
+                      {
+                        x: data?.jobs.runHistory.map((r) => r.date) || [],
+                        y: data?.jobs.runHistory.map((r) => r.count) || [],
+                        lineColor: "#65a30d",
+                        name: "Jobs Run",
+                      },
+                    ]}
+                    loading={isLoading}
+                    errored={!!error}
+                  />
+                </div>
+                <div className="col-span-12 h-96 w-full md:col-span-6">
+                  <PieChart
+                    title="Jobs Run Status"
+                    data={[
+                      {
+                        labels: ["Completed", "Failed", "Running"],
+                        values: [
+                          data?.jobs.statusCounts.completed || 0,
+                          data?.jobs.statusCounts.failed || 0,
+                          data?.jobs.statusCounts.running || 0,
+                        ],
+                        colors: ["#16a34a", "#dc2626", "#94a3b8"],
                       },
                     ]}
                     loading={isLoading}
