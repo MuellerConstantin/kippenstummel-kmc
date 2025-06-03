@@ -1,7 +1,6 @@
 import { useMemo, useState, useCallback } from "react";
 import { DialogProps, Heading } from "react-aria-components";
 import { Formik, FormikHelpers } from "formik";
-import axios from "axios";
 import * as yup from "yup";
 import { Form } from "@/components/atoms/Form";
 import { Dialog } from "@/components/atoms/Dialog";
@@ -299,12 +298,6 @@ function CvmImportOsm(props: CvmImportOsmProps) {
 
   const api = useApi();
 
-  const [isOsmLoading, setIsOsmLoading] = useState(false);
-  const [osmError, setOsmError] = useState<string | null>(null);
-  const [cvmAddress, setCvmAddress] = useState<string | null>(null);
-  const [cvmData, setCvmData] = useState<
-    { longitude: number; latitude: number }[] | null
-  >(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -312,146 +305,32 @@ function CvmImportOsm(props: CvmImportOsmProps) {
     region: yup.string().required("Is required"),
   });
 
-  const fetchOsmAreaId = useCallback(async (region: string) => {
-    const response = await axios.get<
-      {
-        place_id: number;
-        license: string;
-        osm_id: string;
-        osm_type: string;
-        lat: string;
-        lon: string;
-        class: string;
-        type: string;
-        place_rank: number;
-        importance: number;
-        addresstype: string;
-        name: string;
-        display_name: string;
-        boundingbox: string[];
-      }[]
-    >("https://nominatim.openstreetmap.org/search", {
-      params: {
-        city: region,
-        format: "json",
-        limit: 1,
-      },
-    });
-
-    if (!response.data || response.data.length === 0) {
-      throw new Error(`Region "${region}" not found`);
-    }
-
-    const result = response.data?.[0];
-
-    const osmId = parseInt(result.osm_id);
-    const osmType = result.osm_type;
-
-    setCvmAddress(result.display_name);
-
-    switch (osmType) {
-      case "relation":
-        return 3600000000 + osmId;
-        break;
-      case "way":
-        return 2400000000 + osmId;
-        break;
-      case "node":
-        return 1200000000 + osmId;
-        break;
-      default:
-        throw new Error(`Unsupported osm_type: ${osmType}`);
-    }
-  }, []);
-
-  const fetchOsmData = useCallback(async (areaId: number) => {
-    const query = `
-      [out:json][timeout:25];
-      area(${areaId});
-      (
-        node["amenity"="vending_machine"]["vending"~"cigarettes"](area);
-      );
-      out center;
-      `;
-
-    const response = await axios.post<{
-      version: number;
-      generator: string;
-      osm3s: {
-        timestamp_osm_base: string;
-        copyright: string;
-      };
-      elements: {
-        type: "node";
-        id: number;
-        lat: number;
-        lon: number;
-        tags?: Record<string, string>;
-      }[];
-    }>(
-      "https://overpass-api.de/api/interpreter",
-      new URLSearchParams({ data: query }),
-      {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      },
-    );
-
-    return response.data;
-  }, []);
-
-  const onLoad = useCallback(
+  const onImport = useCallback(
     ({ region }: { region: string }) => {
-      setIsOsmLoading(true);
-      setOsmError(null);
-      setCvmAddress(null);
-      setCvmData(null);
+      setIsLoading(true);
+      setError(null);
 
-      fetchOsmAreaId(region)
-        .then((areaId) => fetchOsmData(areaId))
-        .then((data) => {
-          const cvms = data.elements.map((element) => ({
-            longitude: element.lon,
-            latitude: element.lat,
-          }));
-
-          return cvms;
+      api
+        .post("/kmc/cvms/import/osm", {
+          region,
         })
-        .then((cvms) => setCvmData(cvms))
-        .catch(() => {
-          setOsmError("The specified region was not found!");
-        })
-        .finally(() => {
-          setIsOsmLoading(false);
-        });
+        .then(close)
+        .catch(() => setError("An unexpected error occurred, please retry!"))
+        .finally(() => setIsLoading(false));
     },
-    [fetchOsmAreaId, fetchOsmData],
+    [api, close],
   );
-
-  const onImport = useCallback(() => {
-    setIsLoading(true);
-    setError(null);
-
-    api
-      .post("/kmc/cvms/import/manual", {
-        cvms: cvmData,
-      })
-      .then(close)
-      .catch(() => setError("An unexpected error occurred, please retry!"))
-      .finally(() => setIsLoading(false));
-  }, [api, close, cvmData]);
 
   return (
     <div className="flex flex-col gap-4">
       <Formik<{ region: string }>
         initialValues={{ region: "" }}
         validationSchema={schema}
-        onSubmit={(values) => onLoad(values)}
+        onSubmit={(values) => onImport(values)}
       >
         {(props) => (
           <Form onSubmit={props.handleSubmit} validationBehavior="aria">
-            {osmError && <p className="text-center text-red-500">{osmError}</p>}
+            {error && <p className="text-center text-red-500">{error}</p>}
             <div className="flex items-end gap-4">
               <TextField
                 label="Region"
@@ -460,51 +339,28 @@ function CvmImportOsm(props: CvmImportOsmProps) {
                 className="grow"
                 value={props.values.region}
                 onBlur={props.handleBlur}
-                isDisabled={isOsmLoading}
+                isDisabled={isLoading}
                 onChange={(value) => props.setFieldValue("region", value)}
                 isInvalid={!!props.touched.region && !!props.errors.region}
                 errorMessage={props.errors.region}
               />
-              <Button
-                type="submit"
-                className="flex justify-center"
-                isDisabled={!(props.isValid && props.dirty) || isOsmLoading}
-              >
-                {!isOsmLoading && <span>Load</span>}
-                {isOsmLoading && <Spinner />}
-              </Button>
+              <div className="flex justify-start gap-4">
+                <Button variant="secondary" onPress={close} className="w-full">
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  className="flex w-full justify-center"
+                  isDisabled={isLoading}
+                >
+                  {!isLoading && <span>Import</span>}
+                  {isLoading && <Spinner />}
+                </Button>
+              </div>
             </div>
           </Form>
         )}
       </Formik>
-      <div className="flex flex-col gap-4">
-        {error && <p className="text-center text-red-500">{error}</p>}
-        {cvmData && (
-          <div className="text-sm">
-            <div className="flex gap-1">
-              <span className="font-semibold">Region:</span>
-              <span>{cvmAddress}</span>
-            </div>
-            <div className="flex gap-1">
-              <span className="font-semibold">Amount:</span>
-              <span>{cvmData.length}</span>
-            </div>
-          </div>
-        )}
-      </div>
-      <div className="flex justify-start gap-4">
-        <Button variant="secondary" onPress={close} className="w-full">
-          Cancel
-        </Button>
-        <Button
-          className="flex w-full justify-center"
-          isDisabled={isLoading || isOsmLoading || !cvmData}
-          onClick={onImport}
-        >
-          {!isLoading && <span>Import</span>}
-          {isLoading && <Spinner />}
-        </Button>
-      </div>
     </div>
   );
 }

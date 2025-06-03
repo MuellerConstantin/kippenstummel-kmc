@@ -177,7 +177,7 @@ export function JobsTable(props: JobsTableProps) {
       ) : data && data.content.length > 0 ? (
         <div className="flex flex-col gap-4">
           <Table
-            selectionMode="multiple"
+            selectionMode="single"
             selectedKeys={selected}
             onSelectionChange={(keys) => handleSelect(keys)}
           >
