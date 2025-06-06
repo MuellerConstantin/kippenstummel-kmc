@@ -133,7 +133,18 @@ function CvmImportForm(props: CvmImportFormProps) {
               isInvalid={!!props.touched.longitude && !!props.errors.longitude}
               errorMessage={props.errors.longitude}
             />
-            <NumberField label="Score" step={0.1} minValue={-5} maxValue={5} />
+            <NumberField
+              label="Score"
+              step={0.1}
+              minValue={-5}
+              maxValue={5}
+              name="score"
+              value={props.values.score}
+              onBlur={props.handleBlur}
+              onChange={(value) => props.setFieldValue("score", value)}
+              isInvalid={!!props.touched.score && !!props.errors.score}
+              errorMessage={props.errors.score}
+            />
             <div className="flex justify-start gap-4">
               <Button variant="secondary" onPress={close} className="w-full">
                 Cancel

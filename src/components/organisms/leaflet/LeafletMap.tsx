@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import Leaflet from "leaflet";
 import { TileLayer, useMapEvents } from "react-leaflet";
@@ -54,6 +54,8 @@ export interface LeafletMapProps {
 }
 
 export function LeafletMap(props: LeafletMapProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
   const [map, setMap] = useState<Leaflet.Map | null>(null);
 
   const {
@@ -73,8 +75,23 @@ export function LeafletMap(props: LeafletMapProps) {
     }
   }, [map, onReady]);
 
+  useEffect(() => {
+    if (!map || !containerRef.current) return;
+
+    const observer = new ResizeObserver(() => {
+      map.invalidateSize();
+    });
+
+    observer.observe(containerRef.current);
+
+    return () => observer.disconnect();
+  }, [map]);
+
   return (
-    <div className={`relative flex h-full w-full ${className}`}>
+    <div
+      ref={containerRef}
+      className={`relative flex h-full w-full ${className}`}
+    >
       <LeafletMapContainer
         ref={setMap}
         center={center}

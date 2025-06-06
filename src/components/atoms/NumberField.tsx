@@ -17,10 +17,11 @@ import {
 } from "./Field";
 import { composeTailwindRenderProps } from "@/components/utils";
 
-export interface NumberFieldProps extends AriaNumberFieldProps {
+export interface NumberFieldProps extends Omit<AriaNumberFieldProps, "value"> {
   label?: string;
   description?: string;
   errorMessage?: string | ((validation: ValidationResult) => string);
+  value?: number | null;
 }
 
 export function NumberField({
@@ -32,6 +33,7 @@ export function NumberField({
   return (
     <AriaNumberField
       {...props}
+      value={props.value as number}
       className={composeTailwindRenderProps(
         props.className,
         "group flex flex-col gap-1",
