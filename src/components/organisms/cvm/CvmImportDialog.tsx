@@ -1,6 +1,7 @@
 import { useMemo, useState, useCallback } from "react";
 import { DialogProps, Heading } from "react-aria-components";
 import { Formik, FormikHelpers } from "formik";
+import axios from "axios";
 import * as yup from "yup";
 import { Form } from "@/components/atoms/Form";
 import { Dialog } from "@/components/atoms/Dialog";
@@ -12,6 +13,8 @@ import { NumberField } from "@/components/atoms/NumberField";
 import useApi from "@/hooks/useApi";
 import { constraintMessages } from "@/api";
 import { Spinner } from "@/components/atoms/Spinner";
+import { SearchableSelect } from "@/components/atoms/SearchableSelect";
+import useSWR from "swr";
 
 interface CvmImportFormProps {
   close: () => void;
@@ -311,19 +314,26 @@ function CvmImportOsm(props: CvmImportOsmProps) {
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [osmSearchTerm, setOsmSearchTerm] = useState<string | null>(null);
 
   const schema = yup.object().shape({
-    region: yup.string().required("Is required"),
+    region: yup
+      .object()
+      .shape({
+        id: yup.number().required("Is required"),
+        name: yup.string().required("Is required"),
+      })
+      .required("Is required"),
   });
 
   const onImport = useCallback(
-    ({ region }: { region: string }) => {
+    ({ region }: { region: { id: number; name: string } | null }) => {
       setIsLoading(true);
       setError(null);
 
       api
         .post("/kmc/cvms/import/osm", {
-          region,
+          region: region!.name,
         })
         .then(close)
         .catch(() => setError("An unexpected error occurred, please retry!"))
@@ -332,42 +342,138 @@ function CvmImportOsm(props: CvmImportOsmProps) {
     [api, close],
   );
 
+  const defaultOsmSuggestions = useMemo<
+    {
+      place_id: number;
+      licence: string;
+      osm_id: number;
+      osm_type: string;
+      lat: string;
+      lon: string;
+      class: string;
+      type: string;
+      place_rank: number;
+      importance: number;
+      addresstype: string;
+      name: string;
+      display_name: string;
+      boundingbox: string[];
+    }[]
+  >(
+    () => [
+      {
+        place_id: 113453178,
+        licence:
+          "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        osm_type: "relation",
+        osm_id: 62518,
+        lat: "49.0068705",
+        lon: "8.4034195",
+        class: "boundary",
+        type: "administrative",
+        place_rank: 12,
+        importance: 0.6803002897297156,
+        addresstype: "city",
+        name: "Karlsruhe",
+        display_name: "Karlsruhe, Baden-Württemberg, Deutschland",
+        boundingbox: ["48.9404699", "49.0912838", "8.2773142", "8.5417299"],
+      },
+    ],
+    [],
+  );
+
+  const fetchOsmSuggestions = useCallback(async (region: string) => {
+    const url = "https://nominatim.openstreetmap.org/search";
+
+    return await axios.get(url, {
+      params: {
+        q: region,
+        format: "json",
+        limit: 10,
+      },
+      headers: {
+        Accept: "application/json",
+      },
+    });
+  }, []);
+
+  const { data: osmSuggestions } = useSWR<
+    {
+      place_id: number;
+      licence: string;
+      osm_id: number;
+      osm_type: string;
+      lat: string;
+      lon: string;
+      class: string;
+      type: string;
+      place_rank: number;
+      importance: number;
+      addresstype: string;
+      name: string;
+      display_name: string;
+      boundingbox: string[];
+    }[],
+    unknown,
+    string | null
+  >(osmSearchTerm, (key) => fetchOsmSuggestions(key).then((res) => res.data));
+
   return (
     <div className="flex flex-col gap-4">
-      <Formik<{ region: string }>
-        initialValues={{ region: "" }}
+      <Formik<{ region: { id: number; name: string } | null }>
+        initialValues={{ region: null }}
         validationSchema={schema}
         onSubmit={(values) => onImport(values)}
       >
         {(props) => (
           <Form onSubmit={props.handleSubmit} validationBehavior="aria">
             {error && <p className="text-center text-red-500">{error}</p>}
-            <div className="flex items-end gap-4">
-              <TextField
-                label="Region"
-                name="region"
-                type="text"
-                className="grow"
-                value={props.values.region}
-                onBlur={props.handleBlur}
-                isDisabled={isLoading}
-                onChange={(value) => props.setFieldValue("region", value)}
-                isInvalid={!!props.touched.region && !!props.errors.region}
-                errorMessage={props.errors.region}
-              />
-              <div className="flex justify-start gap-4">
-                <Button variant="secondary" onPress={close} className="w-full">
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  className="flex w-full justify-center"
-                  isDisabled={isLoading}
+            <SearchableSelect
+              label="Region"
+              items={osmSuggestions || defaultOsmSuggestions}
+              onSearch={(searchTerm) => setOsmSearchTerm(searchTerm)}
+              selectedKey={
+                props.values.region
+                  ? `osm-select-${props.values.region.id}`
+                  : null
+              }
+              onSelectionChange={(key) => {
+                const found = (osmSuggestions || defaultOsmSuggestions)?.find(
+                  (suggestion) => `osm-select-${suggestion.osm_id}` === key,
+                );
+                props.setFieldValue("region", {
+                  id: found!.osm_id,
+                  name: found!.display_name,
+                });
+              }}
+              errorMessage={props.errors.region}
+              isInvalid={!!props.touched.region && !!props.errors.region}
+              onBlur={props.handleBlur}
+              isDisabled={isLoading}
+              name="region"
+            >
+              {(osmSuggestions || defaultOsmSuggestions).map((option) => (
+                <SelectItem
+                  id={`osm-select-${option.osm_id}`}
+                  key={option.osm_id}
+                  textValue={option.display_name}
                 >
-                  {!isLoading && <span>Import</span>}
-                  {isLoading && <Spinner />}
-                </Button>
-              </div>
+                  {option.display_name}
+                </SelectItem>
+              ))}
+            </SearchableSelect>
+            <div className="flex justify-start gap-4">
+              <Button variant="secondary" onPress={close} className="w-full">
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                className="flex w-full justify-center"
+                isDisabled={!(props.isValid && props.dirty) || isLoading}
+              >
+                {!isLoading && <span>Import</span>}
+                {isLoading && <Spinner />}
+              </Button>
             </div>
           </Form>
         )}
