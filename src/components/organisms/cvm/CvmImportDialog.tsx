@@ -1,5 +1,11 @@
 import { useMemo, useState, useCallback } from "react";
-import { DialogProps, Heading } from "react-aria-components";
+import {
+  DialogProps,
+  DropZone,
+  FileTrigger,
+  Heading,
+  Text,
+} from "react-aria-components";
 import { Formik, FormikHelpers } from "formik";
 import axios from "axios";
 import * as yup from "yup";
@@ -303,6 +309,107 @@ function CvmImportJson(props: CvmImportJsonProps) {
   );
 }
 
+interface CvmImportFileUploadProps {
+  close: () => void;
+}
+
+function CvmImportFileUpload(props: CvmImportFileUploadProps) {
+  const { close } = props;
+
+  const api = useApi();
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File>();
+
+  const onImport = useCallback(() => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const data = new FormData();
+      data.append("file", selectedFile!);
+
+      api
+        .post("/kmc/cvms/import/file", data, {
+          headers: { "Content-Type": "multipart/form-data" },
+        })
+        .then(close);
+    } catch {
+      setError("An unexpected error occurred, please retry!");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [selectedFile, api, close]);
+
+  return (
+    <div className="flex flex-col gap-4">
+      {error && <p className="text-center text-red-500">{error}</p>}
+      {selectedFile && (
+        <TextField
+          isReadOnly
+          label="Selected file"
+          value={selectedFile?.name}
+        />
+      )}
+      {!selectedFile && (
+        <div className="flex flex-col gap-4">
+          <FileTrigger
+            acceptedFileTypes={["application/json"]}
+            onSelect={(files) => {
+              if (files) {
+                const file = files.item(0);
+
+                if (file) {
+                  setSelectedFile(file);
+                }
+              }
+            }}
+          >
+            <Button variant="secondary">Select a file</Button>
+          </FileTrigger>
+          <div className="flex items-center justify-center gap-4">
+            <div className="w-16 flex-1 border-t border-slate-600"></div>
+            <span className="text-sm text-gray-600 uppercase">or</span>
+            <div className="w-16 flex-1 border-t border-gray-600"></div>
+          </div>
+          <DropZone
+            className="flex cursor-pointer flex-col items-center gap-4 rounded-md border border-slate-200 bg-slate-100 p-4 hover:border-slate-300 hover:bg-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700"
+            onDrop={async (event) => {
+              if (event.items) {
+                const item = event.items[0];
+
+                if (item.kind === "file") {
+                  const file = await item.getFile();
+
+                  if (file) {
+                    setSelectedFile(file);
+                  }
+                }
+              }
+            }}
+          >
+            <Text slot="label">Drop file here</Text>
+          </DropZone>
+        </div>
+      )}
+      <div className="flex justify-start gap-4">
+        <Button variant="secondary" onPress={close} className="w-full">
+          Cancel
+        </Button>
+        <Button
+          onPress={onImport}
+          className="flex w-full justify-center"
+          isDisabled={isLoading || !selectedFile}
+        >
+          {!isLoading && <span>Import</span>}
+          {isLoading && <Spinner />}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 interface CvmImportOsmProps {
   close: () => void;
 }
@@ -491,9 +598,10 @@ export function CvmImportDialog(props: CvmImportDialogProps) {
 
   const importOptions = useMemo(
     () => [
-      { label: "Form (Manually)", value: "form" },
-      { label: "JSON (Manually)", value: "json" },
-      { label: "OSM (Automatically)", value: "osm" },
+      { label: "Form", value: "form" },
+      { label: "JSON", value: "json" },
+      { label: "File Upload", value: "file" },
+      { label: "OpenStreetMap", value: "osm" },
     ],
     [],
   );
@@ -537,6 +645,9 @@ export function CvmImportDialog(props: CvmImportDialogProps) {
             )}
             {selectedOption === "import-select-json" && (
               <CvmImportJson close={close} />
+            )}
+            {selectedOption === "import-select-file" && (
+              <CvmImportFileUpload close={close} />
             )}
             {selectedOption === "import-select-osm" && (
               <CvmImportOsm close={close} />
