@@ -1,23 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { signIn, useSession } from "next-auth/react";
+import { signIn } from "next-auth/react";
 import { Button } from "@/components/atoms/Button";
-import { useCallback, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useCallback } from "react";
 
 export default function SignIn() {
-  const router = useRouter();
-  const { data: session, status } = useSession();
-
-  useEffect(() => {
-    if (status === "authenticated") {
-      router.push("/");
-    }
-  }, [session, router, status]);
-
   const onSignIn = useCallback(async () => {
-    await signIn("keycloak");
+    await signIn("keycloak", { callbackUrl: "/" });
   }, []);
 
   return (
