@@ -53,6 +53,7 @@ export function SearchBar(props: SearchBarProps) {
         ))}
       </Select>
       <SearchField
+        className="grow"
         isDisabled={props.isDisabled}
         isReadOnly={props.isReadOnly}
         value={searchTerm}

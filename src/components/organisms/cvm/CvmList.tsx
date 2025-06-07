@@ -147,11 +147,20 @@ export function CvmList(props: CvmListProps) {
                 </ListBoxItem>
               ))}
             </ListBox>
-            <Pagination
-              totalPages={data!.info.totalPages}
-              currentPage={page}
-              onPageChange={setPage}
-            />
+            <div className="flex flex-col gap-2">
+              <Pagination
+                totalPages={data!.info.totalPages}
+                currentPage={page}
+                onPageChange={setPage}
+              />
+              <div>
+                <div className="text-xs">
+                  Page {page} of {data!.info.totalPages} - Showing{" "}
+                  {data!.info.perPage * (page - 1) + 1} to{" "}
+                  {data!.info.perPage * page} of {data!.info.totalElements} CVMs
+                </div>
+              </div>
+            </div>
           </div>
         ) : (
           <div className="max-h-[40rem] min-h-[20rem] w-full max-w-full">

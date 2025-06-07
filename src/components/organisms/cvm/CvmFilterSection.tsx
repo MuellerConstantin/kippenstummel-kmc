@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { SearchBar } from "../../molecules/SearchBar";
+import { SearchBar } from "@/components/molecules/SearchBar";
 import { Formik } from "formik";
 import { Form } from "@/components/atoms/Form";
 import { NumberField } from "@/components/atoms/NumberField";
 import { Button } from "@/components/atoms/Button";
+import { DatePicker } from "@/components/atoms/DatePicker";
+import { DateValue } from "react-aria-components";
 
 interface CvmFilterSectionProps {
   isDisabled?: boolean;
@@ -21,6 +23,11 @@ export function CvmFilterSection(props: CvmFilterSectionProps) {
   const [numberOfFilters, setNumberOfFilters] = useState(0);
   const [filteredMinScore, setFilteredMinScore] = useState<number | null>(null);
   const [filteredMaxScore, setFilteredMaxScore] = useState<number | null>(null);
+  const [filteredCreatedBefore, setFilteredCreatedBefore] =
+    useState<Date | null>(null);
+  const [filteredCreatedAfter, setFilteredCreatedAfter] = useState<Date | null>(
+    null,
+  );
 
   const searchQuery = useMemo(() => {
     if (searchProperty && searchTerm && searchTerm.length > 0) {
@@ -34,19 +41,34 @@ export function CvmFilterSection(props: CvmFilterSectionProps) {
     ({
       minScore,
       maxScore,
+      createdBefore,
+      createdAfter,
     }: {
       minScore: number | null;
       maxScore: number | null;
+      createdBefore: DateValue | null;
+      createdAfter: DateValue | null;
     }) => {
       setFilteredMinScore(minScore);
       setFilteredMaxScore(maxScore);
+      setFilteredCreatedBefore(
+        createdBefore ? createdBefore.toDate("UTC") : null,
+      );
+      setFilteredCreatedAfter(createdAfter ? createdAfter.toDate("UTC") : null);
     },
-    [setFilteredMinScore, setFilteredMaxScore],
+    [
+      setFilteredMinScore,
+      setFilteredMaxScore,
+      setFilteredCreatedBefore,
+      setFilteredCreatedAfter,
+    ],
   );
 
   const onFilterReset = useCallback((resetForm: () => void) => {
     setFilteredMinScore(null);
     setFilteredMaxScore(null);
+    setFilteredCreatedBefore(null);
+    setFilteredCreatedAfter(null);
     resetForm();
   }, []);
 
@@ -62,7 +84,22 @@ export function CvmFilterSection(props: CvmFilterSectionProps) {
           ? `score<=${Math.round(filteredMaxScore * 100)}`
           : null;
 
-      const appliedFilters = [minScoreQuery, maxScoreQuery].filter(Boolean);
+      const createdBeforeQuery =
+        filteredCreatedBefore !== null
+          ? `createdAt<=${filteredCreatedBefore.toISOString()}`
+          : null;
+
+      const createdAfterQuery =
+        filteredCreatedAfter !== null
+          ? `createdAt>=${filteredCreatedAfter.toISOString()}`
+          : null;
+
+      const appliedFilters = [
+        minScoreQuery,
+        maxScoreQuery,
+        createdBeforeQuery,
+        createdAfterQuery,
+      ].filter(Boolean);
 
       setNumberOfFilters(appliedFilters.length);
 
@@ -72,10 +109,17 @@ export function CvmFilterSection(props: CvmFilterSectionProps) {
 
       onFilter(query ? encodeURIComponent(query) : null);
     }
-  }, [searchQuery, filteredMinScore, filteredMaxScore, onFilter]);
+  }, [
+    searchQuery,
+    filteredMinScore,
+    filteredMaxScore,
+    filteredCreatedBefore,
+    filteredCreatedAfter,
+    onFilter,
+  ]);
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex grow flex-col gap-2">
       <SearchBar
         isReadOnly={props.isDisabled}
         onSearch={(property, searchTerm) => {
@@ -107,17 +151,24 @@ export function CvmFilterSection(props: CvmFilterSectionProps) {
         )}
       </div>
       <div className={showMore ? "block" : "hidden"}>
-        <Formik<{ minScore: number | null; maxScore: number | null }>
+        <Formik<{
+          minScore: number | null;
+          maxScore: number | null;
+          createdBefore: DateValue | null;
+          createdAfter: DateValue | null;
+        }>
           initialValues={{
             minScore: null,
             maxScore: null,
+            createdBefore: null,
+            createdAfter: null,
           }}
           onSubmit={(values) => onFilterInternal(values)}
         >
           {(formikProps) => (
             <Form onSubmit={formikProps.handleSubmit} validationBehavior="aria">
-              <div className="flex flex-col gap-4">
-                <div className="flex flex-wrap gap-2">
+              <div className="flex flex-col gap-2">
+                <div className="flex flex-wrap gap-2 lg:flex-nowrap">
                   <NumberField
                     className="grow"
                     label="Minimum score"
@@ -157,26 +208,62 @@ export function CvmFilterSection(props: CvmFilterSectionProps) {
                     }
                   />
                 </div>
-                <div className="flex justify-start gap-4">
-                  <Button
-                    variant="secondary"
-                    onPress={() => onFilterReset(formikProps.resetForm)}
-                    className="w-full"
-                    isDisabled={!formikProps.dirty || props.isDisabled}
-                  >
-                    Reset
-                  </Button>
-                  <Button
-                    type="submit"
-                    className="flex w-full justify-center"
-                    isDisabled={
-                      !(formikProps.isValid && formikProps.dirty) ||
-                      props.isDisabled
+                <div className="flex flex-wrap gap-2 lg:flex-nowrap">
+                  <DatePicker
+                    className="grow"
+                    label="Created before"
+                    name="createdBefore"
+                    isDisabled={props.isDisabled}
+                    isRequired={false}
+                    value={formikProps.values.createdBefore}
+                    onChange={(value) =>
+                      formikProps.setFieldValue("createdBefore", value)
                     }
-                  >
-                    Apply
-                  </Button>
+                    errorMessage={formikProps.errors.createdBefore}
+                    isInvalid={
+                      !!formikProps.touched.createdBefore &&
+                      !!formikProps.errors.createdBefore
+                    }
+                    onBlur={formikProps.handleBlur}
+                  />
+                  <DatePicker
+                    className="grow"
+                    label="Created after"
+                    name="createdAfter"
+                    isDisabled={props.isDisabled}
+                    isRequired={false}
+                    value={formikProps.values.createdAfter}
+                    onChange={(value) =>
+                      formikProps.setFieldValue("createdAfter", value)
+                    }
+                    errorMessage={formikProps.errors.createdAfter}
+                    isInvalid={
+                      !!formikProps.touched.createdAfter &&
+                      !!formikProps.errors.createdAfter
+                    }
+                    onBlur={formikProps.handleBlur}
+                  />
                 </div>
+              </div>
+              <div className="flex justify-start gap-4">
+                <Button
+                  variant="secondary"
+                  onPress={() => onFilterReset(formikProps.resetForm)}
+                  className="w-full"
+                  isDisabled={!formikProps.dirty || props.isDisabled}
+                >
+                  Reset
+                </Button>
+                <Button
+                  type="submit"
+                  className="flex w-full justify-center"
+                  isDisabled={
+                    !(formikProps.isValid && formikProps.dirty) ||
+                    props.isDisabled
+                  }
+                >
+                  Apply
+                </Button>
               </div>
             </Form>
           )}
