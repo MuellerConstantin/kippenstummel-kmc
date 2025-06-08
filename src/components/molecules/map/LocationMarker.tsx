@@ -52,7 +52,12 @@ interface LocationMarkerPopupProps {
 
 function LocationMarkerPopup(props: LocationMarkerPopupProps) {
   return (
-    <Popup autoClose={true} closeOnClick={false} className="relative">
+    <Popup
+      autoClose={true}
+      closeOnClick={false}
+      className="relative"
+      offset={Leaflet.point(0, -15)}
+    >
       {props.score < -99 ? (
         <div className="absolute -top-2 -left-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500">
           <ChevronDown className="h-4 w-4 text-white" />
@@ -127,10 +132,11 @@ export function LocationMarker(props: LocationMarkerProps) {
                   <Equal className="h-2.5 w-2.5 text-white" />
                 </div>
               )}
-              <MapPin className="h-8 w-8 fill-green-600 text-white" />
+              <MapPin className="h-[32px] w-[32px] fill-green-600 text-white" />
             </div>
           ),
-          anchor: Leaflet.point(20, 20),
+          size: Leaflet.point(32, 32),
+          anchor: Leaflet.point(16, 32),
         })}
       >
         <LocationMarkerPopup {...props} onDetails={() => setShowDialog(true)} />
