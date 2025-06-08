@@ -84,13 +84,6 @@ function LocationMarkerPopup(props: LocationMarkerPopupProps) {
             </div>
             <CopyButton text={`${props.position[0]},${props.position[1]}`} />
           </div>
-          <Link
-            className="block"
-            href={`https://www.google.com.sa/maps/search/${props.position[0]},${props.position[1]}`}
-            target="_blank"
-          >
-            Open in Google Maps
-          </Link>
           <Link className="block cursor-pointer" onPress={props.onDetails}>
             Show details
           </Link>
