@@ -11,6 +11,8 @@ import {
   Check,
 } from "lucide-react";
 import { Link } from "@/components/atoms/Link";
+import { Modal } from "@/components/atoms/Modal";
+import { CvmDetailsDialog } from "@/components/organisms/cvm/CvmDetailsDialog";
 
 interface CopyButtonProps {
   text: string;
@@ -45,14 +47,12 @@ function CopyButton(props: CopyButtonProps) {
 interface LocationMarkerPopupProps {
   position: [number, number];
   score: number;
-  imported: boolean;
-  createdAt: string;
-  updatedAt: string;
+  onDetails?: () => void;
 }
 
 function LocationMarkerPopup(props: LocationMarkerPopupProps) {
   return (
-    <Popup autoClose={false} className="relative">
+    <Popup autoClose={true} closeOnClick={false} className="relative">
       {props.score < -99 ? (
         <div className="absolute -top-2 -left-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500">
           <ChevronDown className="h-4 w-4 text-white" />
@@ -84,17 +84,15 @@ function LocationMarkerPopup(props: LocationMarkerPopupProps) {
             </div>
             <CopyButton text={`${props.position[0]},${props.position[1]}`} />
           </div>
-          <div className="text-sm font-semibold">Details</div>
-          <div className="text-xs">
-            <div>Imported: {props.imported ? "Yes" : "No"}</div>
-            <div>Created At: {new Date(props.createdAt).toLocaleString()}</div>
-            <div>Updated At: {new Date(props.updatedAt).toLocaleString()}</div>
-          </div>
           <Link
+            className="block"
             href={`https://www.google.com.sa/maps/search/${props.position[0]},${props.position[1]}`}
             target="_blank"
           >
             Open in Google Maps
+          </Link>
+          <Link className="block cursor-pointer" onPress={props.onDetails}>
+            Show details
           </Link>
         </div>
       </div>
@@ -112,34 +110,41 @@ interface LocationMarkerProps {
 }
 
 export function LocationMarker(props: LocationMarkerProps) {
+  const [showDialog, setShowDialog] = useState(false);
+
   return (
-    <Marker
-      position={Leaflet.latLng(props.position[0], props.position[1])}
-      icon={LeafletDivIcon({
-        source: (
-          <div
-            className={`relative z-[50] h-fit w-fit ${props.selected ? "animate-bounce" : ""}`}
-          >
-            {props.score < -99 ? (
-              <div className="absolute top-1 right-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-red-500">
-                <ChevronDown className="h-2.5 w-2.5 text-white" />
-              </div>
-            ) : props.score > 99 ? (
-              <div className="absolute top-1 right-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-green-600">
-                <ChevronUp className="h-2.5 w-2.5 text-white" />
-              </div>
-            ) : (
-              <div className="absolute top-1 right-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-slate-500">
-                <Equal className="h-2.5 w-2.5 text-white" />
-              </div>
-            )}
-            <MapPin className="h-8 w-8 fill-green-600 text-white" />
-          </div>
-        ),
-        anchor: Leaflet.point(20, 20),
-      })}
-    >
-      <LocationMarkerPopup {...props} />
-    </Marker>
+    <>
+      <Marker
+        position={Leaflet.latLng(props.position[0], props.position[1])}
+        icon={LeafletDivIcon({
+          source: (
+            <div
+              className={`relative z-[50] h-fit w-fit ${props.selected ? "animate-bounce" : ""}`}
+            >
+              {props.score < -99 ? (
+                <div className="absolute top-1 right-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-red-500">
+                  <ChevronDown className="h-2.5 w-2.5 text-white" />
+                </div>
+              ) : props.score > 99 ? (
+                <div className="absolute top-1 right-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-green-600">
+                  <ChevronUp className="h-2.5 w-2.5 text-white" />
+                </div>
+              ) : (
+                <div className="absolute top-1 right-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-slate-500">
+                  <Equal className="h-2.5 w-2.5 text-white" />
+                </div>
+              )}
+              <MapPin className="h-8 w-8 fill-green-600 text-white" />
+            </div>
+          ),
+          anchor: Leaflet.point(20, 20),
+        })}
+      >
+        <LocationMarkerPopup {...props} onDetails={() => setShowDialog(true)} />
+      </Marker>
+      <Modal isOpen={showDialog} onOpenChange={setShowDialog}>
+        <CvmDetailsDialog cvm={props} />
+      </Modal>
+    </>
   );
 }
