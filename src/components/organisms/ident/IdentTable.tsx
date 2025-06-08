@@ -12,6 +12,7 @@ import {
 } from "@/components/atoms/Table";
 import { Pagination } from "@/components/molecules/Pagination";
 import { Key, Selection, TableBody } from "react-aria-components";
+import { IdentFilterSection } from "./IdentFilterSection";
 
 export interface IdentTableProps {
   onSelect?: (
@@ -43,6 +44,7 @@ export function IdentTable(props: IdentTableProps) {
   const [selected, setSelected] = useState<"all" | Iterable<Key> | undefined>();
   const [page, setPage] = useState(1);
   const [perPage] = useState(25);
+  const [filter, setFilter] = useState<string | null>(null);
 
   const { data, isLoading, error } = useSWR<
     {
@@ -72,8 +74,9 @@ export function IdentTable(props: IdentTableProps) {
     },
     unknown,
     string | null
-  >(`/kmc/ident?page=${page - 1}&perPage=${perPage}`, (url) =>
-    api.get(url).then((res) => res.data),
+  >(
+    `/kmc/ident?page=${page - 1}&perPage=${perPage}${filter ? `&filter=${filter}` : ""}`,
+    (url) => api.get(url).then((res) => res.data),
   );
 
   const handleSelect = useCallback(
@@ -107,7 +110,13 @@ export function IdentTable(props: IdentTableProps) {
   );
 
   return (
-    <div>
+    <div className="flex flex-col gap-4">
+      <div className="max-w-screen-sm">
+        <IdentFilterSection
+          isDisabled={isLoading}
+          onFilter={(query) => setFilter(query)}
+        />
+      </div>
       {isLoading ? (
         <div className="flex w-fit flex-col gap-4">
           <Table>
