@@ -11,17 +11,19 @@ interface DeleteIdentDialogProps extends Omit<DialogProps, "children"> {
     identity: string;
     credibility: number;
     issuedAt: string;
-    lastInteractionAt?: string;
-    averageInteractionInterval: number;
-    lastInteractionPosition?: { longitude: number; latitude: number };
-    unrealisticMovementCount: number;
-    voting: {
-      totalCount: number;
-      upvoteCount: number;
-      downvoteCount: number;
-    };
-    registrations: {
-      totalCount: number;
+    behaviour: {
+      lastInteractionAt?: string;
+      averageInteractionInterval: number;
+      lastInteractionPosition?: { longitude: number; latitude: number };
+      unrealisticMovementCount: number;
+      voting: {
+        totalCount: number;
+        upvoteCount: number;
+        downvoteCount: number;
+      };
+      registrations: {
+        totalCount: number;
+      };
     };
   }[];
 }
