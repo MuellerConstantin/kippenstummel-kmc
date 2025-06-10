@@ -15,7 +15,7 @@ export default function Ident() {
         identity: string;
         credibility: number;
         issuedAt: string;
-        behaviour: {
+        behaviour?: {
           lastInteractionAt?: string;
           averageInteractionInterval: number;
           lastInteractionPosition?: { longitude: number; latitude: number };
@@ -25,7 +25,7 @@ export default function Ident() {
             upvoteCount: number;
             downvoteCount: number;
           };
-          registrations: {
+          registration: {
             totalCount: number;
           };
         };

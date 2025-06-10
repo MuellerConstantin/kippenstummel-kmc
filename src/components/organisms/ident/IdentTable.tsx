@@ -20,7 +20,7 @@ export interface IdentTableProps {
       identity: string;
       credibility: number;
       issuedAt: string;
-      behaviour: {
+      behaviour?: {
         lastInteractionAt?: string;
         averageInteractionInterval: number;
         lastInteractionPosition?: { longitude: number; latitude: number };
@@ -30,7 +30,7 @@ export interface IdentTableProps {
           upvoteCount: number;
           downvoteCount: number;
         };
-        registrations: {
+        registration: {
           totalCount: number;
         };
       };
@@ -54,7 +54,7 @@ export function IdentTable(props: IdentTableProps) {
         identity: string;
         credibility: number;
         issuedAt: string;
-        behaviour: {
+        behaviour?: {
           lastInteractionAt?: string;
           averageInteractionInterval: number;
           lastInteractionPosition?: { longitude: number; latitude: number };
@@ -64,7 +64,7 @@ export function IdentTable(props: IdentTableProps) {
             upvoteCount: number;
             downvoteCount: number;
           };
-          registrations: {
+          registration: {
             totalCount: number;
           };
         };
