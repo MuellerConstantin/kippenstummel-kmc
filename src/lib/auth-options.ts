@@ -84,5 +84,9 @@ export const authOptions: AuthOptions = {
   },
   pages: {
     signIn: "/signin",
+    error: "/not-found",
+    signOut: "/not-found",
+    verifyRequest: "/not-found",
+    newUser: "/not-found",
   },
 };
