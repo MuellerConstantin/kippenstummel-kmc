@@ -75,11 +75,11 @@ export function CvmDetailsDialog(props: CvmDetailsDialogProps) {
                   <div className="font-semibold">Score:</div>
                   <div className="flex items-center gap-1">
                     {(props.cvm.score / 100).toFixed(1)}
-                    {props.cvm.score < -99 ? (
+                    {props.cvm.score < -100 ? (
                       <div className="flex h-3 w-3 items-center justify-center rounded-full bg-red-500">
                         <ChevronDown className="text-white" />
                       </div>
-                    ) : props.cvm.score > 99 ? (
+                    ) : props.cvm.score > 100 ? (
                       <div className="flex h-3 w-3 items-center justify-center rounded-full bg-green-600">
                         <ChevronUp className="text-white" />
                       </div>
