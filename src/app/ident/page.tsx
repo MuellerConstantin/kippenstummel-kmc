@@ -13,20 +13,23 @@ export default function Ident() {
   const [selected, setSelected] = useState<
     | {
         identity: string;
-        credibility: number;
-        issuedAt: string;
-        behaviour?: {
-          lastInteractionAt?: string;
-          averageInteractionInterval: number;
-          lastInteractionPosition?: { longitude: number; latitude: number };
-          unrealisticMovementCount: number;
-          voting: {
-            totalCount: number;
-            upvoteCount: number;
-            downvoteCount: number;
-          };
-          registration: {
-            totalCount: number;
+        createdAt?: string;
+        updatedAt?: string;
+        credibility: {
+          rating: number;
+          behaviour?: {
+            lastInteractionAt?: string;
+            averageInteractionInterval: number;
+            lastInteractionPosition?: { longitude: number; latitude: number };
+            unrealisticMovementCount: number;
+            voting: {
+              totalCount: number;
+              upvoteCount: number;
+              downvoteCount: number;
+            };
+            registration: {
+              totalCount: number;
+            };
           };
         };
       }[]

@@ -18,20 +18,23 @@ export interface IdentTableProps {
   onSelect?: (
     ident: {
       identity: string;
-      credibility: number;
-      issuedAt: string;
-      behaviour?: {
-        lastInteractionAt?: string;
-        averageInteractionInterval: number;
-        lastInteractionPosition?: { longitude: number; latitude: number };
-        unrealisticMovementCount: number;
-        voting: {
-          totalCount: number;
-          upvoteCount: number;
-          downvoteCount: number;
-        };
-        registration: {
-          totalCount: number;
+      createdAt?: string;
+      updatedAt?: string;
+      credibility: {
+        rating: number;
+        behaviour?: {
+          lastInteractionAt?: string;
+          averageInteractionInterval: number;
+          lastInteractionPosition?: { longitude: number; latitude: number };
+          unrealisticMovementCount: number;
+          voting: {
+            totalCount: number;
+            upvoteCount: number;
+            downvoteCount: number;
+          };
+          registration: {
+            totalCount: number;
+          };
         };
       };
     }[],
@@ -52,20 +55,23 @@ export function IdentTable(props: IdentTableProps) {
     {
       content: {
         identity: string;
-        credibility: number;
-        issuedAt: string;
-        behaviour?: {
-          lastInteractionAt?: string;
-          averageInteractionInterval: number;
-          lastInteractionPosition?: { longitude: number; latitude: number };
-          unrealisticMovementCount: number;
-          voting: {
-            totalCount: number;
-            upvoteCount: number;
-            downvoteCount: number;
-          };
-          registration: {
-            totalCount: number;
+        createdAt?: string;
+        updatedAt?: string;
+        credibility: {
+          rating: number;
+          behaviour?: {
+            lastInteractionAt?: string;
+            averageInteractionInterval: number;
+            lastInteractionPosition?: { longitude: number; latitude: number };
+            unrealisticMovementCount: number;
+            voting: {
+              totalCount: number;
+              upvoteCount: number;
+              downvoteCount: number;
+            };
+            registration: {
+              totalCount: number;
+            };
           };
         };
       }[];
@@ -197,8 +203,8 @@ export function IdentTable(props: IdentTableProps) {
               {(row) => (
                 <Row key={row.identity} id={`ident-table-${row.identity}`}>
                   <Cell>{row.identity}</Cell>
-                  <Cell>{new Date(row.issuedAt).toLocaleDateString()}</Cell>
-                  <Cell>{row.credibility}</Cell>
+                  <Cell>{new Date(row.createdAt!).toLocaleDateString()}</Cell>
+                  <Cell>{row.credibility.rating}</Cell>
                 </Row>
               )}
             </TableBody>
