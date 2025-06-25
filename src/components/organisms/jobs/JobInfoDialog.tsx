@@ -19,6 +19,7 @@ interface JobInfoDialogProps extends Omit<DialogProps, "children"> {
     attemptsMade: number;
     timestamp: string;
     finishedOn?: string;
+    logs?: string[];
     createdAt: string;
     updatedAt: string;
   };
@@ -103,6 +104,14 @@ export function JobInfoDialog(props: JobInfoDialogProps) {
                   />
                 </div>
               )}
+              <div className="space-y-2 text-sm">
+                <div className="font-semibold">Logs:</div>
+                <TextArea
+                  rows={5}
+                  isReadOnly
+                  value={props.job.logs?.join("\n") || "-"}
+                />
+              </div>
             </div>
             <div className="flex justify-start gap-4">
               <Button onPress={close} className="w-full">

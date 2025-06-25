@@ -51,6 +51,7 @@ export function TextArea({
         maxLength={props.maxLength}
         minLength={props.minLength}
         rows={props.rows}
+        wrap="off"
       />
       {description && <Description>{description}</Description>}
       <FieldError>{errorMessage}</FieldError>

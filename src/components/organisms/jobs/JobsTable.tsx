@@ -59,6 +59,7 @@ export function JobsTable(props: JobsTableProps) {
         attemptsMade: number;
         timestamp: string;
         finishedOn?: string;
+        logs?: string[];
         createdAt: string;
         updatedAt: string;
       }[];
