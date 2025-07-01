@@ -12,6 +12,7 @@
 
 - [Introduction](#introduction)
 - [Deployment](#deployment)
+- [Architecture](#architecture)
 - [License](#license)
   - [Forbidden](#forbidden)
 
@@ -28,6 +29,26 @@ The frontend client is generally operated on-premise. Because it is written with
 requires a proper runtime environment to run (See [Operation](docs/operation.md)).
 Besides the runtime environment, there are a few configuration settings that need
 to be set (See [Configuration](docs/configuration.md)).
+
+## Architecture
+
+Kippenstummel KMC is a web application based on SSG (Static Site Generation). The
+following diagram shows the architecture of the application:
+
+![Architecture Overview](./docs/images/architecture-overview.svg)
+
+The application consists of three major parts:
+
+- **Static File Server**: The static file server is responsible for serving the
+  static files of the actual application, a multi-page application (MPA) built
+  with [Next.js](https://nextjs.org/).
+- **BFF Proxy**: The BFF (Backend For Frontend) proxy is responsible for proxying
+  requests to the Kippenstummel API.
+
+The actual web application is browser-based and therefore runs on the client. Required
+dynamic data is fetched from the BFF proxy, which in turn proxies the requests to
+the Kippenstummel API. For security reasons, the web application is secured by
+[Keycloak](https://www.keycloak.org/) using OAuth2.
 
 ## License
 
