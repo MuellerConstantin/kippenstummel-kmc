@@ -20,23 +20,7 @@ export interface IdentTableProps {
       identity: string;
       createdAt?: string;
       updatedAt?: string;
-      credibility: {
-        rating: number;
-        behaviour?: {
-          lastInteractionAt?: string;
-          averageInteractionInterval: number;
-          lastInteractionPosition?: { longitude: number; latitude: number };
-          unrealisticMovementCount: number;
-          voting: {
-            totalCount: number;
-            upvoteCount: number;
-            downvoteCount: number;
-          };
-          registration: {
-            totalCount: number;
-          };
-        };
-      };
+      credibility: number;
     }[],
   ) => void;
 }
@@ -57,23 +41,7 @@ export function IdentTable(props: IdentTableProps) {
         identity: string;
         createdAt?: string;
         updatedAt?: string;
-        credibility: {
-          rating: number;
-          behaviour?: {
-            lastInteractionAt?: string;
-            averageInteractionInterval: number;
-            lastInteractionPosition?: { longitude: number; latitude: number };
-            unrealisticMovementCount: number;
-            voting: {
-              totalCount: number;
-              upvoteCount: number;
-              downvoteCount: number;
-            };
-            registration: {
-              totalCount: number;
-            };
-          };
-        };
+        credibility: number;
       }[];
       info: {
         page: number;
@@ -204,7 +172,7 @@ export function IdentTable(props: IdentTableProps) {
                 <Row key={row.identity} id={`ident-table-${row.identity}`}>
                   <Cell>{row.identity}</Cell>
                   <Cell>{new Date(row.createdAt!).toLocaleDateString()}</Cell>
-                  <Cell>{row.credibility.rating}</Cell>
+                  <Cell>{row.credibility}</Cell>
                 </Row>
               )}
             </TableBody>

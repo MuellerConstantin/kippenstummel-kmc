@@ -15,23 +15,7 @@ export default function Ident() {
         identity: string;
         createdAt?: string;
         updatedAt?: string;
-        credibility: {
-          rating: number;
-          behaviour?: {
-            lastInteractionAt?: string;
-            averageInteractionInterval: number;
-            lastInteractionPosition?: { longitude: number; latitude: number };
-            unrealisticMovementCount: number;
-            voting: {
-              totalCount: number;
-              upvoteCount: number;
-              downvoteCount: number;
-            };
-            registration: {
-              totalCount: number;
-            };
-          };
-        };
+        credibility: number;
       }[]
     | null
   >(null);

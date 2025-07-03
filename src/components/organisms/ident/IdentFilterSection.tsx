@@ -79,12 +79,12 @@ export function IdentFilterSection(props: IdentFilterSectionProps) {
     if (onFilter) {
       const minCredibilityQuery =
         filteredMinCredibility !== null
-          ? `credibility.rating>=${filteredMinCredibility}`
+          ? `credibility>=${filteredMinCredibility}`
           : null;
 
       const maxCredibilityQuery =
         filteredMaxCredibility !== null
-          ? `credibility.rating<=${filteredMaxCredibility}`
+          ? `credibility<=${filteredMaxCredibility}`
           : null;
 
       const issuedBeforeQuery =
