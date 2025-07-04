@@ -1,84 +1,122 @@
 import { AuthOptions } from "next-auth";
-import KeycloakProvider from "next-auth/providers/keycloak";
+import CredentialsProvider from "next-auth/providers/credentials";
+import * as bcryptjs from "bcryptjs";
+import * as jwt from "jsonwebtoken";
+
+const ACCESS_TOKEN_EXPIRES_IN = 5 * 60; // 5 minutes
 
 declare module "next-auth" {
   interface Session {
-    error?: "RefreshTokenError";
     accessToken?: string;
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT {
+    username?: string | null;
     accessToken?: string;
     expiresAt?: number;
-    refreshToken?: string;
-    error?: "RefreshTokenError";
   }
 }
 
 export const authOptions: AuthOptions = {
   providers: [
-    KeycloakProvider({
-      clientId: process.env.OAUTH2_CLIENT_ID!,
-      clientSecret: process.env.OAUTH2_CLIENT_SECRET!,
-      issuer: process.env.OAUTH2_ISSUER,
+    CredentialsProvider({
+      id: "credentials",
+      name: "Credentials",
+      credentials: {
+        username: { label: "Username", type: "text" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        if (!credentials) {
+          return null;
+        }
+
+        if (!process.env.ADMIN_USER) {
+          throw new Error("ADMIN_USER is not defined");
+        }
+
+        if (!process.env.ADMIN_PASSWORD) {
+          throw new Error("ADMIN_PASSWORD is not defined");
+        }
+
+        const adminUser = process.env.ADMIN_USER;
+        const adminPass = process.env.ADMIN_PASSWORD;
+
+        if (
+          credentials.username === adminUser &&
+          bcryptjs.compareSync(credentials.password, adminPass)
+        ) {
+          return { id: credentials.username, name: credentials.username };
+        }
+
+        return null;
+      },
     }),
   ],
-  session: { strategy: "jwt" },
+  jwt: {
+    maxAge: 7 * 86400, // 7 days
+  },
+  session: {
+    strategy: "jwt",
+    maxAge: 1 * 86400, // 1 day
+    updateAge: 6 * 3600, // 6 hours
+  },
   callbacks: {
-    async jwt({ token, account }) {
-      if (account) {
-        return {
-          ...token,
-          accessToken: account.access_token,
-          expiresAt: account.expires_at,
-          refreshToken: account.refresh_token,
-        };
-      } else if (Date.now() < token.expiresAt! * 1000) {
-        return token;
-      } else {
-        if (!token.refreshToken) throw new TypeError("Missing refresh_token");
-
-        try {
-          const response = await fetch(process.env.OAUTH2_TOKEN_URL!, {
-            method: "POST",
-            body: new URLSearchParams({
-              client_id: process.env.OAUTH2_CLIENT_ID!,
-              client_secret: process.env.OAUTH2_CLIENT_SECRET!,
-              grant_type: "refresh_token",
-              refresh_token: token.refreshToken!,
-            }),
-          });
-
-          const tokensOrError = await response.json();
-
-          if (!response.ok) throw tokensOrError;
-
-          const newTokens = tokensOrError as {
-            access_token: string;
-            expires_at: number;
-            refresh_token?: string;
-          };
-
-          return {
-            ...token,
-            accessToken: newTokens.access_token,
-            expiresAt: newTokens.expires_at,
-            refreshToken: newTokens.refresh_token
-              ? newTokens.refresh_token
-              : token.refreshToken,
-          };
-        } catch (error) {
-          console.error("Error refreshing access_token", error);
-          token.error = "RefreshTokenError";
-          return token;
-        }
+    async jwt({ token, user }) {
+      if (!process.env.JWT_SECRET) {
+        throw new Error("JWT_SECRET is not defined");
       }
+
+      if (user) {
+        const accessToken = jwt.sign(
+          { username: user.name },
+          process.env.JWT_SECRET,
+          {
+            algorithm: "HS256",
+            expiresIn: ACCESS_TOKEN_EXPIRES_IN,
+            subject: user.id,
+          },
+        );
+
+        token.sub = user.id;
+        token.username = user.name;
+        token.accessToken = accessToken;
+        token.expiresAt = Date.now() + ACCESS_TOKEN_EXPIRES_IN * 1000;
+
+        return token;
+      }
+
+      if (
+        token.accessToken &&
+        token.expiresAt &&
+        Date.now() >= token.expiresAt
+      ) {
+        const accessToken = jwt.sign(
+          { username: token.username },
+          process.env.JWT_SECRET,
+          {
+            algorithm: "HS256",
+            expiresIn: ACCESS_TOKEN_EXPIRES_IN,
+            subject: token.sub,
+          },
+        );
+
+        token.accessToken = accessToken;
+        token.expiresAt = Date.now() + ACCESS_TOKEN_EXPIRES_IN * 1000;
+
+        return token;
+      }
+
+      return token;
     },
     async session({ session, token }) {
-      session.error = token.error;
-      session.accessToken = token.accessToken;
+      if (token && session.user) {
+        session.user.name = token.username;
+        session.accessToken = token.accessToken;
+      }
+
       return session;
     },
   },
