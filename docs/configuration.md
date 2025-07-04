@@ -39,12 +39,9 @@ _None variables to configure._
 Runtime configuration variables are used by the frontend's web server responsible for serving the web client. Changing these variables
 requires a restart of the web server.
 
-| Environment Variable  | Description                                                                                                    | Required |
-| --------------------- | -------------------------------------------------------------------------------------------------------------- | -------- |
-| KIPPENSTUMMEL_API_URL | Url of the Kippenstummel API. Including the api prefix and version. (e.g. `http://<HOST>:<PORT>/api/v1`)       | Yes      |
-| NEXTAUTH_URL          | Url of the Kippenstummel KMC web client. (e.g. `http://<HOST>:<PORT>`). Used for redirects after OAuth2 login. | Yes      |
-| NEXTAUTH_SECRET       | Secret used to encrypt the session cookie.                                                                     | Yes      |
-| OAUTH2_ISSUER         | Issuer URL of the OAuth2 provider.                                                                             | Yes      |
-| OAUTH2_TOKEN_URL      | Token endpoint of the OAuth2 provider.                                                                         | Yes      |
-| OAUTH2_CLIENT_ID      | Client ID of the OAuth2 provider.                                                                              | Yes      |
-| OAUTH2_CLIENT_SECRET  | Client secret of the OAuth2 provider.                                                                          | Yes      |
+| Environment Variable  | Description                                                                                              | Required |
+| --------------------- | -------------------------------------------------------------------------------------------------------- | -------- |
+| KIPPENSTUMMEL_API_URL | Url of the Kippenstummel API. Including the api prefix and version. (e.g. `http://<HOST>:<PORT>/api/v1`) | Yes      |
+| NEXTAUTH_URL          | Canonical Url of the Kippenstummel KMC web client. (e.g. `http://<HOST>:<PORT>`).                        | Yes      |
+| NEXTAUTH_SECRET       | Secret used to encrypt the session cookie.                                                               | Yes      |
+| JWT_SECRET            | Symmetric secret used to sign the JWT access token used for admin API access.                            | Yes      |

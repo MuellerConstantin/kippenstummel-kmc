@@ -47,8 +47,8 @@ The application consists of three major parts:
 
 The actual web application is browser-based and therefore runs on the client. Required
 dynamic data is fetched from the BFF proxy, which in turn proxies the requests to
-the Kippenstummel API. For security reasons, the web application is secured by
-[Keycloak](https://www.keycloak.org/) using OAuth2.
+the Kippenstummel API. For security reasons, the web application is secured using
+signed JSON Web Tokens (JWT).
 
 ## License
 

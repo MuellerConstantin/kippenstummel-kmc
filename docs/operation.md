@@ -12,12 +12,6 @@ obviously the [Kippenstummel API](https://github.com/MuellerConstantin/kippenstu
 service itself. Therefore, this service must be present and available for
 communication.
 
-**[Keycloak](https://www.keycloak.org/)**
-
-Because the web client requires authentication, a [Keycloak](https://www.keycloak.org/)
-authentication server must be present and available for communication. Technically,
-other OAuth2 providers could work as well, but this is not officially supported.
-
 ## Deployment
 
 The web client can be deployed on any [Node.js](https://nodejs.org/) runtime
