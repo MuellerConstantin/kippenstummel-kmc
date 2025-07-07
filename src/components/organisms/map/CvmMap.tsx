@@ -57,10 +57,16 @@ export function CvmMap(props: CvmMapProps) {
     (
       | {
           id: string;
-          longitude: number;
           latitude: number;
+          longitude: number;
           score: number;
           imported: boolean;
+          recentlyReported: {
+            missing: number;
+            spam: number;
+            inactive: number;
+            inaccessible: number;
+          };
           createdAt: string;
           updatedAt: string;
         }
@@ -86,10 +92,16 @@ export function CvmMap(props: CvmMapProps) {
     () =>
       data?.filter((item) => !("cluster" in item)) as {
         id: string;
-        longitude: number;
         latitude: number;
+        longitude: number;
         score: number;
         imported: boolean;
+        recentlyReported: {
+          missing: number;
+          spam: number;
+          inactive: number;
+          inaccessible: number;
+        };
         createdAt: string;
         updatedAt: string;
       }[],
@@ -132,11 +144,7 @@ export function CvmMap(props: CvmMapProps) {
       {markers?.map((marker) => (
         <LocationMarker
           key={marker.id}
-          position={[marker.latitude, marker.longitude]}
-          score={marker.score}
-          imported={marker.imported}
-          createdAt={marker.createdAt}
-          updatedAt={marker.updatedAt}
+          cvm={marker}
           selected={marker.id === props.selectedCvm?.id}
         />
       ))}

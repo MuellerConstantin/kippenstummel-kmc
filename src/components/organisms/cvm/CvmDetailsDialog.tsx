@@ -36,9 +36,17 @@ function CopyButton(props: CopyButtonProps) {
 
 interface CvmDetailsDialogProps extends Omit<DialogProps, "children"> {
   cvm: {
-    position: [number, number];
+    id: string;
+    latitude: number;
+    longitude: number;
     score: number;
     imported: boolean;
+    recentlyReported: {
+      missing: number;
+      spam: number;
+      inactive: number;
+      inaccessible: number;
+    };
     createdAt: string;
     updatedAt: string;
   };
@@ -61,11 +69,11 @@ export function CvmDetailsDialog(props: CvmDetailsDialogProps) {
                 <div>Cigarette Vending Machine</div>
                 <div className="flex items-center gap-2">
                   <div className="text-xs">
-                    {props.cvm.position[0].toFixed(7)} /{" "}
-                    {props.cvm.position[1].toFixed(7)} (lat/lng)
+                    {props.cvm.latitude.toFixed(7)} /{" "}
+                    {props.cvm.longitude.toFixed(7)} (lat/lng)
                   </div>
                   <CopyButton
-                    text={`${props.cvm.position[0]},${props.cvm.position[1]}`}
+                    text={`${props.cvm.latitude},${props.cvm.longitude}`}
                   />
                 </div>
               </div>
@@ -98,6 +106,40 @@ export function CvmDetailsDialog(props: CvmDetailsDialogProps) {
 
                   <div className="font-semibold">Updated At:</div>
                   <div>{new Date(props.cvm.updatedAt).toLocaleString()}</div>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <div className="font-semibold text-green-600">
+                  Recent Reports
+                </div>
+                <div className="grid grid-cols-[100px_1fr] text-sm">
+                  <div className="font-semibold">Missing:</div>
+                  <div>
+                    {props.cvm.recentlyReported.missing
+                      ? `Yes (${props.cvm.recentlyReported.missing})`
+                      : "No"}
+                  </div>
+
+                  <div className="font-semibold">Spam:</div>
+                  <div>
+                    {props.cvm.recentlyReported.spam
+                      ? `Yes (${props.cvm.recentlyReported.spam})`
+                      : "No"}
+                  </div>
+
+                  <div className="font-semibold">Inactive:</div>
+                  <div>
+                    {props.cvm.recentlyReported.inactive
+                      ? `Yes (${props.cvm.recentlyReported.inactive})`
+                      : "No"}
+                  </div>
+
+                  <div className="font-semibold">Inaccessible:</div>
+                  <div>
+                    {props.cvm.recentlyReported.inaccessible
+                      ? `Yes (${props.cvm.recentlyReported.inaccessible})`
+                      : "No"}
+                  </div>
                 </div>
               </div>
               <Button onPress={close} className="w-full">

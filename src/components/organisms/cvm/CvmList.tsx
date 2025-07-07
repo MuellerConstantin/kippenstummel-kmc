@@ -11,9 +11,18 @@ import { CvmFilterSection } from "@/components/organisms/cvm/CvmFilterSection";
 export interface CvmListProps {
   onClick?: (cvm: {
     id: string;
-    longitude: number;
     latitude: number;
+    longitude: number;
     score: number;
+    imported: boolean;
+    recentlyReported: {
+      missing: number;
+      spam: number;
+      inactive: number;
+      inaccessible: number;
+    };
+    createdAt: string;
+    updatedAt: string;
   }) => void;
 }
 
@@ -31,9 +40,18 @@ export function CvmList(props: CvmListProps) {
     {
       content: {
         id: string;
-        longitude: number;
         latitude: number;
+        longitude: number;
         score: number;
+        imported: boolean;
+        recentlyReported: {
+          missing: number;
+          spam: number;
+          inactive: number;
+          inaccessible: number;
+        };
+        createdAt: string;
+        updatedAt: string;
       }[];
       info: {
         page: number;
