@@ -8,7 +8,7 @@ import { tv } from "tailwind-variants";
 import { focusRing } from "@/components/utils";
 
 export interface ButtonProps extends RACButtonProps {
-  variant?: "primary" | "secondary" | "icon";
+  variant?: "primary" | "secondary" | "danger" | "icon";
 }
 
 const button = tv({
@@ -20,6 +20,7 @@ const button = tv({
         "bg-green-600 hover:bg-green-700 pressed:bg-green-800 text-white",
       secondary:
         "bg-gray-100 hover:bg-gray-200 pressed:bg-gray-300 text-gray-800 dark:bg-slate-600 dark:hover:bg-slate-500 dark:pressed:bg-slate-400 dark:text-slate-100",
+      danger: "bg-red-600 hover:bg-red-700 pressed:bg-red-800 text-white",
       icon: "border-0 p-1 flex items-center justify-center text-gray-600 hover:bg-black/[5%] pressed:bg-black/10 dark:text-slate-400 dark:hover:bg-white/10 dark:pressed:bg-white/20 disabled:bg-transparent",
     },
     isDisabled: {

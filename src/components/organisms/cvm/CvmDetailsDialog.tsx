@@ -50,6 +50,7 @@ interface CvmDetailsDialogProps extends Omit<DialogProps, "children"> {
     createdAt: string;
     updatedAt: string;
   };
+  onDelete?: () => void;
 }
 
 export function CvmDetailsDialog(props: CvmDetailsDialogProps) {
@@ -139,6 +140,28 @@ export function CvmDetailsDialog(props: CvmDetailsDialogProps) {
                     {props.cvm.recentlyReported.inaccessible
                       ? `Yes (${props.cvm.recentlyReported.inaccessible})`
                       : "No"}
+                  </div>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <div className="font-semibold text-red-500">Danger Zone</div>
+                <div className="flex flex-col gap-2 rounded-md border border-red-500 p-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="text-sm">
+                      <div className="font-semibold">Remove</div>
+                      <div>This will permanently remove this CVM.</div>
+                    </div>
+                    <div>
+                      <Button
+                        variant="danger"
+                        onPress={() => {
+                          close();
+                          props.onDelete?.();
+                        }}
+                      >
+                        Remove
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>

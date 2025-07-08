@@ -15,6 +15,7 @@ import { Link } from "@/components/atoms/Link";
 import { Modal } from "@/components/atoms/Modal";
 import { CvmDetailsDialog } from "@/components/organisms/cvm/CvmDetailsDialog";
 import { Button } from "@/components/atoms/Button";
+import { RemoveCvmDialog } from "@/components/organisms/cvm/RemoveCvmDialog";
 
 interface CopyButtonProps {
   text: string;
@@ -149,7 +150,8 @@ interface LocationMarkerProps {
 }
 
 export function LocationMarker(props: LocationMarkerProps) {
-  const [showDialog, setShowDialog] = useState(false);
+  const [showDetailsDialog, setShowDetailsDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   return (
     <>
@@ -180,10 +182,19 @@ export function LocationMarker(props: LocationMarkerProps) {
           anchor: Leaflet.point(16, 32),
         })}
       >
-        <LocationMarkerPopup {...props} onDetails={() => setShowDialog(true)} />
+        <LocationMarkerPopup
+          {...props}
+          onDetails={() => setShowDetailsDialog(true)}
+        />
       </Marker>
-      <Modal isOpen={showDialog} onOpenChange={setShowDialog}>
-        <CvmDetailsDialog cvm={props.cvm} />
+      <Modal isOpen={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
+        <CvmDetailsDialog
+          cvm={props.cvm}
+          onDelete={() => setShowDeleteDialog(true)}
+        />
+      </Modal>
+      <Modal isOpen={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <RemoveCvmDialog cvm={props.cvm} />
       </Modal>
     </>
   );
