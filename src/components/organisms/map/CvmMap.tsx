@@ -135,7 +135,7 @@ export function CvmMap(props: CvmMapProps) {
       tileLayerAttribution='&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       center={[49.006889, 8.403653]}
       zoom={14}
-      minZoom={12}
+      minZoom={8}
       maxZoom={18}
       onReady={onReady}
       onMoveEnd={onMoveEnd}
