@@ -137,11 +137,11 @@ export function CvmList(props: CvmListProps) {
                 <ListBoxItem id={`cvm-list-item-${cvm.id}`} key={cvm.id}>
                   <div className="flex cursor-pointer gap-2 overflow-hidden">
                     <div className="relative z-[50] h-fit w-fit">
-                      {cvm.score < -100 ? (
+                      {cvm.score < -5 ? (
                         <div className="absolute top-1 right-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-red-500">
                           <ChevronDown className="h-2.5 w-2.5 text-white" />
                         </div>
-                      ) : cvm.score > 100 ? (
+                      ) : cvm.score > 5 ? (
                         <div className="absolute top-1 right-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-green-600">
                           <ChevronUp className="h-2.5 w-2.5 text-white" />
                         </div>
