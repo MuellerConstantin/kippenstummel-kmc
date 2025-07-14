@@ -76,12 +76,12 @@ export function CvmFilterSection(props: CvmFilterSectionProps) {
     if (onFilter) {
       const minScoreQuery =
         filteredMinScore !== null
-          ? `score>=${Math.round(filteredMinScore * 100)}`
+          ? `score>=${Math.round(filteredMinScore)}`
           : null;
 
       const maxScoreQuery =
         filteredMaxScore !== null
-          ? `score<=${Math.round(filteredMaxScore * 100)}`
+          ? `score<=${Math.round(filteredMaxScore)}`
           : null;
 
       const createdBeforeQuery =
@@ -172,9 +172,9 @@ export function CvmFilterSection(props: CvmFilterSectionProps) {
                   <NumberField
                     className="grow"
                     label="Minimum score"
-                    step={0.1}
-                    minValue={-5}
-                    maxValue={5}
+                    step={1}
+                    minValue={-10}
+                    maxValue={10}
                     errorMessage={formikProps.errors.minScore}
                     isInvalid={
                       !!formikProps.touched.minScore &&
@@ -191,9 +191,9 @@ export function CvmFilterSection(props: CvmFilterSectionProps) {
                   <NumberField
                     className="grow"
                     label="Maximum score"
-                    step={0.1}
-                    minValue={-5}
-                    maxValue={5}
+                    step={1}
+                    minValue={-10}
+                    maxValue={10}
                     errorMessage={formikProps.errors.maxScore}
                     isInvalid={
                       !!formikProps.touched.maxScore &&

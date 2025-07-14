@@ -2,7 +2,7 @@ import React, { useCallback, useState } from "react";
 import { DialogProps, Heading } from "react-aria-components";
 import { Dialog } from "@/components/atoms/Dialog";
 import { Button } from "@/components/atoms/Button";
-import { Check, ChevronDown, ChevronUp, Copy, Equal } from "lucide-react";
+import { Check, ChevronDown, ChevronUp, Copy, Equal, X } from "lucide-react";
 
 interface CopyButtonProps {
   text: string;
@@ -84,11 +84,15 @@ export function CvmDetailsDialog(props: CvmDetailsDialogProps) {
                   <div className="font-semibold">Score:</div>
                   <div className="flex items-center gap-1">
                     {props.cvm.score}
-                    {props.cvm.score < -5 ? (
+                    {props.cvm.score < -8 ? (
+                      <div className="flex h-3 w-3 items-center justify-center rounded-full bg-red-800">
+                        <X className="text-white" />
+                      </div>
+                    ) : props.cvm.score < -5 ? (
                       <div className="flex h-3 w-3 items-center justify-center rounded-full bg-red-500">
                         <ChevronDown className="text-white" />
                       </div>
-                    ) : props.cvm.score > 5 ? (
+                    ) : props.cvm.score >= 5 ? (
                       <div className="flex h-3 w-3 items-center justify-center rounded-full bg-green-600">
                         <ChevronUp className="text-white" />
                       </div>

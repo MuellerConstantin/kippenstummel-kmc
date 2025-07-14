@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react";
 import useSWR from "swr";
-import { MapPin, ChevronUp, ChevronDown, Equal } from "lucide-react";
+import { MapPin, ChevronUp, ChevronDown, Equal, X } from "lucide-react";
 import useApi from "@/hooks/useApi";
 import { ListBox, ListBoxItem } from "@/components/atoms/ListBox";
 import { Pagination } from "@/components/molecules/Pagination";
@@ -137,11 +137,15 @@ export function CvmList(props: CvmListProps) {
                 <ListBoxItem id={`cvm-list-item-${cvm.id}`} key={cvm.id}>
                   <div className="flex cursor-pointer gap-2 overflow-hidden">
                     <div className="relative z-[50] h-fit w-fit">
-                      {cvm.score < -5 ? (
+                      {cvm.score < -8 ? (
+                        <div className="absolute top-1 right-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-red-800">
+                          <X className="h-2.5 w-2.5 text-white" />
+                        </div>
+                      ) : cvm.score < -5 ? (
                         <div className="absolute top-1 right-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-red-500">
                           <ChevronDown className="h-2.5 w-2.5 text-white" />
                         </div>
-                      ) : cvm.score > 5 ? (
+                      ) : cvm.score >= 5 ? (
                         <div className="absolute top-1 right-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-green-600">
                           <ChevronUp className="h-2.5 w-2.5 text-white" />
                         </div>
@@ -158,7 +162,7 @@ export function CvmList(props: CvmListProps) {
                       </div>
                       <div className="flex items-center gap-1 text-xs">
                         <div>Score:</div>
-                        <div>{(cvm.score / 100).toFixed(1)}</div>
+                        <div>{cvm.score}</div>
                       </div>
                     </div>
                   </div>

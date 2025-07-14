@@ -77,11 +77,15 @@ function LocationMarkerPopup(props: LocationMarkerPopupProps) {
       className="relative"
       offset={Leaflet.point(0, -15)}
     >
-      {props.cvm.score < -5 ? (
+      {props.cvm.score < -8 ? (
+        <div className="absolute -top-2 -left-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-800">
+          <X className="h-4 w-4 text-white" />
+        </div>
+      ) : props.cvm.score < -5 ? (
         <div className="absolute -top-2 -left-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500">
           <ChevronDown className="h-4 w-4 text-white" />
         </div>
-      ) : props.cvm.score > 5 ? (
+      ) : props.cvm.score >= 5 ? (
         <div className="absolute -top-2 -left-2 flex h-6 w-6 items-center justify-center rounded-full bg-green-600">
           <ChevronUp className="h-4 w-4 text-white" />
         </div>
@@ -160,11 +164,15 @@ export function LocationMarker(props: LocationMarkerProps) {
             <div
               className={`relative z-[50] h-fit w-fit ${props.selected ? "animate-bounce" : ""}`}
             >
-              {props.cvm.score < -5 ? (
+              {props.cvm.score < -8 ? (
+                <div className="absolute top-1 right-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-red-800">
+                  <X className="h-2.5 w-2.5 text-white" />
+                </div>
+              ) : props.cvm.score < -5 ? (
                 <div className="absolute top-1 right-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-red-500">
                   <ChevronDown className="h-2.5 w-2.5 text-white" />
                 </div>
-              ) : props.cvm.score > 5 ? (
+              ) : props.cvm.score >= 5 ? (
                 <div className="absolute top-1 right-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-green-600">
                   <ChevronUp className="h-2.5 w-2.5 text-white" />
                 </div>
