@@ -7,6 +7,7 @@ import useApi from "@/hooks/useApi";
 import { LeafletMap } from "@/components/organisms/leaflet/LeafletMap";
 import { ClusterMarker } from "@/components/molecules/map/ClusterMarker";
 import { LocationMarker } from "@/components/molecules/map/LocationMarker";
+import { MapLibreTileLayer } from "../leaflet/MapLibreTileLayer";
 
 export interface CvmMapProps {
   selectedCvm: {
@@ -131,16 +132,13 @@ export function CvmMap(props: CvmMapProps) {
 
   return (
     <LeafletMap
-      tileLayerUrl="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      tileLayerAttribution='&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       center={[49.006889, 8.403653]}
       zoom={14}
-      minZoom={8}
-      maxZoom={18}
       onReady={onReady}
       onMoveEnd={onMoveEnd}
       onZoomEnd={onZoomEnd}
     >
+      <MapLibreTileLayer url="https://tiles.openfreemap.org/styles/bright" />
       {markers?.map((marker) => (
         <LocationMarker
           key={marker.id}

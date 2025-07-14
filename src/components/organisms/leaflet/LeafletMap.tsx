@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import Leaflet from "leaflet";
-import { TileLayer, useMapEvents } from "react-leaflet";
+import { useMapEvents } from "react-leaflet";
 
 const LeafletMapContainer = dynamic(
   () =>
@@ -37,8 +37,6 @@ function LeafletMapEventHandler(params: LeafletMapEventHandlerProps) {
 
 export interface LeafletMapProps {
   children?: React.ReactNode;
-  tileLayerUrl: string;
-  tileLayerAttribution: string;
   center?: [number, number];
   zoom?: number;
   minZoom?: number;
@@ -58,16 +56,7 @@ export function LeafletMap(props: LeafletMapProps) {
 
   const [map, setMap] = useState<Leaflet.Map | null>(null);
 
-  const {
-    className,
-    tileLayerUrl,
-    tileLayerAttribution,
-    center,
-    zoom,
-    minZoom,
-    maxZoom,
-    onReady,
-  } = props;
+  const { className, center, zoom, minZoom, maxZoom, onReady } = props;
 
   useEffect(() => {
     if (map) {
@@ -100,14 +89,6 @@ export function LeafletMap(props: LeafletMapProps) {
         maxZoom={maxZoom}
         closePopupOnClick={true}
       >
-        <TileLayer
-          attribution={tileLayerAttribution}
-          url={tileLayerUrl}
-          minNativeZoom={0}
-          maxNativeZoom={18}
-          maxZoom={maxZoom}
-          minZoom={minZoom}
-        />
         <LeafletMapEventHandler
           onZoomStart={props.onZoomStart}
           onZoomEnd={props.onZoomEnd}
