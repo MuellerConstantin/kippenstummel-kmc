@@ -134,11 +134,13 @@ export function CvmMap(props: CvmMapProps) {
     <LeafletMap
       center={[49.006889, 8.403653]}
       zoom={14}
+      minZoom={6}
+      maxZoom={19}
       onReady={onReady}
       onMoveEnd={onMoveEnd}
       onZoomEnd={onZoomEnd}
     >
-      <MapLibreTileLayer url="https://tiles.openfreemap.org/styles/bright" />
+      <MapLibreTileLayer url="/tiles/default.json" />
       {markers?.map((marker) => (
         <LocationMarker
           key={marker.id}

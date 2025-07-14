@@ -27,6 +27,10 @@ body {
   font-family: var(--font-lato) sans-serif;
 }
 
+.dark .leaflet-gl-layer {
+  filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+}
+
 .leaflet-popup-content-wrapper .leaflet-popup-content {
   margin-left: 10px !important;
   margin-right: 10px !important;
@@ -36,10 +40,6 @@ body {
 
 .leaflet-popup-content-wrapper .leaflet-popup-content a {
   color: #16a34a;
-}
-
-.dark .leaflet-layer {
-  filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
 }
 
 .leaflet-control-zoom-in,
