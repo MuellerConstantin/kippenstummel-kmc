@@ -73,7 +73,7 @@ export function JobsTable(props: JobsTableProps) {
     unknown,
     string | null
   >(
-    `/kmc/jobs?page=${page - 1}&perPage=${perPage}&distinct=${props.distinct}`,
+    `/kmc/jobs/runs?page=${page - 1}&perPage=${perPage}&distinct=${props.distinct}`,
     (url) => api.get(url).then((res) => res.data),
   );
 
