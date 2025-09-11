@@ -88,7 +88,7 @@ export function CvmDetailsDialog(props: CvmDetailsDialogProps) {
                       <div className="flex h-3 w-3 items-center justify-center rounded-full bg-red-800">
                         <X className="text-white" />
                       </div>
-                    ) : props.cvm.score < -5 ? (
+                    ) : props.cvm.score < 0 ? (
                       <div className="flex h-3 w-3 items-center justify-center rounded-full bg-red-500">
                         <ChevronDown className="text-white" />
                       </div>

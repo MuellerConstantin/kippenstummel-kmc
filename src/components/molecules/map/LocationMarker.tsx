@@ -81,7 +81,7 @@ function LocationMarkerPopup(props: LocationMarkerPopupProps) {
         <div className="absolute -top-2 -left-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-800">
           <X className="h-4 w-4 text-white" />
         </div>
-      ) : props.cvm.score < -5 ? (
+      ) : props.cvm.score < 0 ? (
         <div className="absolute -top-2 -left-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500">
           <ChevronDown className="h-4 w-4 text-white" />
         </div>
@@ -168,7 +168,7 @@ export function LocationMarker(props: LocationMarkerProps) {
                 <div className="absolute top-1 right-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-red-800">
                   <X className="h-2.5 w-2.5 text-white" />
                 </div>
-              ) : props.cvm.score < -5 ? (
+              ) : props.cvm.score < 0 ? (
                 <div className="absolute top-1 right-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-red-500">
                   <ChevronDown className="h-2.5 w-2.5 text-white" />
                 </div>
