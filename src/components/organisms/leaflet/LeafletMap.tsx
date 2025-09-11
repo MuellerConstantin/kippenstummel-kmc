@@ -79,7 +79,7 @@ export function LeafletMap(props: LeafletMapProps) {
   return (
     <div
       ref={containerRef}
-      className={`relative flex h-full w-full ${className}`}
+      className={`relative flex grow flex-col ${className}`}
     >
       <LeafletMapContainer
         ref={setMap}
@@ -88,6 +88,7 @@ export function LeafletMap(props: LeafletMapProps) {
         minZoom={minZoom}
         maxZoom={maxZoom}
         closePopupOnClick={true}
+        className="grow"
       >
         <LeafletMapEventHandler
           onZoomStart={props.onZoomStart}
