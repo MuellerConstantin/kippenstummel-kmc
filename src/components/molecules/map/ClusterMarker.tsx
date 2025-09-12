@@ -41,14 +41,11 @@ export function ClusterMarker(props: ClusterMarkerProps) {
 
   const formattedCount = useMemo(() => {
     if (props.count < 1000) return props.count.toString();
-    if (props.count < 1_000_000)
-      return (props.count / 1000).toFixed(props.count < 10_000 ? 1 : 0) + "K";
+    if (props.count < 1_000_000) return (props.count / 1000).toFixed(0) + "K";
     if (props.count < 1_000_000_000)
-      return (props.count / 1_000_000).toFixed(1) + "M";
-    if (props.count < 1_000_000_000_000)
-      return (props.count / 1_000_000_000).toFixed(1) + "B";
+      return (props.count / 1_000_000).toFixed(0) + "M";
 
-    return (props.count / 1_000_000_000).toFixed(1) + "B+";
+    return "1B+";
   }, [props.count]);
 
   const handleClick = useCallback(() => {
