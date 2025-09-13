@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { StackTemplate } from "@/components/templates/StackTemplate";
 import { Button } from "@/components/atoms/Button";
+import { SearchX as SearchXIcon } from "lucide-react";
 
 export default function NotFound() {
   const router = useRouter();
@@ -18,8 +19,8 @@ export default function NotFound() {
         <section>
           <div className="mx-auto max-w-screen-xl px-4 py-8 lg:px-6 lg:py-16">
             <div className="flex max-w-screen-sm flex-col items-center">
-              <h1 className="mb-4 text-center text-7xl font-extrabold tracking-tight text-green-600 lg:text-9xl dark:text-green-600">
-                404
+              <h1 className="mb-4 flex items-center gap-4 text-center text-7xl font-extrabold tracking-tight text-green-600 lg:text-9xl dark:text-green-600">
+                <SearchXIcon className="h-16 w-16" />
               </h1>
               <p className="mb-4 text-center text-3xl font-bold tracking-tight text-gray-900 md:text-4xl dark:text-white">
                 Page not found
