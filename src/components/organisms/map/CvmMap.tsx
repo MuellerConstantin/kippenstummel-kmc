@@ -151,7 +151,7 @@ export function CvmMap(props: CvmMapProps) {
       {clusters?.map((marker, index) => (
         <ClusterMarker
           key={index}
-          position={[marker.latitude, marker.longitude]}
+          position={new Leaflet.LatLng(marker.latitude, marker.longitude)}
           count={marker.count}
         />
       ))}
