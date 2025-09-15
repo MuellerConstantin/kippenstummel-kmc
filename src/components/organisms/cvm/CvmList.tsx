@@ -9,7 +9,7 @@ import { Pagination } from "@/components/molecules/Pagination";
 import { CvmFilterSection } from "@/components/organisms/cvm/CvmFilterSection";
 
 export interface CvmListProps {
-  onClick?: (cvm: {
+  onClick?: (cvm?: {
     id: string;
     latitude: number;
     longitude: number;
@@ -77,6 +77,8 @@ export function CvmList(props: CvmListProps) {
 
       if (cvm) {
         onClick?.(cvm);
+      } else {
+        onClick?.();
       }
     },
     [data?.content, onClick],

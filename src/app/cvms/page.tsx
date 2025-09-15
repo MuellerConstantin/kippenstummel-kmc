@@ -42,7 +42,7 @@ export default function Cvms() {
             <h4 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
               Registered CVMs
             </h4>
-            <CvmList onClick={(cvm) => setSelectedCvm(cvm)} />
+            <CvmList onClick={(cvm) => setSelectedCvm(cvm || null)} />
           </div>
           <div className="flex w-full flex-col space-y-4">
             <h4 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
