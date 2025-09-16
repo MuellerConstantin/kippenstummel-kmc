@@ -134,7 +134,7 @@ export function CvmMap(props: CvmMapProps) {
     <LeafletMap
       center={[49.006889, 8.403653]}
       zoom={14}
-      minZoom={6}
+      minZoom={8}
       maxZoom={19}
       onReady={onReady}
       onMoveEnd={onMoveEnd}
