@@ -74,30 +74,57 @@ async function proxyRequest(
     targetUrl.searchParams.append(key, value);
   });
 
-  const headers = new Headers();
+  const requestHeaders = new Headers(req.headers);
 
-  req.headers.forEach((value, key) => {
-    if (key.toLowerCase() !== "content-length") {
-      headers.append(key, value);
-    }
-  });
+  requestHeaders.delete("accept-encoding");
+  requestHeaders.set("accept-encoding", "identity");
+  requestHeaders.append("authorization", `Bearer ${session.accessToken}`);
 
-  headers.append("authorization", `Bearer ${session.accessToken}`);
+  [
+    "host",
+    "connection",
+    "keep-alive",
+    "proxy-authenticate",
+    "proxy-authorization",
+    "te",
+    "trailers",
+    "transfer-encoding",
+    "upgrade",
+  ].forEach((header) => requestHeaders.delete(header));
 
-  const fetchOptions = {
+  const couldHaveBody = req.method !== "GET" && req.method !== "HEAD";
+
+  const fetchOptions: RequestInit = {
     method: req.method,
-    headers,
-    body: req.method !== "GET" && req.method !== "HEAD" ? req.body : undefined,
-    duplex: "half",
+    headers: requestHeaders,
+    body: couldHaveBody ? req.body : undefined,
+    redirect: "manual",
+    // @ts-expect-error: Not available for browser fetch type
+    duplex: couldHaveBody ? "half" : undefined,
+    cache: "no-store",
   };
 
   try {
-    const response = await fetch(targetUrl, fetchOptions);
-    const headers = new Headers(response.headers);
+    const upstream = await fetch(targetUrl, fetchOptions);
+    const upstreamHeaders = new Headers(upstream.headers);
 
-    return new Response(response.body, {
-      status: response.status,
-      headers,
+    upstreamHeaders.delete("content-encoding");
+    upstreamHeaders.delete("content-length");
+
+    [
+      "connection",
+      "keep-alive",
+      "transfer-encoding",
+      "upgrade",
+      "proxy-authenticate",
+      "proxy-authorization",
+      "te",
+      "trailers",
+    ].forEach((header) => upstreamHeaders.delete(header));
+
+    return new Response(upstream.body, {
+      status: upstream.status,
+      headers: upstreamHeaders,
     });
   } catch (error) {
     console.error("Proxy-Error:", error);
