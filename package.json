@@ -1,6 +1,6 @@
 {
   "name": "@kippenstummel/kmc",
-  "version": "0.1.0-dev.12",
+  "version": "0.1.0-alpha.1",
   "description": "Administrative interface for Kippenstummel.",
   "author": {
     "name": "Constantin Müller",
