@@ -19,7 +19,7 @@ import themeSlice from "@/store/slices/theme";
 
 const persistConfig = {
   key: "kippenstummel",
-  version: 1,
+  version: 2,
   storage,
   whitelist: ["theme"],
 };
