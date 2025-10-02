@@ -27,75 +27,109 @@ body {
   font-family: var(--font-lato) sans-serif;
 }
 
-.dark .leaflet-gl-layer {
+.dark .maplibregl-canvas {
   filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
 }
 
-.leaflet-popup-content-wrapper .leaflet-popup-content {
-  margin-left: 10px !important;
-  margin-right: 10px !important;
-  margin-top: 10px !important;
-  margin-bottom: 10px !important;
+.dark .maplibregl-ctrl-group {
+  @apply overflow-hidden bg-slate-900 text-white;
 }
 
-.leaflet-popup-content-wrapper .leaflet-popup-content a {
-  color: #16a34a;
+.dark .maplibregl-ctrl-group:not(:empty) {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
 }
 
-.leaflet-control-zoom-in,
-.leaflet-control-zoom-out {
-  @apply !bg-white !text-slate-900;
-
-  @variant dark {
-    @apply !bg-slate-900 !text-white;
-  }
-
-  &:hover {
-    @apply !bg-slate-100;
-
-    @variant dark {
-      @apply !bg-slate-800;
-    }
-  }
+.dark .maplibregl-ctrl-group button {
+  @apply bg-slate-900 text-white hover:!bg-slate-800;
 }
 
-.leaflet-control {
-  @apply !border-slate-400;
-
-  @variant dark {
-    @apply !border-slate-600;
-  }
+.dark .maplibregl-ctrl .maplibregl-ctrl-icon {
+  background-color: transparent !important;
+  filter: invert(1) brightness(2);
 }
 
-.leaflet-control .leaflet-bar-part {
-  @apply !bg-white text-slate-900;
-
-  @variant dark {
-    @apply !bg-slate-900 !text-white;
-  }
-
-  &:hover {
-    @apply !bg-slate-100;
-
-    @variant dark {
-      @apply !bg-slate-800;
-    }
-  }
+.maplibregl-ctrl-attrib-inner a {
+  @apply !text-green-600 !decoration-green-600/60 hover:!underline hover:!decoration-green-600;
 }
 
-.leaflet-popup-content-wrapper,
-.leaflet-popup-tip {
-  @apply !bg-white !text-slate-900;
-
-  @variant dark {
-    @apply !bg-slate-900 !text-white;
-  }
+.dark .maplibregl-ctrl-attrib {
+  @apply !bg-slate-900 !text-white;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
 }
 
-.leaflet-popup-close-button span {
-  @apply !text-slate-900;
+.maplibregl-ctrl-attrib-button {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill-rule='evenodd' fill='#1e293b' viewBox='0 0 20 20'%3E%3Cpath d='M4 10a6 6 0 1 0 12 0 6 6 0 1 0-12 0m5-3a1 1 0 1 0 2 0 1 1 0 1 0-2 0m0 3a1 1 0 1 1 2 0v3a1 1 0 1 1-2 0'/%3E%3C/svg%3E");
+}
 
-  @variant dark {
-    @apply !text-white;
-  }
+.maplibregl-ctrl-attrib-button:focus {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1) !important;
+}
+
+.dark .maplibregl-ctrl-attrib-button {
+  @apply !bg-slate-800;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill-rule='evenodd' fill='white' viewBox='0 0 20 20'%3E%3Cpath d='M4 10a6 6 0 1 0 12 0 6 6 0 1 0-12 0m5-3a1 1 0 1 0 2 0 1 1 0 1 0-2 0m0 3a1 1 0 1 1 2 0v3a1 1 0 1 1-2 0'/%3E%3C/svg%3E");
+}
+
+.dark .maplibregl-ctrl-attrib-inner {
+  @apply bg-slate-900 text-white;
+}
+
+.dark .maplibregl-ctrl-attrib-inner a {
+  @apply !text-green-500 !decoration-green-500/60 hover:!decoration-green-500;
+}
+
+.maplibregl-popup-content {
+  @apply !rounded-md !p-2 !text-slate-800;
+}
+
+.dark .maplibregl-popup-content {
+  @apply !bg-slate-900 !text-white;
+}
+
+.maplibregl-popup-anchor-bottom-right .maplibregl-popup-content {
+  @apply !rounded-br-none;
+}
+
+.maplibregl-popup-anchor-bottom-left .maplibregl-popup-content {
+  @apply !rounded-bl-none;
+}
+
+.maplibregl-popup-anchor-top-right .maplibregl-popup-content {
+  @apply !rounded-tr-none;
+}
+
+.maplibregl-popup-anchor-top-left .maplibregl-popup-content {
+  @apply !rounded-tl-none;
+}
+
+.dark .maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
+  @apply !border-t-slate-900;
+}
+
+.dark .maplibregl-popup-anchor-top .maplibregl-popup-tip {
+  @apply !border-b-slate-900;
+}
+
+.dark .maplibregl-popup-anchor-left .maplibregl-popup-tip {
+  @apply !border-r-slate-900;
+}
+
+.dark .maplibregl-popup-anchor-right .maplibregl-popup-tip {
+  @apply !border-l-slate-900;
+}
+
+.dark .maplibregl-popup-anchor-top-left .maplibregl-popup-tip {
+  @apply !border-b-slate-900;
+}
+
+.dark .maplibregl-popup-anchor-top-right .maplibregl-popup-tip {
+  @apply !border-b-slate-900;
+}
+
+.dark .maplibregl-popup-anchor-bottom-left .maplibregl-popup-tip {
+  @apply !border-t-slate-900;
+}
+
+.dark .maplibregl-popup-anchor-bottom-right .maplibregl-popup-tip {
+  @apply !border-t-slate-900;
 }

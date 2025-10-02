@@ -5,23 +5,10 @@ import { Button } from "@/components/atoms/Button";
 import useApi from "@/hooks/useApi";
 import { Spinner } from "@/components/atoms/Spinner";
 import { useSWRConfig } from "swr";
+import { Cvm } from "@/lib/types/cvm";
 
 interface RemoveCvmDialogProps extends Omit<DialogProps, "children"> {
-  cvm: {
-    id: string;
-    latitude: number;
-    longitude: number;
-    score: number;
-    imported: boolean;
-    recentlyReported: {
-      missing: number;
-      spam: number;
-      inactive: number;
-      inaccessible: number;
-    };
-    createdAt: string;
-    updatedAt: string;
-  };
+  cvm: Cvm;
 }
 
 export function RemoveCvmDialog(props: RemoveCvmDialogProps) {

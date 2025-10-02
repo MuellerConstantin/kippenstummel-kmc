@@ -3,6 +3,7 @@ import { DialogProps, Heading } from "react-aria-components";
 import { Dialog } from "@/components/atoms/Dialog";
 import { Button } from "@/components/atoms/Button";
 import { Check, ChevronDown, ChevronUp, Copy, Equal, X } from "lucide-react";
+import { Cvm } from "@/lib/types/cvm";
 
 interface CopyButtonProps {
   text: string;
@@ -35,21 +36,7 @@ function CopyButton(props: CopyButtonProps) {
 }
 
 interface CvmDetailsDialogProps extends Omit<DialogProps, "children"> {
-  cvm: {
-    id: string;
-    latitude: number;
-    longitude: number;
-    score: number;
-    imported: boolean;
-    recentlyReported: {
-      missing: number;
-      spam: number;
-      inactive: number;
-      inaccessible: number;
-    };
-    createdAt: string;
-    updatedAt: string;
-  };
+  cvm: Cvm;
   onDelete?: () => void;
 }
 

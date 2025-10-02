@@ -1,160 +1,109 @@
 "use client";
 
-import { useState, useCallback, useMemo, useEffect } from "react";
-import useSWR from "swr";
-import Leaflet from "leaflet";
-import useApi from "@/hooks/useApi";
-import { LeafletMap } from "@/components/organisms/leaflet/LeafletMap";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { ClusterMarker } from "@/components/molecules/map/ClusterMarker";
 import { LocationMarker } from "@/components/molecules/map/LocationMarker";
-import { MapLibreTileLayer } from "../leaflet/MapLibreTileLayer";
+import Map, {
+  AttributionControl,
+  MapRef,
+  NavigationControl,
+  ViewStateChangeEvent,
+} from "react-map-gl/maplibre";
+import { GeoCoordinates } from "@/lib/types/geo";
+import { MapLibreEvent } from "maplibre-gl";
+import useMapCvmViewportData from "@/hooks/useMapCvmViewportData";
+import { SelectedMarker } from "@/components/molecules/map/SelectedMarker";
+import { Cvm } from "@/lib/types/cvm";
+
+import "maplibre-gl/dist/maplibre-gl.css";
 
 export interface CvmMapProps {
-  selectedCvm: {
-    id: string;
-    longitude: number;
-    latitude: number;
-    score: number;
-  } | null;
+  selectedCvm: Cvm | null;
 }
 
 export function CvmMap(props: CvmMapProps) {
-  const api = useApi();
+  const mapRef = useRef<MapRef>(null);
 
-  const [map, setMap] = useState<Leaflet.Map | null>(null);
   const [zoom, setZoom] = useState<number>();
-  const [bottomLeft, setBottomLeft] = useState<[number, number]>();
-  const [topRight, setTopRight] = useState<[number, number]>();
+  const [bottomLeft, setBottomLeft] = useState<GeoCoordinates>();
+  const [topRight, setTopRight] = useState<GeoCoordinates>();
 
-  const onReady = useCallback((map: Leaflet.Map) => {
-    const mapBounds = map.getBounds();
+  const { markers, clusters } = useMapCvmViewportData({
+    zoom: zoom!,
+    bottomLeft: bottomLeft!,
+    topRight: topRight!,
+  });
 
-    setBottomLeft([mapBounds.getSouthWest().lat, mapBounds.getSouthWest().lng]);
-    setTopRight([mapBounds.getNorthEast().lat, mapBounds.getNorthEast().lng]);
-    setZoom(map.getZoom());
+  const onLoad = useCallback((event: MapLibreEvent) => {
+    const mapBounds = event.target.getBounds();
+    const mapZoom = Math.ceil(event.target.getZoom());
 
-    setMap(map);
+    setBottomLeft({
+      latitude: mapBounds.getSouthWest().lat,
+      longitude: mapBounds.getSouthWest().lng,
+    });
+    setTopRight({
+      latitude: mapBounds.getNorthEast().lat,
+      longitude: mapBounds.getNorthEast().lng,
+    });
+    setZoom(mapZoom);
   }, []);
 
-  const onZoomEnd = useCallback((event: Leaflet.LeafletEvent) => {
-    const map = event.target as Leaflet.Map;
-    const mapBounds = map.getBounds();
+  const onViewStateChanged = useCallback((event: ViewStateChangeEvent) => {
+    const mapBounds = event.target.getBounds();
+    const mapZoom = Math.ceil(event.target.getZoom());
 
-    setBottomLeft([mapBounds.getSouthWest().lat, mapBounds.getSouthWest().lng]);
-    setTopRight([mapBounds.getNorthEast().lat, mapBounds.getNorthEast().lng]);
-    setZoom(map.getZoom());
+    setBottomLeft({
+      latitude: mapBounds.getSouthWest().lat,
+      longitude: mapBounds.getSouthWest().lng,
+    });
+    setTopRight({
+      latitude: mapBounds.getNorthEast().lat,
+      longitude: mapBounds.getNorthEast().lng,
+    });
+    setZoom(mapZoom);
   }, []);
-
-  const onMoveEnd = useCallback((event: Leaflet.LeafletEvent) => {
-    const map = event.target as Leaflet.Map;
-    const mapBounds = map.getBounds();
-
-    setBottomLeft([mapBounds.getSouthWest().lat, mapBounds.getSouthWest().lng]);
-    setTopRight([mapBounds.getNorthEast().lat, mapBounds.getNorthEast().lng]);
-    setZoom(map.getZoom());
-  }, []);
-
-  const { data } = useSWR<
-    (
-      | {
-          id: string;
-          latitude: number;
-          longitude: number;
-          score: number;
-          imported: boolean;
-          recentlyReported: {
-            missing: number;
-            spam: number;
-            inactive: number;
-            inaccessible: number;
-          };
-          createdAt: string;
-          updatedAt: string;
-        }
-      | {
-          id: string;
-          cluster: true;
-          longitude: number;
-          latitude: number;
-          count: number;
-        }
-    )[],
-    unknown,
-    string | null
-  >(
-    !!bottomLeft && !!topRight && !!zoom
-      ? `/kmc/cvms/within?bottomLeft=${bottomLeft?.[0]},${bottomLeft?.[1]}&topRight=${topRight?.[0]},${topRight?.[1]}&zoom=${zoom}`
-      : null,
-    (url) => api.get(url).then((res) => res.data),
-    { keepPreviousData: true },
-  );
-
-  const markers = useMemo(
-    () =>
-      data?.filter((item) => !("cluster" in item)) as {
-        id: string;
-        latitude: number;
-        longitude: number;
-        score: number;
-        imported: boolean;
-        recentlyReported: {
-          missing: number;
-          spam: number;
-          inactive: number;
-          inaccessible: number;
-        };
-        createdAt: string;
-        updatedAt: string;
-      }[],
-    [data],
-  );
-
-  const clusters = useMemo(
-    () =>
-      data?.filter((item) => "cluster" in item) as {
-        id: string;
-        cluster: true;
-        longitude: number;
-        latitude: number;
-        count: number;
-      }[],
-    [data],
-  );
 
   useEffect(() => {
     if (props.selectedCvm) {
-      map?.setView(
-        [props.selectedCvm.latitude, props.selectedCvm.longitude],
-        18,
-      );
+      mapRef.current?.flyTo({
+        center: [props.selectedCvm.longitude, props.selectedCvm.latitude],
+        zoom: 18,
+      });
     }
-  }, [props.selectedCvm, map]);
+  }, [props.selectedCvm]);
 
   return (
-    <LeafletMap
-      center={[49.006889, 8.403653]}
-      zoom={14}
+    <Map
+      ref={mapRef}
+      initialViewState={{
+        longitude: 8.403653,
+        latitude: 49.006889,
+        zoom: 14,
+      }}
+      style={{ flexGrow: 1 }}
+      mapStyle="/tiles/default.json"
       minZoom={8}
       maxZoom={19}
-      onReady={onReady}
-      onMoveEnd={onMoveEnd}
-      onZoomEnd={onZoomEnd}
+      attributionControl={false}
+      onLoad={onLoad}
+      onZoomEnd={onViewStateChanged}
+      onMoveEnd={onViewStateChanged}
+      cooperativeGestures
     >
-      <MapLibreTileLayer url="/tiles/default.json" />
-      {markers?.map((marker) => (
-        <LocationMarker
-          key={marker.id}
-          cvm={marker}
-          selected={marker.id === props.selectedCvm?.id}
-        />
-      ))}
+      <AttributionControl compact />
+      <NavigationControl />
+      {markers
+        ?.filter((marker) => marker.id !== props.selectedCvm?.id)
+        .map((marker) => <LocationMarker key={marker.id} cvm={marker} />)}
       {clusters?.map((marker, index) => (
         <ClusterMarker
           key={index}
-          position={new Leaflet.LatLng(marker.latitude, marker.longitude)}
+          position={{ latitude: marker.latitude, longitude: marker.longitude }}
           count={marker.count}
         />
       ))}
-    </LeafletMap>
+      {!!props.selectedCvm && <SelectedMarker cvm={props.selectedCvm} />}
+    </Map>
   );
 }

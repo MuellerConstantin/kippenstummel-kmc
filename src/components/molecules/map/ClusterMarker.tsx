@@ -1,15 +1,14 @@
 import { useMemo, useCallback } from "react";
-import Leaflet from "leaflet";
-import { Marker, useMap } from "react-leaflet";
-import LeafletDivIcon from "@/components/organisms/leaflet/LeafletDivIcon";
+import { GeoCoordinates } from "@/lib/types/geo";
+import { Marker, useMap } from "react-map-gl/maplibre";
 
 interface ClusterMarkerProps {
   count: number;
-  position: Leaflet.LatLng;
+  position: GeoCoordinates;
 }
 
 export function ClusterMarker(props: ClusterMarkerProps) {
-  const map = useMap();
+  const { current: map } = useMap();
 
   const outerClasses = useMemo(() => {
     let outerClasses = "";
@@ -49,32 +48,32 @@ export function ClusterMarker(props: ClusterMarkerProps) {
   }, [props.count]);
 
   const handleClick = useCallback(() => {
-    const newZoom = Math.min(map.getZoom() + 1, map.getMaxZoom());
+    const newZoom = Math.min(Math.ceil(map!.getZoom()) + 1, map!.getMaxZoom());
 
-    map.flyTo(Leaflet.latLng(props.position), newZoom);
+    map!.flyTo({
+      center: [props.position.longitude, props.position.latitude],
+      zoom: newZoom,
+    });
   }, [map, props.position]);
 
   return (
     <Marker
-      position={Leaflet.latLng(props.position)}
-      icon={LeafletDivIcon({
-        source: (
-          <div
-            className={`${outerClasses} box-border h-fit w-fit rounded-[20px] p-[3px]`}
-          >
-            <div
-              className={`${innerClasses} flex h-[32px] w-[32px] items-center justify-center rounded-full`}
-            >
-              <span className="text-center font-sans text-[12px] leading-[30px]">
-                {formattedCount}
-              </span>
-            </div>
-          </div>
-        ),
-        size: Leaflet.point(32, 32),
-        anchor: Leaflet.point(16, 16),
-      })}
-      eventHandlers={{ click: handleClick }}
-    />
+      latitude={props.position.latitude}
+      longitude={props.position.longitude}
+      onClick={handleClick}
+      className="cursor-pointer"
+    >
+      <div
+        className={`${outerClasses} box-border h-fit w-fit rounded-[20px] p-[3px]`}
+      >
+        <div
+          className={`${innerClasses} flex h-[32px] w-[32px] items-center justify-center rounded-full`}
+        >
+          <span className="text-center font-sans text-[10px] leading-[30px]">
+            {formattedCount}
+          </span>
+        </div>
+      </div>
+    </Marker>
   );
 }

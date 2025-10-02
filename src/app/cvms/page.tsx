@@ -8,15 +8,11 @@ import { Button } from "@/components/atoms/Button";
 import { CvmImportDialog } from "@/components/organisms/cvm/CvmImportDialog";
 import { DialogTrigger } from "react-aria-components";
 import { Modal } from "@/components/atoms/Modal";
+import { Cvm } from "@/lib/types/cvm";
 
 export default function Cvms() {
   const [showImportDialog, setShowImportDialog] = useState(false);
-  const [selectedCvm, setSelectedCvm] = useState<{
-    id: string;
-    longitude: number;
-    latitude: number;
-    score: number;
-  } | null>(null);
+  const [selectedCvm, setSelectedCvm] = useState<Cvm | null>(null);
 
   return (
     <div className="flex grow flex-col">
@@ -49,7 +45,9 @@ export default function Cvms() {
               CVM Map
             </h4>
             <div className="flex h-0 min-h-[20rem] grow flex-col overflow-hidden rounded-md">
-              <CvmMap selectedCvm={selectedCvm} />
+              <div className="relative flex grow flex-col">
+                <CvmMap selectedCvm={selectedCvm} />
+              </div>
             </div>
           </div>
         </div>
