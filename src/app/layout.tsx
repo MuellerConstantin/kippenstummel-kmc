@@ -5,6 +5,7 @@ import { AuthProvider } from "@/components/organisms/AuthProvider";
 import { ApiLogoutInterceptor } from "@/hooks/useApi";
 
 import "./globals.css";
+import { RuntimeConfigProvider } from "@/contexts/RuntimeConfigProvider";
 
 const lato = Lato({
   variable: "--font-lato",
@@ -44,7 +45,9 @@ export default function RootLayout({
       <body className={`${lato.variable} bg-white dark:bg-slate-800`}>
         <AuthProvider>
           <StoreProvider>
-            <ApiLogoutInterceptor>{children}</ApiLogoutInterceptor>
+            <RuntimeConfigProvider>
+              <ApiLogoutInterceptor>{children}</ApiLogoutInterceptor>
+            </RuntimeConfigProvider>
           </StoreProvider>
         </AuthProvider>
       </body>
