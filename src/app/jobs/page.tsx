@@ -4,10 +4,9 @@ import { useState } from "react";
 import { Switch } from "@/components/atoms/Switch";
 import { JobsTable } from "@/components/organisms/jobs/JobsTable";
 import { Button } from "@/components/atoms/Button";
-import { DialogTrigger } from "react-aria-components";
-import { Modal } from "@/components/atoms/Modal";
 import { JobInfoDialog } from "@/components/organisms/jobs/JobInfoDialog";
 import { Info } from "lucide-react";
+import { AnimatedDialogModal } from "@/components/molecules/AnimatedDialogModal";
 
 export default function Jobs() {
   const [distinct, setDistinct] = useState(false);
@@ -48,14 +47,15 @@ export default function Jobs() {
           <Switch isSelected={distinct} onChange={setDistinct}>
             Distinct
           </Switch>
-          <DialogTrigger
-            isOpen={showInfoDialog}
-            onOpenChange={setShowInfoDialog}
-          >
-            <Modal className="max-w-2xl">
-              {selected && <JobInfoDialog job={selected![0]} />}
-            </Modal>
-          </DialogTrigger>
+          {selected && (
+            <AnimatedDialogModal
+              isOpen={showInfoDialog}
+              onOpenChange={setShowInfoDialog}
+              className="!max-w-2xl"
+            >
+              <JobInfoDialog job={selected![0]} />
+            </AnimatedDialogModal>
+          )}
         </div>
         <div className="space-y-4">
           <h4 className="text-lg font-semibold text-slate-900 dark:text-slate-100">

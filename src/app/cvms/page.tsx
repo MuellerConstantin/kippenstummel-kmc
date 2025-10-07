@@ -6,9 +6,8 @@ import { CvmList } from "@/components/organisms/cvm/CvmList";
 import { CvmMap } from "@/components/organisms/map/CvmMap";
 import { Button } from "@/components/atoms/Button";
 import { CvmImportDialog } from "@/components/organisms/cvm/CvmImportDialog";
-import { DialogTrigger } from "react-aria-components";
-import { Modal } from "@/components/atoms/Modal";
 import { Cvm } from "@/lib/types/cvm";
+import { AnimatedDialogModal } from "@/components/molecules/AnimatedDialogModal";
 
 export default function Cvms() {
   const [showImportDialog, setShowImportDialog] = useState(false);
@@ -24,14 +23,12 @@ export default function Cvms() {
               <div>Import</div>
             </div>
           </Button>
-          <DialogTrigger
+          <AnimatedDialogModal
             isOpen={showImportDialog}
             onOpenChange={setShowImportDialog}
           >
-            <Modal className="max-w-2xl">
-              <CvmImportDialog />
-            </Modal>
-          </DialogTrigger>
+            <CvmImportDialog />
+          </AnimatedDialogModal>
         </div>
         <div className="flex w-full grow flex-col gap-4 lg:flex-row">
           <div className="w-full space-y-4 md:w-fit">

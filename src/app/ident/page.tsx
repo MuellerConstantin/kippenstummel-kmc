@@ -1,12 +1,11 @@
 "use client";
 
 import { Button } from "@/components/atoms/Button";
-import { Modal } from "@/components/atoms/Modal";
+import { AnimatedDialogModal } from "@/components/molecules/AnimatedDialogModal";
 import { DeleteIdentDialog } from "@/components/organisms/ident/DeleteIdentDialog";
 import { IdentTable } from "@/components/organisms/ident/IdentTable";
 import { Trash } from "lucide-react";
 import { useState } from "react";
-import { DialogTrigger } from "react-aria-components";
 
 export default function Ident() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -33,14 +32,12 @@ export default function Ident() {
               <div>Delete</div>
             </div>
           </Button>
-          <DialogTrigger
+          <AnimatedDialogModal
             isOpen={showDeleteDialog}
             onOpenChange={setShowDeleteDialog}
           >
-            <Modal>
-              <DeleteIdentDialog idents={selected || []} />
-            </Modal>
-          </DialogTrigger>
+            <DeleteIdentDialog idents={selected || []} />
+          </AnimatedDialogModal>
         </div>
         <div className="space-y-4">
           <h4 className="text-lg font-semibold text-slate-900 dark:text-slate-100">

@@ -13,9 +13,9 @@ import { Link } from "@/components/atoms/Link";
 import { Button } from "@/components/atoms/Button";
 import { useCallback, useState } from "react";
 import { Offset } from "maplibre-gl";
-import { Modal } from "@/components/atoms/Modal";
 import { CvmDetailsDialog } from "@/components/organisms/cvm/CvmDetailsDialog";
 import { RemoveCvmDialog } from "@/components/organisms/cvm/RemoveCvmDialog";
+import { AnimatedDialogModal } from "../AnimatedDialogModal";
 
 interface CopyButtonProps {
   text: string;
@@ -157,15 +157,21 @@ export function LocationMarker(props: LocationMarkerProps) {
           />
         )}
       </Marker>
-      <Modal isOpen={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
+      <AnimatedDialogModal
+        isOpen={showDetailsDialog}
+        onOpenChange={setShowDetailsDialog}
+      >
         <CvmDetailsDialog
           cvm={props.cvm}
           onDelete={() => setShowDeleteDialog(true)}
         />
-      </Modal>
-      <Modal isOpen={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+      </AnimatedDialogModal>
+      <AnimatedDialogModal
+        isOpen={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+      >
         <RemoveCvmDialog cvm={props.cvm} />
-      </Modal>
+      </AnimatedDialogModal>
     </>
   );
 }
