@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { tv } from "tailwind-variants";
 
 interface MessageBannerProps {
@@ -63,12 +63,51 @@ export function MessageBannerCarousel(props: MessageBannerCarouselProps) {
     return () => clearInterval(interval);
   }, [props.messages]);
 
+  const dotIndices = useMemo(() => {
+    const MAX_VISIBLE_DOTS = 5;
+    const total = props.messages.length;
+
+    if (total <= MAX_VISIBLE_DOTS) {
+      return Array.from({ length: total }, (_, i) => i);
+    }
+
+    const half = Math.floor(MAX_VISIBLE_DOTS / 2);
+    let start = Math.max(0, index - half);
+    let end = Math.min(total - 1, index + half);
+
+    if (end - start + 1 < MAX_VISIBLE_DOTS) {
+      if (start === 0) end = MAX_VISIBLE_DOTS - 1;
+      else if (end === total - 1) start = total - MAX_VISIBLE_DOTS;
+    }
+
+    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+  }, [props.messages.length, index]);
+
+  const dots = useMemo(() => {
+    const first = dotIndices[0];
+    const last = dotIndices[dotIndices.length - 1];
+    const hasLeftOverflow = first > 0;
+    const hasRightOverflow = last < props.messages.length - 1;
+
+    return dotIndices.map((msgIndex, pos) => {
+      const isActive = msgIndex === index;
+      const isLeftEdge = pos === 0 && hasLeftOverflow;
+      const isRightEdge = pos === dotIndices.length - 1 && hasRightOverflow;
+
+      return {
+        index: msgIndex,
+        isActive,
+        isEdge: isLeftEdge || isRightEdge,
+      };
+    });
+  }, [dotIndices, index, props.messages.length]);
+
   if (props.messages.length === 0) {
     return null;
   }
 
   return (
-    <div className="bg-slate-50 dark:bg-slate-900">
+    <div className="relative bg-slate-50 dark:bg-slate-900">
       <AnimatePresence mode="wait">
         <motion.div
           key={index}
@@ -82,6 +121,24 @@ export function MessageBannerCarousel(props: MessageBannerCarouselProps) {
           <MessageBanner {...props.messages[index]} />
         </motion.div>
       </AnimatePresence>
+      {props.messages.length > 1 && (
+        <div className="absolute right-0 bottom-2 left-0 mx-auto flex items-center justify-center gap-1">
+          {dots.map((dot) => {
+            return (
+              <div
+                key={dot.index}
+                className={`h-[6px] w-[6px] rounded-full transition-colors ${
+                  dot.isActive
+                    ? "bg-slate-800 dark:bg-slate-200"
+                    : dot.isEdge
+                      ? "!h-[5px] !w-[5px] bg-slate-300 dark:bg-slate-600"
+                      : "bg-slate-400 dark:bg-slate-500"
+                }`}
+              />
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
