@@ -9,7 +9,25 @@ interface MessageBannerProps {
 }
 
 const banner = tv({
-  base: "border w-full h-full px-4 py-2",
+  base: "w-full h-full px-4 py-2",
+  variants: {
+    variant: {
+      default: "bg-white text-slate-900 dark:bg-slate-900  dark:text-slate-100",
+      success:
+        "bg-green-50  text-green-800 dark:bg-green-950  dark:text-green-100",
+      error: "bg-red-50  text-red-800 dark:bg-red-950  dark:text-red-100",
+      info: "bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100",
+      warning:
+        "bg-amber-50  text-amber-800 dark:bg-amber-950  dark:text-amber-100",
+    },
+  },
+  defaultVariants: {
+    variant: "default",
+  },
+});
+
+const carousel = tv({
+  base: "border",
   variants: {
     variant: {
       default:
@@ -107,7 +125,9 @@ export function MessageBannerCarousel(props: MessageBannerCarouselProps) {
   }
 
   return (
-    <div className="relative bg-slate-50 dark:bg-slate-900">
+    <div
+      className={`relative flex flex-col gap-1 ${carousel({ variant: props.messages[index].variant })}`}
+    >
       <AnimatePresence mode="wait">
         <motion.div
           key={index}
@@ -122,7 +142,7 @@ export function MessageBannerCarousel(props: MessageBannerCarouselProps) {
         </motion.div>
       </AnimatePresence>
       {props.messages.length > 1 && (
-        <div className="absolute right-0 bottom-2 left-0 mx-auto flex items-center justify-center gap-1">
+        <div className="flex items-center justify-center gap-1 pb-1">
           {dots.map((dot) => {
             return (
               <div
