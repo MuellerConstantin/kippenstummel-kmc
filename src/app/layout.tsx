@@ -40,7 +40,6 @@ export default function RootLayout({
           href="/apple-touch-icon.png"
         />
         <meta name="apple-mobile-web-app-title" content="Kippenstummel" />
-        <link rel="manifest" href="/manifest.json" />
       </head>
       <body className={`${lato.variable} bg-white dark:bg-slate-800`}>
         <AuthProvider>
