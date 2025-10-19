@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import { tv } from "tailwind-variants";
+import { Link } from "../atoms/Link";
 
 interface MessageBannerProps {
   title: string;
@@ -12,7 +13,7 @@ const banner = tv({
   base: "w-full h-full px-4 py-2",
   variants: {
     variant: {
-      default: "bg-white text-slate-900 dark:bg-slate-900  dark:text-slate-100",
+      default: "bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100",
       success:
         "bg-green-50  text-green-800 dark:bg-green-950  dark:text-green-100",
       error: "bg-red-50  text-red-800 dark:bg-red-950  dark:text-red-100",
@@ -67,6 +68,7 @@ export interface MessageBannerCarouselProps {
 }
 
 export function MessageBannerCarousel(props: MessageBannerCarouselProps) {
+  const [visible, setVisible] = useState(true);
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
@@ -124,6 +126,10 @@ export function MessageBannerCarousel(props: MessageBannerCarouselProps) {
     return null;
   }
 
+  if (!visible) {
+    return null;
+  }
+
   return (
     <div
       className={`relative flex flex-col gap-1 ${carousel({ variant: props.messages[index].variant })}`}
@@ -141,24 +147,33 @@ export function MessageBannerCarousel(props: MessageBannerCarouselProps) {
           <MessageBanner {...props.messages[index]} />
         </motion.div>
       </AnimatePresence>
-      {props.messages.length > 1 && (
-        <div className="flex items-center justify-center gap-1 pb-1">
-          {dots.map((dot) => {
-            return (
-              <div
-                key={dot.index}
-                className={`h-[6px] w-[6px] rounded-full transition-colors ${
-                  dot.isActive
-                    ? "bg-slate-800 dark:bg-slate-200"
-                    : dot.isEdge
-                      ? "!h-[5px] !w-[5px] bg-slate-300 dark:bg-slate-600"
-                      : "bg-slate-400 dark:bg-slate-500"
-                }`}
-              />
-            );
-          })}
-        </div>
-      )}
+      <div className="flex items-center justify-between gap-2 px-4 pb-1">
+        {props.messages.length > 1 && (
+          <div className="flex items-center justify-center gap-1">
+            {dots.map((dot) => {
+              return (
+                <div
+                  key={dot.index}
+                  className={`h-[6px] w-[6px] rounded-full transition-colors ${
+                    dot.isActive
+                      ? "bg-slate-800 dark:bg-slate-200"
+                      : dot.isEdge
+                        ? "!h-[5px] !w-[5px] bg-slate-300 dark:bg-slate-600"
+                        : "bg-slate-400 dark:bg-slate-500"
+                  }`}
+                />
+              );
+            })}
+          </div>
+        )}
+        <Link
+          variant="secondary"
+          className="!cursor-pointer !text-xs"
+          onPress={() => setVisible(false)}
+        >
+          Hide
+        </Link>
+      </div>
     </div>
   );
 }
