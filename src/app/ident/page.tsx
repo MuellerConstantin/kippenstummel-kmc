@@ -15,6 +15,7 @@ export default function Ident() {
         createdAt?: string;
         updatedAt?: string;
         credibility: number;
+        karma: number;
       }[]
     | null
   >(null);

@@ -21,6 +21,7 @@ export interface IdentTableProps {
       createdAt?: string;
       updatedAt?: string;
       credibility: number;
+      karma: number;
     }[],
   ) => void;
 }
@@ -42,6 +43,7 @@ export function IdentTable(props: IdentTableProps) {
         createdAt?: string;
         updatedAt?: string;
         credibility: number;
+        karma: number;
       }[];
       info: {
         page: number;
@@ -166,6 +168,7 @@ export function IdentTable(props: IdentTableProps) {
               </Column>
               <Column id="type">Issued At</Column>
               <Column id="date">Credibility</Column>
+              <Column id="karma">Karma</Column>
             </TableHeader>
             <TableBody items={data.content}>
               {(row) => (
@@ -173,6 +176,7 @@ export function IdentTable(props: IdentTableProps) {
                   <Cell>{row.identity}</Cell>
                   <Cell>{new Date(row.createdAt!).toLocaleDateString()}</Cell>
                   <Cell>{row.credibility}</Cell>
+                  <Cell>{row.karma}</Cell>
                 </Row>
               )}
             </TableBody>
