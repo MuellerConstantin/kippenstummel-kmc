@@ -86,7 +86,7 @@ export function SearchableSelect<T extends object>({
       </Button>
       {description && <Description>{description}</Description>}
       <FieldError>{errorMessage}</FieldError>
-      <Popover className="entering:animate-in entering:fade-in exiting:animate-out exiting:fade-out flex !max-h-80 w-(--trigger-width) flex-col rounded-md bg-white text-base shadow-lg ring-1 ring-black/5">
+      <Popover className="entering:animate-in entering:fade-in exiting:animate-out exiting:fade-out !z-[150000] flex !max-h-80 w-(--trigger-width) flex-col rounded-md bg-white text-base shadow-lg ring-1 ring-black/5">
         <SearchField
           aria-label="Search"
           autoFocus
