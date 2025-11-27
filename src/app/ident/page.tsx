@@ -16,6 +16,7 @@ export default function Ident() {
         updatedAt?: string;
         credibility: number;
         karma: number;
+        displayName?: string;
       }[]
     | null
   >(null);

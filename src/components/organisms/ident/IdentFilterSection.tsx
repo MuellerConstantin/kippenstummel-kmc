@@ -130,7 +130,10 @@ export function IdentFilterSection(props: IdentFilterSectionProps) {
           setSearchProperty(property);
           setSearchTerm(searchTerm);
         }}
-        properties={[{ label: "Identity", value: "identity" }]}
+        properties={[
+          { label: "Identity", value: "identity" },
+          { label: "Display Name", value: "displayName" },
+        ]}
       />
       <div className="flex items-center gap-2">
         <button
