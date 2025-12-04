@@ -91,7 +91,7 @@ export function CvmMap(props: CvmMapProps) {
       onMoveEnd={onViewStateChanged}
       cooperativeGestures
     >
-      <AttributionControl compact />
+      <AttributionControl compact={false} />
       <NavigationControl />
       {markers
         ?.filter((marker) => marker.id !== props.selectedCvm?.id)

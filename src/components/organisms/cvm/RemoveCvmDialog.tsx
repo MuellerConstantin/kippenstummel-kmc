@@ -9,11 +9,13 @@ import { Cvm } from "@/lib/types/cvm";
 
 interface RemoveCvmDialogProps extends Omit<DialogProps, "children"> {
   cvm: Cvm;
+  onConfirm?: () => void;
+  onCancel?: () => void;
 }
 
 export function RemoveCvmDialog(props: RemoveCvmDialogProps) {
   const { mutate } = useSWRConfig();
-  const { cvm } = props;
+  const { cvm, onCancel, onConfirm } = props;
 
   const api = useApi();
 
@@ -29,13 +31,14 @@ export function RemoveCvmDialog(props: RemoveCvmDialogProps) {
         await api.delete(`/kmc/cvms/${cvm.id}`);
         mutate((key: string) => /^.*\/kmc\/cvms.*$/.test(key), null);
         close();
+        onConfirm?.();
       } catch {
         setError("An unexpected error occurred, please retry!");
       } finally {
         setIsLoading(false);
       }
     },
-    [api, cvm, mutate],
+    [api, cvm, mutate, onConfirm],
   );
 
   return (
@@ -57,7 +60,10 @@ export function RemoveCvmDialog(props: RemoveCvmDialogProps) {
             <div className="flex justify-start gap-4">
               <Button
                 variant="secondary"
-                onPress={() => close()}
+                onPress={() => {
+                  close();
+                  onCancel?.();
+                }}
                 className="w-full"
               >
                 Cancel

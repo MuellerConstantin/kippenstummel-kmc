@@ -14,7 +14,7 @@ export function SelectedMarker(props: SelectedMarkerProps) {
       longitude={props.cvm.longitude}
     >
       <div className="relative z-[50] h-fit w-fit">
-        <MapPin className="h-[36px] w-[36px] fill-[#EA4335] text-[#A52714]" />
+        <MapPin className="h-[32px] w-[32px] fill-[#EA4335] text-[#A52714]" />
       </div>
     </Marker>
   );

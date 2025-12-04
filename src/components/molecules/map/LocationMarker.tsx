@@ -147,7 +147,7 @@ export function LocationMarker(props: LocationMarkerProps) {
               <Equal className="h-2.5 w-2.5 text-white" />
             </div>
           )}
-          <MapPin className="h-[36px] w-[36px] fill-green-600 text-white dark:text-slate-600" />
+          <MapPin className="h-[32px] w-[32px] fill-green-600 text-white dark:text-slate-600" />
         </div>
         {showPopup && (
           <LocationMarkerPopup
@@ -170,7 +170,10 @@ export function LocationMarker(props: LocationMarkerProps) {
         isOpen={showDeleteDialog}
         onOpenChange={setShowDeleteDialog}
       >
-        <RemoveCvmDialog cvm={props.cvm} />
+        <RemoveCvmDialog
+          cvm={props.cvm}
+          onConfirm={() => setShowPopup(false)}
+        />
       </AnimatedDialogModal>
     </>
   );
