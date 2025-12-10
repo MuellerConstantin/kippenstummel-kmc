@@ -14,6 +14,8 @@ export interface LineChartProps {
   traces: { x: string[]; y: number[]; lineColor: string; name: string }[];
   loading: boolean;
   errored: boolean;
+  yAxis?: Partial<Plotly.Layout["yaxis"]>;
+  xAxis?: Partial<Plotly.Layout["xaxis"]>;
 }
 
 export function LineChart(props: LineChartProps) {
@@ -54,11 +56,13 @@ export function LineChart(props: LineChartProps) {
                 type: "date",
                 tickformat: "%Y-%m-%d",
                 color: darkMode ? "#f1f5f9" : "#0f172a",
+                ...props.xAxis,
               },
               yaxis: {
                 showgrid: true,
                 gridcolor: darkMode ? "#334155" : "#cbd5e1",
                 color: darkMode ? "#f1f5f9" : "#0f172a",
+                ...props.yAxis,
               },
             }}
             config={{ responsive: true }}

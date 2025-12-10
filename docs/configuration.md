@@ -32,10 +32,11 @@ here for the sake of completeness.
 Build time configuration variables are in general prefixed with `NEXT_PUBLIC_`. Changing these variables
 requires a rebuild of the web client. These variables are loaded and hardcoded at build time.
 
-| Environment Variable       | Description                                                                  | Required |
-| -------------------------- | ---------------------------------------------------------------------------- | -------- |
-| NEXT_PUBLIC_IS_TEST_SYSTEM | Indicates if the web client is running in a test system. Default is `false`. | No       |
-| NEXT_PUBLIC_IS_PRE_RELEASE | Indicates if the web client is a pre-release. Default is `false`.            | No       |
+| Environment Variable        | Description                                                                  | Required |
+| --------------------------- | ---------------------------------------------------------------------------- | -------- |
+| NEXT_PUBLIC_IS_TEST_SYSTEM  | Indicates if the web client is running in a test system. Default is `false`. | No       |
+| NEXT_PUBLIC_IS_PRE_RELEASE  | Indicates if the web client is a pre-release. Default is `false`.            | No       |
+| NEXT_PUBLIC_ACKEE_DOMAIN_ID | Domain ID of the [Ackee](https://ackee.software/) instance.                  | No       |
 
 ### Runtime configuration
 
@@ -48,3 +49,5 @@ requires a restart of the web server.
 | NEXTAUTH_URL          | Canonical Url of the Kippenstummel KMC web client. (e.g. `http://<HOST>:<PORT>`).                        | Yes      |
 | NEXTAUTH_SECRET       | Secret used to encrypt the session cookie.                                                               | Yes      |
 | JWT_SECRET            | Symmetric secret used to sign the JWT access token used for admin API access.                            | Yes      |
+| ACKEE_API_URL         | Url of the Ackee API.                                                                                    | No       |
+| ACKEE_API_TOKEN       | Token used to access the Ackee API.                                                                      | No       |
