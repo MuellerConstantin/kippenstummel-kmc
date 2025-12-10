@@ -31,7 +31,7 @@
     "lucide-react": "^0.483.0",
     "maplibre-gl": "^5.8.0",
     "motion": "^12.23.22",
-    "next": "15.2.3",
+    "next": "^15.2.3",
     "next-auth": "^4.24.11",
     "plotly.js": "^3.0.1",
     "react": "^19.0.0",
