@@ -3,7 +3,7 @@ import { StackTemplate } from "@/components/templates/StackTemplate";
 import { AuthGuard } from "@/components/organisms/AuthGuard";
 
 export const metadata: Metadata = {
-  title: "KMC | Jobs",
+  title: "Jobs",
 };
 
 export default function JobsLayout({

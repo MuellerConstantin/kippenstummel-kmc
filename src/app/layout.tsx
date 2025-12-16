@@ -14,7 +14,10 @@ const lato = Lato({
 });
 
 export const metadata: Metadata = {
-  title: "KMC",
+  title: {
+    default: "KMC",
+    template: "%s · KMC",
+  },
 };
 
 export default function RootLayout({
