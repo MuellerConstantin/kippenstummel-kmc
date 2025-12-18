@@ -18,6 +18,10 @@ export const metadata: Metadata = {
     default: "KMC",
     template: "%s · KMC",
   },
+  robots: {
+    follow: false,
+    index: false,
+  },
 };
 
 export default function RootLayout({
