@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
-import { Lato } from "next/font/google";
+import { Outfit } from "next/font/google";
 import { StoreProvider } from "@/store";
 import { AuthProvider } from "@/components/organisms/AuthProvider";
+import { RuntimeConfigProvider } from "@/contexts/RuntimeConfigProvider";
 import { ApiLogoutInterceptor } from "@/hooks/useApi";
 
 import "./globals.css";
-import { RuntimeConfigProvider } from "@/contexts/RuntimeConfigProvider";
 
-const lato = Lato({
-  variable: "--font-lato",
+const outfit = Outfit({
+  variable: "--font-outfit",
   weight: ["400", "700"],
   subsets: ["latin"],
 });
@@ -48,7 +48,7 @@ export default function RootLayout({
         />
         <meta name="apple-mobile-web-app-title" content="Kippenstummel" />
       </head>
-      <body className={`${lato.variable} bg-white dark:bg-slate-800`}>
+      <body className={`${outfit.variable} bg-white dark:bg-slate-800`}>
         <AuthProvider>
           <StoreProvider>
             <RuntimeConfigProvider>

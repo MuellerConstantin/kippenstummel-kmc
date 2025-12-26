@@ -62,9 +62,13 @@ export function Navbar() {
           </div>
         </NextLink>
         <div className="flex items-center space-x-4">
-          <div className="hidden space-x-4 md:flex">
+          <div className="hidden space-x-2 md:flex">
             {navigation.map((item) => (
-              <Link key={item.name} href={item.href}>
+              <Link
+                key={item.name}
+                href={item.href}
+                className="rounded-md px-3 py-2 text-sm font-medium font-semibold !text-slate-800 !no-underline hover:bg-slate-200 dark:!text-white dark:hover:bg-slate-800"
+              >
                 {item.name}
               </Link>
             ))}

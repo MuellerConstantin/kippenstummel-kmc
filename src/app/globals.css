@@ -24,7 +24,7 @@
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: var(--font-lato) sans-serif;
+  font-family: var(--font-outfit), sans-serif;
 }
 
 .dark .maplibregl-canvas {
