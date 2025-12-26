@@ -20,7 +20,7 @@ export function PieChart(props: PieChartProps) {
   const darkMode = useAppSelector((state) => state.theme.darkMode);
 
   return (
-    <div className="flex h-full w-full flex-col gap-2 overflow-hidden rounded-md border border-slate-200 bg-slate-100 p-2 shadow dark:border-slate-700 dark:bg-slate-900">
+    <div className="flex h-full w-full flex-col gap-2 overflow-hidden rounded-md border border-slate-200 bg-white p-2 dark:border-slate-700 dark:bg-slate-900">
       <h5 className="truncate font-semibold text-slate-900 dark:text-slate-100">
         {props.title}
       </h5>
@@ -38,13 +38,18 @@ export function PieChart(props: PieChartProps) {
               labels: d.labels,
               values: d.values,
               marker: { colors: d.colors },
-              textinfo: "label+percent",
+              textinfo: "percent",
+              textposition: "inside",
               hoverinfo: "label+value+percent",
             }))}
             layout={{
               autosize: true,
-              margin: { t: 0, b: 0, l: 0, r: 0 },
-              paper_bgcolor: darkMode ? "#0f172a" : "#f1f5f9",
+              margin: { t: 10, b: 10, l: 10, r: 10 },
+              legend: {
+                orientation: "h",
+                y: -0.1,
+              },
+              paper_bgcolor: darkMode ? "#0f172a" : "#ffffff",
               font: {
                 color: darkMode ? "#f1f5f9" : "#0f172a",
               },

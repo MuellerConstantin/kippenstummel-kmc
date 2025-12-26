@@ -328,13 +328,13 @@ export default function Stats() {
   >("/kmc/stats", (url) => api.get(url).then((res) => res.data));
 
   return (
-    <div className="flex grow flex-col">
-      <div className="mx-auto flex w-full max-w-screen-2xl grow flex-col gap-4 p-4">
-        <div className="flex w-full grow flex-col gap-4 lg:flex-row lg:gap-8">
-          <div className="w-full min-w-[15rem] shrink-0 space-y-4 md:w-fit">
+    <div className="flex grow flex-col gap-4 bg-slate-50 dark:bg-slate-800">
+      <div className="mx-auto flex w-full max-w-screen-2xl grow flex-col gap-4">
+        <div className="flex w-full grow flex-col lg:flex-row lg:gap-8">
+          <div className="w-full min-w-[15rem] shrink-0 space-y-4 border-r border-slate-200 bg-white p-4 md:w-fit dark:border-slate-700 dark:bg-slate-800">
             <Sidebar />
           </div>
-          <div className="flex w-full flex-col space-y-4">
+          <div className="flex w-full flex-col space-y-4 p-4">
             <section
               id="section-cvm-stats"
               className="flex w-full flex-col gap-4"
