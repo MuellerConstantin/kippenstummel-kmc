@@ -16,6 +16,13 @@ import { useAppSelector, useAppDispatch } from "@/store";
 import themeSlice from "@/store/slices/theme";
 
 export function Navbar() {
+  const { data: session, status } = useSession();
+
+  const isAuthenticated = useMemo(
+    () => status !== "loading" && session,
+    [session, status],
+  );
+
   const navigation = useMemo(() => {
     return [
       { name: "Home", href: "/" },
@@ -30,22 +37,24 @@ export function Navbar() {
     <nav className="relative border-b border-slate-200 bg-slate-50 text-slate-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400">
       <div className="flex items-center justify-between space-x-10 p-4">
         <div className="md:hidden">
-          <MenuTrigger>
-            <Button variant="icon">
-              <MenuIcon className="h-6 w-6" />
-            </Button>
-            <Menu>
-              {navigation.map((item) => (
-                <MenuItem
-                  key={item.name}
-                  id={`nav-${item.name}`}
-                  href={item.href}
-                >
-                  {item.name}
-                </MenuItem>
-              ))}
-            </Menu>
-          </MenuTrigger>
+          {isAuthenticated && (
+            <MenuTrigger>
+              <Button variant="icon">
+                <MenuIcon className="h-6 w-6" />
+              </Button>
+              <Menu>
+                {navigation.map((item) => (
+                  <MenuItem
+                    key={item.name}
+                    id={`nav-${item.name}`}
+                    href={item.href}
+                  >
+                    {item.name}
+                  </MenuItem>
+                ))}
+              </Menu>
+            </MenuTrigger>
+          )}
         </div>
         <NextLink href="/">
           <div className="flex w-fit items-center justify-center md:space-x-4">
@@ -62,17 +71,19 @@ export function Navbar() {
           </div>
         </NextLink>
         <div className="flex items-center space-x-4">
-          <div className="hidden space-x-2 md:flex">
-            {navigation.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className="rounded-md px-3 py-2 text-sm font-medium font-semibold !text-slate-800 !no-underline hover:bg-slate-200 dark:!text-white dark:hover:bg-slate-800"
-              >
-                {item.name}
-              </Link>
-            ))}
-          </div>
+          {isAuthenticated && (
+            <div className="hidden space-x-2 md:flex">
+              {navigation.map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className="rounded-md px-3 py-2 text-sm font-medium font-semibold !text-slate-800 !no-underline hover:bg-slate-200 dark:!text-white dark:hover:bg-slate-800"
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </div>
+          )}
           <div className="self-end">
             <NavbarOptionsMenu />
           </div>
