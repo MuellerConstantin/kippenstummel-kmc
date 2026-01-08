@@ -19,6 +19,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 
 export interface CvmMapProps {
   selectedCvm: Cvm | null;
+  filter?: string | null;
 }
 
 export function CvmMap(props: CvmMapProps) {
@@ -32,6 +33,7 @@ export function CvmMap(props: CvmMapProps) {
     zoom: zoom!,
     bottomLeft: bottomLeft!,
     topRight: topRight!,
+    filter: props.filter,
   });
 
   const onLoad = useCallback((event: MapLibreEvent) => {
@@ -95,7 +97,9 @@ export function CvmMap(props: CvmMapProps) {
       <NavigationControl />
       {markers
         ?.filter((marker) => marker.id !== props.selectedCvm?.id)
-        .map((marker) => <LocationMarker key={marker.id} cvm={marker} />)}
+        .map((marker) => (
+          <LocationMarker key={marker.id} cvm={marker} />
+        ))}
       {clusters?.map((marker, index) => (
         <ClusterMarker
           key={index}

@@ -107,7 +107,7 @@ export function CvmFilterSection(props: CvmFilterSectionProps) {
         .filter(Boolean)
         .join(" and ");
 
-      onFilter(query ? encodeURIComponent(query) : null);
+      onFilter(query);
     }
   }, [
     searchQuery,

@@ -11,6 +11,7 @@ export interface UseMapViewportCvmDataProps {
   zoom: number;
   bottomLeft: GeoCoordinates;
   topRight: GeoCoordinates;
+  filter?: string | null;
 }
 
 /**
@@ -26,7 +27,7 @@ export interface UseMapViewportCvmDataProps {
 export default function useMapCvmViewportData(
   props: UseMapViewportCvmDataProps & SWRConfiguration,
 ) {
-  const { zoom, bottomLeft, topRight } = props;
+  const { zoom, bottomLeft, topRight, filter } = props;
 
   const api = useApi();
 
@@ -82,8 +83,12 @@ export default function useMapCvmViewportData(
       zoom: String(normalizedZoom),
     });
 
+    if (filter) {
+      params.set("filter", filter);
+    }
+
     return params;
-  }, [normalizedBottomLeft, normalizedTopRight, normalizedZoom]);
+  }, [normalizedBottomLeft, normalizedTopRight, normalizedZoom, filter]);
 
   const { data, isLoading, error } = useSWR<
     (Cvm | CvmCluster)[],

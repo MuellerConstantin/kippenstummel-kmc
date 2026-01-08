@@ -8,10 +8,12 @@ import { Button } from "@/components/atoms/Button";
 import { CvmImportDialog } from "@/components/organisms/cvm/CvmImportDialog";
 import { Cvm } from "@/lib/types/cvm";
 import { AnimatedDialogModal } from "@/components/molecules/AnimatedDialogModal";
+import { CvmFilterSection } from "@/components/organisms/cvm/CvmFilterSection";
 
 export default function Cvms() {
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [selectedCvm, setSelectedCvm] = useState<Cvm | null>(null);
+  const [filter, setFilter] = useState<string | null>(null);
 
   return (
     <div className="flex grow flex-col">
@@ -35,7 +37,11 @@ export default function Cvms() {
             <h4 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
               Registered CVMs
             </h4>
-            <CvmList onClick={(cvm) => setSelectedCvm(cvm || null)} />
+            <CvmFilterSection onFilter={(query) => setFilter(query)} />
+            <CvmList
+              onClick={(cvm) => setSelectedCvm(cvm || null)}
+              filter={filter}
+            />
           </div>
           <div className="flex w-full flex-col space-y-4">
             <h4 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
@@ -43,7 +49,7 @@ export default function Cvms() {
             </h4>
             <div className="flex h-0 min-h-[20rem] grow flex-col overflow-hidden rounded-md">
               <div className="relative flex grow flex-col">
-                <CvmMap selectedCvm={selectedCvm} />
+                <CvmMap selectedCvm={selectedCvm} filter={filter} />
               </div>
             </div>
           </div>
