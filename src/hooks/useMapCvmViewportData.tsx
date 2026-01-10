@@ -95,7 +95,7 @@ export default function useMapCvmViewportData(
     AxiosError<ApiError>,
     string | null
   >(
-    !!searchParams ? `/cvms?${searchParams.toString()}` : null,
+    !!searchParams ? `/kmc/cvms/within?${searchParams.toString()}` : null,
     (url) => api.get(url).then((res) => res.data),
     { keepPreviousData: true, ...props },
   );

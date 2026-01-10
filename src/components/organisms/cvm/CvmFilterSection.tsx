@@ -7,6 +7,7 @@ import { NumberField } from "@/components/atoms/NumberField";
 import { Button } from "@/components/atoms/Button";
 import { DatePicker } from "@/components/atoms/DatePicker";
 import { DateValue } from "react-aria-components";
+import { TextField } from "@/components/atoms/TextField";
 
 interface CvmFilterSectionProps {
   isDisabled?: boolean;
@@ -28,6 +29,9 @@ export function CvmFilterSection(props: CvmFilterSectionProps) {
   const [filteredCreatedAfter, setFilteredCreatedAfter] = useState<Date | null>(
     null,
   );
+  const [filteredRegisteredBy, setFilteredRegisteredBy] = useState<
+    string | null
+  >(null);
 
   const searchQuery = useMemo(() => {
     if (searchProperty && searchTerm && searchTerm.length > 0) {
@@ -43,11 +47,13 @@ export function CvmFilterSection(props: CvmFilterSectionProps) {
       maxScore,
       createdBefore,
       createdAfter,
+      registeredBy,
     }: {
       minScore: number | null;
       maxScore: number | null;
       createdBefore: DateValue | null;
       createdAfter: DateValue | null;
+      registeredBy: string;
     }) => {
       setFilteredMinScore(minScore);
       setFilteredMaxScore(maxScore);
@@ -55,13 +61,11 @@ export function CvmFilterSection(props: CvmFilterSectionProps) {
         createdBefore ? createdBefore.toDate("UTC") : null,
       );
       setFilteredCreatedAfter(createdAfter ? createdAfter.toDate("UTC") : null);
+      setFilteredRegisteredBy(
+        registeredBy && registeredBy.length > 0 ? registeredBy : null,
+      );
     },
-    [
-      setFilteredMinScore,
-      setFilteredMaxScore,
-      setFilteredCreatedBefore,
-      setFilteredCreatedAfter,
-    ],
+    [],
   );
 
   const onFilterReset = useCallback((resetForm: () => void) => {
@@ -69,6 +73,7 @@ export function CvmFilterSection(props: CvmFilterSectionProps) {
     setFilteredMaxScore(null);
     setFilteredCreatedBefore(null);
     setFilteredCreatedAfter(null);
+    setFilteredRegisteredBy(null);
     resetForm();
   }, []);
 
@@ -94,11 +99,17 @@ export function CvmFilterSection(props: CvmFilterSectionProps) {
           ? `createdAt>=${filteredCreatedAfter.toISOString()}`
           : null;
 
+      const registeredByQuery =
+        filteredRegisteredBy !== null
+          ? `registeredBy=="${filteredRegisteredBy}"`
+          : null;
+
       const appliedFilters = [
         minScoreQuery,
         maxScoreQuery,
         createdBeforeQuery,
         createdAfterQuery,
+        registeredByQuery,
       ].filter(Boolean);
 
       setNumberOfFilters(appliedFilters.length);
@@ -115,6 +126,7 @@ export function CvmFilterSection(props: CvmFilterSectionProps) {
     filteredMaxScore,
     filteredCreatedBefore,
     filteredCreatedAfter,
+    filteredRegisteredBy,
     onFilter,
   ]);
 
@@ -156,12 +168,14 @@ export function CvmFilterSection(props: CvmFilterSectionProps) {
           maxScore: number | null;
           createdBefore: DateValue | null;
           createdAfter: DateValue | null;
+          registeredBy: string;
         }>
           initialValues={{
             minScore: null,
             maxScore: null,
             createdBefore: null,
             createdAfter: null,
+            registeredBy: "",
           }}
           onSubmit={(values) => onFilterInternal(values)}
         >
@@ -240,6 +254,23 @@ export function CvmFilterSection(props: CvmFilterSectionProps) {
                     isInvalid={
                       !!formikProps.touched.createdAfter &&
                       !!formikProps.errors.createdAfter
+                    }
+                    onBlur={formikProps.handleBlur}
+                  />
+                </div>
+                <div>
+                  <TextField
+                    label="Registered By"
+                    name="registeredBy"
+                    isDisabled={props.isDisabled}
+                    value={formikProps.values.registeredBy}
+                    onChange={(value) =>
+                      formikProps.setFieldValue("registeredBy", value)
+                    }
+                    errorMessage={formikProps.errors.registeredBy}
+                    isInvalid={
+                      !!formikProps.touched.registeredBy &&
+                      !!formikProps.errors.registeredBy
                     }
                     onBlur={formikProps.handleBlur}
                   />
