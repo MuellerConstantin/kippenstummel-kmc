@@ -33,7 +33,7 @@ export default function Cvms() {
           </AnimatedDialogModal>
         </div>
         <div className="flex w-full grow flex-col gap-4 lg:flex-row">
-          <div className="w-full space-y-4 md:w-fit">
+          <div className="w-full space-y-4 overflow-hidden md:w-1/3">
             <h4 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
               Registered CVMs
             </h4>
@@ -43,7 +43,7 @@ export default function Cvms() {
               filter={filter}
             />
           </div>
-          <div className="flex w-full flex-col space-y-4">
+          <div className="flex w-full flex-col space-y-4 md:w-2/3">
             <h4 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
               CVM Map
             </h4>

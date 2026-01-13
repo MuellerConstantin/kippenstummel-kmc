@@ -43,7 +43,7 @@ export function NumberField({
       <FieldGroup>
         {(renderProps) => (
           <>
-            <Input />
+            <Input className="w-full" />
             <div
               className={fieldBorderStyles({
                 ...renderProps,
