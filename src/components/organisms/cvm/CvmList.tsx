@@ -6,6 +6,11 @@ import { MapPin, ChevronUp, ChevronDown, Equal, X } from "lucide-react";
 import useApi from "@/hooks/useApi";
 import { ListBox, ListBoxItem } from "@/components/atoms/ListBox";
 import { Pagination } from "@/components/molecules/Pagination";
+import {
+  SCORING_DELETION_UPPER_LIMIT,
+  SCORING_GOOD_LOWER_LIMIT,
+  SCORING_NEUTRAL_LOWER_LIMIT,
+} from "@/lib/constants";
 
 export interface CvmListProps {
   filter?: string | null;
@@ -131,15 +136,15 @@ export function CvmList(props: CvmListProps) {
               <ListBoxItem id={`cvm-list-item-${cvm.id}`} key={cvm.id}>
                 <div className="flex cursor-pointer gap-2 overflow-hidden">
                   <div className="relative z-[50] h-fit w-fit">
-                    {cvm.score < -8 ? (
+                    {cvm.score <= SCORING_DELETION_UPPER_LIMIT ? (
                       <div className="absolute top-1 right-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-red-800">
                         <X className="h-2.5 w-2.5 text-white" />
                       </div>
-                    ) : cvm.score < 0 ? (
+                    ) : cvm.score < SCORING_NEUTRAL_LOWER_LIMIT ? (
                       <div className="absolute top-1 right-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-red-500">
                         <ChevronDown className="h-2.5 w-2.5 text-white" />
                       </div>
-                    ) : cvm.score >= 5 ? (
+                    ) : cvm.score >= SCORING_GOOD_LOWER_LIMIT ? (
                       <div className="absolute top-1 right-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-green-600">
                         <ChevronUp className="h-2.5 w-2.5 text-white" />
                       </div>

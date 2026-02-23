@@ -16,6 +16,11 @@ import { Offset } from "maplibre-gl";
 import { CvmDetailsDialog } from "@/components/organisms/cvm/CvmDetailsDialog";
 import { RemoveCvmDialog } from "@/components/organisms/cvm/RemoveCvmDialog";
 import { AnimatedDialogModal } from "../AnimatedDialogModal";
+import {
+  SCORING_DELETION_UPPER_LIMIT,
+  SCORING_GOOD_LOWER_LIMIT,
+  SCORING_NEUTRAL_LOWER_LIMIT,
+} from "@/lib/constants";
 
 interface CopyButtonProps {
   text: string;
@@ -130,15 +135,15 @@ export function LocationMarker(props: LocationMarkerProps) {
         onClick={() => setShowPopup(true)}
       >
         <div className="relative z-[50] h-fit w-fit">
-          {props.cvm.score < -8 ? (
+          {props.cvm.score <= SCORING_DELETION_UPPER_LIMIT ? (
             <div className="absolute top-1 right-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-red-800">
               <X className="h-2.5 w-2.5 text-white" />
             </div>
-          ) : props.cvm.score < 0 ? (
+          ) : props.cvm.score < SCORING_NEUTRAL_LOWER_LIMIT ? (
             <div className="absolute top-1 right-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-red-500">
               <ChevronDown className="h-2.5 w-2.5 text-white" />
             </div>
-          ) : props.cvm.score >= 5 ? (
+          ) : props.cvm.score >= SCORING_GOOD_LOWER_LIMIT ? (
             <div className="absolute top-1 right-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-green-600">
               <ChevronUp className="h-2.5 w-2.5 text-white" />
             </div>

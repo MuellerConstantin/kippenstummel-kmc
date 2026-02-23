@@ -4,6 +4,11 @@ import { Dialog } from "@/components/atoms/Dialog";
 import { Button } from "@/components/atoms/Button";
 import { Check, ChevronDown, ChevronUp, Copy, Equal, X } from "lucide-react";
 import { Cvm } from "@/lib/types/cvm";
+import {
+  SCORING_DELETION_UPPER_LIMIT,
+  SCORING_GOOD_LOWER_LIMIT,
+  SCORING_NEUTRAL_LOWER_LIMIT,
+} from "@/lib/constants";
 
 interface CopyButtonProps {
   text: string;
@@ -71,15 +76,15 @@ export function CvmDetailsDialog(props: CvmDetailsDialogProps) {
                   <div className="font-semibold">Score:</div>
                   <div className="flex items-center gap-1">
                     {props.cvm.score}
-                    {props.cvm.score < -8 ? (
+                    {props.cvm.score <= SCORING_DELETION_UPPER_LIMIT ? (
                       <div className="flex h-3 w-3 items-center justify-center rounded-full bg-red-800">
                         <X className="text-white" />
                       </div>
-                    ) : props.cvm.score < 0 ? (
+                    ) : props.cvm.score < SCORING_NEUTRAL_LOWER_LIMIT ? (
                       <div className="flex h-3 w-3 items-center justify-center rounded-full bg-red-500">
                         <ChevronDown className="text-white" />
                       </div>
-                    ) : props.cvm.score >= 5 ? (
+                    ) : props.cvm.score >= SCORING_GOOD_LOWER_LIMIT ? (
                       <div className="flex h-3 w-3 items-center justify-center rounded-full bg-green-600">
                         <ChevronUp className="text-white" />
                       </div>
