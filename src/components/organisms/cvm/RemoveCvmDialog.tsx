@@ -29,7 +29,10 @@ export function RemoveCvmDialog(props: RemoveCvmDialogProps) {
 
       try {
         await api.delete(`/kmc/cvms/${cvm.id}`);
-        mutate((key: string) => /^.*\/kmc\/cvms.*$/.test(key), null);
+        mutate(
+          (key: unknown) =>
+            typeof key === "string" && /^.*\/kmc\/cvms.*$/.test(key),
+        );
         close();
         onConfirm?.();
       } catch {

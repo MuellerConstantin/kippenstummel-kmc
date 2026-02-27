@@ -105,6 +105,7 @@ function LocationMarkerPopup(props: LocationMarkerPopupProps) {
 
 interface SelectedMarkerProps {
   cvm: Cvm;
+  onDelete?: () => void;
 }
 
 export function SelectedMarker(props: SelectedMarkerProps) {
@@ -147,7 +148,12 @@ export function SelectedMarker(props: SelectedMarkerProps) {
       >
         <RemoveCvmDialog
           cvm={props.cvm}
-          onConfirm={() => setShowPopup(false)}
+          onConfirm={() => {
+            setShowPopup(false);
+            setShowDetailsDialog(false);
+            setShowDeleteDialog(false);
+            props.onDelete?.();
+          }}
         />
       </AnimatedDialogModal>
     </>

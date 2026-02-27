@@ -49,7 +49,11 @@ export default function Cvms() {
             </h4>
             <div className="flex h-0 min-h-[20rem] grow flex-col overflow-hidden rounded-md">
               <div className="relative flex grow flex-col">
-                <CvmMap selectedCvm={selectedCvm} filter={filter} />
+                <CvmMap
+                  selectedCvm={selectedCvm}
+                  filter={filter}
+                  onSelectedCvmDelete={() => setSelectedCvm(null)}
+                />
               </div>
             </div>
           </div>

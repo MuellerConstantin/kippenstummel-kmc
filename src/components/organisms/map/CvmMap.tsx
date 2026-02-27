@@ -20,6 +20,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 export interface CvmMapProps {
   selectedCvm: Cvm | null;
   filter?: string | null;
+  onSelectedCvmDelete?: () => void;
 }
 
 export function CvmMap(props: CvmMapProps) {
@@ -107,7 +108,12 @@ export function CvmMap(props: CvmMapProps) {
           count={marker.count}
         />
       ))}
-      {!!props.selectedCvm && <SelectedMarker cvm={props.selectedCvm} />}
+      {!!props.selectedCvm && (
+        <SelectedMarker
+          cvm={props.selectedCvm}
+          onDelete={props.onSelectedCvmDelete}
+        />
+      )}
     </Map>
   );
 }
