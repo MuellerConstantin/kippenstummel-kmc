@@ -1,7 +1,7 @@
-import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useMemo, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
+import { useEffect, useState } from "react";
 import { tv } from "tailwind-variants";
-import { Link } from "../atoms/Link";
+import { Info, CheckCircle, AlertTriangle, XCircle, X } from "lucide-react";
 
 interface MessageBannerProps {
   title: string;
@@ -9,51 +9,68 @@ interface MessageBannerProps {
   variant?: "default" | "success" | "error" | "info" | "warning";
 }
 
-const banner = tv({
-  base: "w-full h-full px-4 py-2",
-  variants: {
-    variant: {
-      default: "bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100",
-      success:
-        "bg-green-50  text-green-800 dark:bg-green-950  dark:text-green-100",
-      error: "bg-red-50  text-red-800 dark:bg-red-950  dark:text-red-100",
-      info: "bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100",
-      warning:
-        "bg-amber-50  text-amber-800 dark:bg-amber-950  dark:text-amber-100",
-    },
-  },
-  defaultVariants: {
-    variant: "default",
-  },
+const carousel = tv({
+  base: `
+  relative
+  w-full
+  border-b
+  backdrop-blur
+  bg-white
+  dark:bg-slate-900
+  border-slate-200
+  dark:border-slate-800
+  `,
 });
 
-const carousel = tv({
-  base: "border",
-  variants: {
-    variant: {
-      default:
-        "bg-white border-slate-200 text-slate-900 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-100",
-      success:
-        "bg-green-50 border-green-200 text-green-800 dark:bg-green-950 dark:border-green-800 dark:text-green-100",
-      error:
-        "bg-red-50 border-red-200 text-red-800 dark:bg-red-950 dark:border-red-800 dark:text-red-100",
-      info: "bg-slate-50 border-slate-200 text-slate-800 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-100",
-      warning:
-        "bg-amber-50 border-amber-200 text-amber-800 dark:bg-amber-950 dark:border-amber-800 dark:text-amber-100",
-    },
+const variantStyles = {
+  default: {
+    text: "text-slate-800 dark:text-slate-100",
+    accent: "border-l-slate-400",
+    progress: "bg-slate-500/40 dark:bg-slate-400/40",
   },
-  defaultVariants: {
-    variant: "default",
+  info: {
+    text: "text-sky-900 dark:text-sky-200",
+    accent: "border-l-sky-500",
+    progress: "bg-sky-500/40",
   },
-});
+  success: {
+    text: "text-green-900 dark:text-green-200",
+    accent: "border-l-green-500",
+    progress: "bg-green-500/40",
+  },
+  warning: {
+    text: "text-amber-900 dark:text-amber-200",
+    accent: "border-l-amber-500",
+    progress: "bg-amber-500/40",
+  },
+  error: {
+    text: "text-red-900 dark:text-red-200",
+    accent: "border-l-red-500",
+    progress: "bg-red-500/40",
+  },
+};
+
+const icons = {
+  default: Info,
+  info: Info,
+  success: CheckCircle,
+  warning: AlertTriangle,
+  error: XCircle,
+};
 
 function MessageBanner(props: MessageBannerProps) {
+  const variant = props.variant ?? "default";
+  const Icon = icons[variant];
+
   return (
-    <div className={banner({ variant: props.variant })} role="alert">
-      <div className="line-clamp-2 text-xs lg:line-clamp-1">
+    <div
+      role="alert"
+      className={`flex items-center gap-3 border-l-4 px-4 py-3 ${variantStyles[variant].accent} ${variantStyles[variant].text}`}
+    >
+      <Icon className="h-4 w-4 shrink-0 opacity-80" />
+      <div className="text-xs leading-snug">
         <span className="font-semibold">{props.title}</span>
-        &nbsp;
-        <span>{props.description}</span>
+        <span className="ml-1 opacity-80">{props.description}</span>
       </div>
     </div>
   );
@@ -71,109 +88,61 @@ export function MessageBannerCarousel(props: MessageBannerCarouselProps) {
   const [visible, setVisible] = useState(true);
   const [index, setIndex] = useState(0);
 
+  const INTERVAL = 10000;
+
   useEffect(() => {
-    if (props.messages.length <= 1) {
-      return;
-    }
+    if (props.messages.length <= 1) return;
 
     const interval = setInterval(() => {
       setIndex((prev) => (prev + 1) % props.messages.length);
-    }, 5000);
+    }, INTERVAL);
 
     return () => clearInterval(interval);
-  }, [props.messages]);
+  }, [props.messages.length]);
 
-  const dotIndices = useMemo(() => {
-    const MAX_VISIBLE_DOTS = 5;
-    const total = props.messages.length;
+  if (props.messages.length === 0 || !visible) return null;
 
-    if (total <= MAX_VISIBLE_DOTS) {
-      return Array.from({ length: total }, (_, i) => i);
-    }
-
-    const half = Math.floor(MAX_VISIBLE_DOTS / 2);
-    let start = Math.max(0, index - half);
-    let end = Math.min(total - 1, index + half);
-
-    if (end - start + 1 < MAX_VISIBLE_DOTS) {
-      if (start === 0) end = MAX_VISIBLE_DOTS - 1;
-      else if (end === total - 1) start = total - MAX_VISIBLE_DOTS;
-    }
-
-    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
-  }, [props.messages.length, index]);
-
-  const dots = useMemo(() => {
-    const first = dotIndices[0];
-    const last = dotIndices[dotIndices.length - 1];
-    const hasLeftOverflow = first > 0;
-    const hasRightOverflow = last < props.messages.length - 1;
-
-    return dotIndices.map((msgIndex, pos) => {
-      const isActive = msgIndex === index;
-      const isLeftEdge = pos === 0 && hasLeftOverflow;
-      const isRightEdge = pos === dotIndices.length - 1 && hasRightOverflow;
-
-      return {
-        index: msgIndex,
-        isActive,
-        isEdge: isLeftEdge || isRightEdge,
-      };
-    });
-  }, [dotIndices, index, props.messages.length]);
-
-  if (props.messages.length === 0) {
-    return null;
-  }
-
-  if (!visible) {
-    return null;
-  }
+  const message = props.messages[index];
+  const variant = message.variant ?? "default";
 
   return (
-    <div
-      className={`relative flex flex-col gap-1 ${carousel({ variant: props.messages[index].variant })}`}
-    >
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={index}
-          layout
-          initial={{ opacity: 0, y: -4 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 4 }}
-          transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
-          className="h-full w-full"
+    <div className={carousel()}>
+      <div className="relative flex items-center justify-between gap-4 overflow-hidden pr-4">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 6 }}
+            transition={{ duration: 0.25 }}
+          >
+            <MessageBanner {...message} />
+          </motion.div>
+        </AnimatePresence>
+
+        <button
+          onClick={() => setVisible(false)}
+          className="cursor-pointer text-slate-400 transition hover:text-slate-800 dark:text-slate-400 dark:hover:text-white"
+          aria-label="Hide"
         >
-          <MessageBanner {...props.messages[index]} />
-        </motion.div>
-      </AnimatePresence>
-      <div className="flex items-center justify-between gap-2 px-4 pb-1">
-        {props.messages.length > 1 && (
-          <div className="flex items-center justify-center gap-1">
-            {dots.map((dot) => {
-              return (
-                <div
-                  key={dot.index}
-                  className={`h-[6px] w-[6px] rounded-full transition-colors ${
-                    dot.isActive
-                      ? "bg-slate-800 dark:bg-slate-200"
-                      : dot.isEdge
-                        ? "!h-[5px] !w-[5px] bg-slate-300 dark:bg-slate-600"
-                        : "bg-slate-400 dark:bg-slate-500"
-                  }`}
-                />
-              );
-            })}
-          </div>
-        )}
-        <Link
-          variant="secondary"
-          className="!cursor-pointer !text-xs"
-          onPress={() => setVisible(false)}
-        >
-          Hide
-        </Link>
+          <X className="h-4 w-4" />
+        </button>
       </div>
+
+      {props.messages.length > 1 && (
+        <div className="h-[2px] w-full overflow-hidden bg-black/5 dark:bg-white/10">
+          <motion.div
+            key={index}
+            className={`h-full origin-left ${variantStyles[variant].progress}`}
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{
+              duration: INTERVAL / 1000,
+              ease: "linear",
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }

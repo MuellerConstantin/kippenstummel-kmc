@@ -8,7 +8,6 @@ import { Menu as MenuIcon, EllipsisVertical, LogOut } from "lucide-react";
 import { MenuTrigger } from "react-aria-components";
 import { Button } from "@/components/atoms/Button";
 import { ListBox, ListBoxItem } from "@/components/atoms/ListBox";
-import { Link } from "@/components/atoms/Link";
 import { Switch } from "@/components/atoms/Switch";
 import { Menu, MenuItem } from "@/components/molecules/Menu";
 import { Popover } from "@/components/atoms/Popover";
@@ -71,19 +70,26 @@ export function Navbar() {
           </div>
         </NextLink>
         <div className="flex items-center space-x-4">
-          {isAuthenticated && (
-            <div className="hidden space-x-2 md:flex">
-              {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className="rounded-md px-3 py-2 text-sm font-medium font-semibold !text-slate-800 !no-underline hover:bg-slate-200 dark:!text-white dark:hover:bg-slate-800"
-                >
-                  {item.name}
-                </Link>
-              ))}
-            </div>
-          )}
+          <div className="hidden md:block">
+            {isAuthenticated && (
+              <MenuTrigger>
+                <Button variant="icon">
+                  <MenuIcon className="h-6 w-6" />
+                </Button>
+                <Menu>
+                  {navigation.map((item) => (
+                    <MenuItem
+                      key={item.name}
+                      id={`nav-${item.name}`}
+                      href={item.href}
+                    >
+                      {item.name}
+                    </MenuItem>
+                  ))}
+                </Menu>
+              </MenuTrigger>
+            )}
+          </div>
           <div className="self-end">
             <NavbarOptionsMenu />
           </div>
