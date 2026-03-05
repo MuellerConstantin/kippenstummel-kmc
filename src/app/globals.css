@@ -75,6 +75,10 @@ body {
   @apply !text-green-500 !decoration-green-500/60 hover:!decoration-green-500;
 }
 
+.maplibregl-popup {
+  max-width: max-content !important;
+}
+
 .maplibregl-popup-content {
   @apply !rounded-md !p-2 !text-slate-800;
 }
