@@ -11,6 +11,7 @@ import {
   SCORING_GOOD_LOWER_LIMIT,
   SCORING_NEUTRAL_LOWER_LIMIT,
 } from "@/lib/constants";
+import { useOsmAddresses } from "@/hooks/useOsmAddresses";
 
 export interface CvmListProps {
   filter?: string | null;
@@ -70,6 +71,8 @@ export function CvmList(props: CvmListProps) {
     `/kmc/cvms?page=${page - 1}&perPage=${perPage}${props.filter ? `&filter=${encodeURIComponent(props.filter)}` : ""}`,
     (url) => api.get(url).then((res) => res.data),
   );
+
+  const formattedAddresses = useOsmAddresses({ cvms: data?.content || null });
 
   const handleSelect = useCallback(
     (key: string) => {
@@ -132,41 +135,56 @@ export function CvmList(props: CvmListProps) {
               handleSelect([...(keys as Set<string>)][0])
             }
           >
-            {data?.content.map((cvm) => (
-              <ListBoxItem id={`cvm-list-item-${cvm.id}`} key={cvm.id}>
-                <div className="flex cursor-pointer gap-2 overflow-hidden">
-                  <div className="relative z-[50] h-fit w-fit">
-                    {cvm.score <= SCORING_DELETION_UPPER_LIMIT ? (
-                      <div className="absolute top-1 right-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-red-800">
-                        <X className="h-2.5 w-2.5 text-white" />
-                      </div>
-                    ) : cvm.score < SCORING_NEUTRAL_LOWER_LIMIT ? (
-                      <div className="absolute top-1 right-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-red-500">
-                        <ChevronDown className="h-2.5 w-2.5 text-white" />
-                      </div>
-                    ) : cvm.score >= SCORING_GOOD_LOWER_LIMIT ? (
-                      <div className="absolute top-1 right-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-green-600">
-                        <ChevronUp className="h-2.5 w-2.5 text-white" />
-                      </div>
-                    ) : (
-                      <div className="absolute top-1 right-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-slate-500">
-                        <Equal className="h-2.5 w-2.5 text-white" />
-                      </div>
-                    )}
-                    <MapPin className="h-8 w-8 fill-green-600 text-white dark:text-slate-600" />
-                  </div>
-                  <div className="flex flex-col gap-1 overflow-hidden">
-                    <div className="truncate text-sm font-semibold text-nowrap">
-                      {cvm.id}
+            {data?.content.map((cvm, index) => {
+              const formattedAddress = formattedAddresses?.[index];
+
+              return (
+                <ListBoxItem id={`cvm-list-item-${cvm.id}`} key={cvm.id}>
+                  <div className="flex cursor-pointer gap-2 overflow-hidden">
+                    <div className="relative z-[50] h-fit w-fit">
+                      {cvm.score <= SCORING_DELETION_UPPER_LIMIT ? (
+                        <div className="absolute top-1 right-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-red-800">
+                          <X className="h-2.5 w-2.5 text-white" />
+                        </div>
+                      ) : cvm.score < SCORING_NEUTRAL_LOWER_LIMIT ? (
+                        <div className="absolute top-1 right-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-red-500">
+                          <ChevronDown className="h-2.5 w-2.5 text-white" />
+                        </div>
+                      ) : cvm.score >= SCORING_GOOD_LOWER_LIMIT ? (
+                        <div className="absolute top-1 right-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-green-600">
+                          <ChevronUp className="h-2.5 w-2.5 text-white" />
+                        </div>
+                      ) : (
+                        <div className="absolute top-1 right-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-slate-500">
+                          <Equal className="h-2.5 w-2.5 text-white" />
+                        </div>
+                      )}
+                      <MapPin className="h-8 w-8 fill-green-600 text-white dark:text-slate-600" />
                     </div>
-                    <div className="flex items-center gap-1 text-xs">
-                      <div>Score:</div>
-                      <div>{cvm.score}</div>
+                    <div className="flex flex-col gap-1 overflow-hidden">
+                      <div className="truncate text-sm font-semibold text-nowrap">
+                        {cvm.id}
+                      </div>
+                      <div>
+                        {formattedAddress ? (
+                          <div className="truncate text-xs">
+                            {formattedAddress}
+                          </div>
+                        ) : (
+                          <div className="truncate text-xs">
+                            {cvm.latitude} / {cvm.longitude} (lat/lng)
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-1 text-xs">
+                        <div>Score:</div>
+                        <div>{cvm.score}</div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </ListBoxItem>
-            ))}
+                </ListBoxItem>
+              );
+            })}
           </ListBox>
           <div className="flex flex-col gap-2">
             <Pagination
