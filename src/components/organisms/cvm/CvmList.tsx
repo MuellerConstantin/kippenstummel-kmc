@@ -153,7 +153,7 @@ export function CvmList(props: CvmListProps) {
                         <Equal className="h-2.5 w-2.5 text-white" />
                       </div>
                     )}
-                    <MapPin className="h-8 w-8 fill-green-600 text-white" />
+                    <MapPin className="h-8 w-8 fill-green-600 text-white dark:text-slate-600" />
                   </div>
                   <div className="flex flex-col gap-1 overflow-hidden">
                     <div className="truncate text-sm font-semibold text-nowrap">
@@ -175,7 +175,7 @@ export function CvmList(props: CvmListProps) {
               onPageChange={setPage}
             />
             <div>
-              <div className="text-xs">
+              <div className="text-xs text-slate-500 dark:text-slate-400">
                 Page {page} of {data!.info.totalPages} - Showing{" "}
                 {data!.info.perPage * (page - 1) + 1} to{" "}
                 {data!.info.perPage * page} of {data!.info.totalElements} CVMs
