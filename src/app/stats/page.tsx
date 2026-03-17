@@ -157,7 +157,7 @@ function AnalyticsSection() {
                 viewsYear
               }
               statistics {
-                views(interval: DAILY, type: UNIQUE) {
+                views(interval: DAILY, type: UNIQUE, limit: 14) {
                   id
                   count
                 }
@@ -186,13 +186,10 @@ function AnalyticsSection() {
         setViewsMonth(facts?.viewsMonth ?? 0);
         setViewsYear(facts?.viewsYear ?? 0);
         setDailyViews(
-          views
-            .slice()
-            .reverse()
-            .map((value: { count: number }, index: number) => ({
-              date: dateFromDaysAgo(index),
-              count: value.count,
-            })),
+          views.map((value: { count: number }, index: number) => ({
+            date: dateFromDaysAgo(index),
+            count: value.count,
+          })),
         );
       })
       .catch((err) => {
