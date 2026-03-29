@@ -117,6 +117,7 @@ export function JobsTable(props: JobsTableProps) {
                 Queue
               </Column>
               <Column id="name">Name</Column>
+              <Column id="jobId">Job ID</Column>
               <Column id="createdAt">Created At</Column>
               <Column id="status">Status</Column>
             </TableHeader>
@@ -125,6 +126,9 @@ export function JobsTable(props: JobsTableProps) {
             >
               {(row) => (
                 <Row key={row.key} id={`ident-table-${row.key}`}>
+                  <Cell>
+                    <div className="rounde-md h-3 w-24 animate-pulse bg-slate-200 dark:bg-slate-700" />
+                  </Cell>
                   <Cell>
                     <div className="rounde-md h-3 w-24 animate-pulse bg-slate-200 dark:bg-slate-700" />
                   </Cell>
@@ -150,6 +154,7 @@ export function JobsTable(props: JobsTableProps) {
                 Queue
               </Column>
               <Column id="name">Name</Column>
+              <Column id="jobId">Job ID</Column>
               <Column id="createdAt">Created At</Column>
               <Column id="status">Status</Column>
             </TableHeader>
@@ -158,6 +163,9 @@ export function JobsTable(props: JobsTableProps) {
             >
               {(row) => (
                 <Row key={row.key} id={`ident-table-${row.key}`}>
+                  <Cell>
+                    <div className="h-3 w-24 rounded-md bg-red-300 dark:bg-red-800" />
+                  </Cell>
                   <Cell>
                     <div className="h-3 w-24 rounded-md bg-red-300 dark:bg-red-800" />
                   </Cell>
@@ -187,17 +195,19 @@ export function JobsTable(props: JobsTableProps) {
                 Queue
               </Column>
               <Column id="name">Name</Column>
+              <Column id="jobId">Job ID</Column>
               <Column id="createdAt">Created At</Column>
               <Column id="status">Status</Column>
             </TableHeader>
             <TableBody items={data.content}>
               {(row) => (
                 <Row
-                  key={`${row.queue}-${row.jobId}`}
-                  id={`ident-table-${row.queue}-${row.jobId}`}
+                  key={`${row.queue}-${row.jobId}-${row.createdAt}`}
+                  id={`ident-table-${row.queue}-${row.jobId}-${row.createdAt}`}
                 >
                   <Cell>{row.queue}</Cell>
                   <Cell>{row.name}</Cell>
+                  <Cell>{row.jobId}</Cell>
                   <Cell>{new Date(row.createdAt).toLocaleString()}</Cell>
                   <Cell>
                     <div
