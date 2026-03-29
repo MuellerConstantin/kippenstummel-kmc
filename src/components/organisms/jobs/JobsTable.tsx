@@ -107,6 +107,19 @@ export function JobsTable(props: JobsTableProps) {
     [data?.content, onSelect],
   );
 
+  const getBadgeColor = useCallback((status: string) => {
+    switch (status) {
+      case "completed":
+        return "bg-green-600";
+      case "failed":
+        return "bg-red-600";
+      case "orphaned":
+        return "bg-yellow-600";
+      default:
+        return "bg-slate-400";
+    }
+  }, []);
+
   return (
     <div>
       {isLoading ? (
@@ -211,7 +224,7 @@ export function JobsTable(props: JobsTableProps) {
                   <Cell>{new Date(row.createdAt).toLocaleString()}</Cell>
                   <Cell>
                     <div
-                      className={`w-fit rounded-md px-1 py-0.5 text-xs text-white capitalize ${row.status === "completed" ? "bg-green-600" : row.status === "failed" ? "bg-red-600" : "bg-slate-400"}`}
+                      className={`w-fit rounded-md px-1 py-0.5 text-xs text-white capitalize ${getBadgeColor(row.status)}`}
                     >
                       {row.status}
                     </div>

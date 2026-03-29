@@ -312,6 +312,7 @@ export default function Stats() {
           running: number;
           completed: number;
           failed: number;
+          orphaned: number;
         };
         totalRunLast7Days: number;
         runHistory: {
@@ -597,13 +598,14 @@ export default function Stats() {
                     title="Jobs Run Status"
                     data={[
                       {
-                        labels: ["Completed", "Failed", "Running"],
+                        labels: ["Completed", "Failed", "Running", "Orphaned"],
                         values: [
                           data?.jobs.statusCounts.completed || 0,
                           data?.jobs.statusCounts.failed || 0,
                           data?.jobs.statusCounts.running || 0,
+                          data?.jobs.statusCounts.orphaned || 0,
                         ],
-                        colors: ["#16a34a", "#dc2626", "#94a3b8"],
+                        colors: ["#16a34a", "#dc2626", "#94a3b8", "#eab308"],
                       },
                     ]}
                     loading={isLoading}
