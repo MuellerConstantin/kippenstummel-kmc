@@ -4,9 +4,9 @@ import { Button } from "@/components/atoms/Button";
 import { Spinner } from "@/components/atoms/Spinner";
 import { TextArea } from "@/components/atoms/TextArea";
 import useApi from "@/hooks/useApi";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ChevronRight, ChevronDown } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import useSWR from "swr";
 
 interface JobMetadataSectionProps {
@@ -126,55 +126,112 @@ interface JobLogsSectionProps {
 }
 
 function JobLogsSection(props: JobLogsSectionProps) {
+  const [show, setShow] = useState(false);
+
   return (
-    <section>
-      <div className="space-y-2">
-        <div className="font-semibold text-green-600">Runtime</div>
-        <div className="space-y-2 text-sm">
-          <div className="font-semibold">Data:</div>
+    <section className="space-y-2">
+      <div className="flex gap-1">
+        <Button onPress={() => setShow((prev) => !prev)} variant="icon">
+          {show ? (
+            <ChevronDown className="h-4 w-4" />
+          ) : (
+            <ChevronRight className="h-4 w-4" />
+          )}
+        </Button>
+        <div className="font-semibold text-green-600">Logs</div>
+      </div>
+      {show && (
+        <div className="text-sm">
           <TextArea
-            rows={5}
-            isReadOnly
-            value={props.job ? JSON.stringify(props.job.data) : ""}
-            isDisabled={props.isLoading || !!props.error}
-          />
-        </div>
-        {props.job?.status === "running" && (
-          <div className="space-y-2 text-sm">
-            <div className="font-semibold">Result:</div>
-            <Spinner />
-          </div>
-        )}
-        {props.job?.status === "completed" && (
-          <div className="space-y-2 text-sm">
-            <div className="font-semibold">Result:</div>
-            <TextArea
-              rows={5}
-              isReadOnly
-              value={props.job ? JSON.stringify(props.job.result) : "-"}
-            />
-          </div>
-        )}
-        {props.job?.status === "failed" && (
-          <div className="space-y-2 text-sm">
-            <div className="font-semibold">Error:</div>
-            <TextArea
-              rows={10}
-              isReadOnly
-              value={props.job ? JSON.stringify(props.job.failedReason) : "-"}
-            />
-          </div>
-        )}
-        <div className="space-y-2 text-sm">
-          <div className="font-semibold">Logs:</div>
-          <TextArea
-            rows={5}
+            rows={10}
             isReadOnly
             value={props.job ? props.job.logs?.join("\n") : "-"}
             isDisabled={props.isLoading || !!props.error}
           />
         </div>
+      )}
+    </section>
+  );
+}
+
+interface JobInputOutputSectionProps {
+  job?: {
+    jobId: string;
+    queue: string;
+    name: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    data: any;
+    status: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    result: any;
+    failedReason?: string;
+    attemptsMade: number;
+    timestamp: string;
+    finishedOn?: string;
+    logs?: string[];
+    createdAt: string;
+    updatedAt: string;
+  };
+  isLoading: boolean;
+  error: unknown;
+}
+
+function JobInputOutputSection(props: JobInputOutputSectionProps) {
+  const [show, setShow] = useState(false);
+
+  return (
+    <section className="space-y-2">
+      <div className="flex gap-1">
+        <Button onPress={() => setShow((prev) => !prev)} variant="icon">
+          {show ? (
+            <ChevronDown className="h-4 w-4" />
+          ) : (
+            <ChevronRight className="h-4 w-4" />
+          )}
+        </Button>
+        <div className="font-semibold text-green-600">Input/Output</div>
       </div>
+      {show && (
+        <div className="space-y-2">
+          <div className="space-y-2 text-sm">
+            <div className="font-semibold">Data:</div>
+            <TextArea
+              rows={10}
+              isReadOnly
+              value={props.job ? JSON.stringify(props.job.data) : ""}
+              isDisabled={props.isLoading || !!props.error}
+            />
+          </div>
+          <div>
+            {props.job?.status === "running" && (
+              <div className="space-y-2 text-sm">
+                <div className="font-semibold">Result:</div>
+                <Spinner />
+              </div>
+            )}
+            {props.job?.status === "completed" && (
+              <div className="space-y-2 text-sm">
+                <div className="font-semibold">Result:</div>
+                <TextArea
+                  rows={10}
+                  isReadOnly
+                  value={props.job ? JSON.stringify(props.job.result) : "-"}
+                />
+              </div>
+            )}
+          </div>
+          {props.job?.status === "failed" && (
+            <div className="space-y-2 text-sm">
+              <div className="font-semibold">Error:</div>
+              <TextArea
+                rows={10}
+                isReadOnly
+                value={props.job ? JSON.stringify(props.job.failedReason) : "-"}
+              />
+            </div>
+          )}
+        </div>
+      )}
     </section>
   );
 }
@@ -258,6 +315,11 @@ export default function JobDetails() {
         )}
         <JobMetadataSection job={data!} isLoading={isLoading} error={error} />
         <JobLogsSection job={data!} isLoading={isLoading} error={error} />
+        <JobInputOutputSection
+          job={data!}
+          isLoading={isLoading}
+          error={error}
+        />
       </div>
     </div>
   );
