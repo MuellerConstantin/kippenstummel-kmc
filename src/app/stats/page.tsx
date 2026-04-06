@@ -16,6 +16,7 @@ import {
 import { PieChart } from "@/components/molecules/visualizations/PieChart";
 import useAckeeClient from "@/hooks/useAckeeClient";
 import { gql } from "urql";
+import { Select, SelectItem } from "@/components/atoms/Select";
 
 const Kpi = dynamic(
   () =>
@@ -119,7 +120,11 @@ function Sidebar() {
   );
 }
 
-function AnalyticsSection() {
+interface AnalyticsSectionProps {
+  nDaysAgo?: number;
+}
+
+function AnalyticsSection({ nDaysAgo = 7 }: AnalyticsSectionProps) {
   const client = useAckeeClient();
 
   const ACKEE_DOMAIN_ID = useEnv("NEXT_PUBLIC_ACKEE_DOMAIN_ID");
@@ -157,7 +162,7 @@ function AnalyticsSection() {
                 viewsYear
               }
               statistics {
-                views(interval: DAILY, type: UNIQUE, limit: 14) {
+                views(interval: DAILY, type: UNIQUE, limit: ${String(nDaysAgo)}) {
                   id
                   count
                 }
@@ -202,7 +207,7 @@ function AnalyticsSection() {
     return () => {
       cancelled = true;
     };
-  }, [client, ACKEE_DOMAIN_ID]);
+  }, [client, ACKEE_DOMAIN_ID, nDaysAgo]);
 
   return (
     <div className="grid w-full grid-cols-12 gap-4">
@@ -255,6 +260,44 @@ function AnalyticsSection() {
 export default function Stats() {
   const api = useApi();
 
+  const timespanOptions = useMemo(
+    () => [
+      {
+        label: "Last 7 Days",
+        value: "last7Days",
+        filter: { lastNDays: 7 },
+      },
+      {
+        label: "Last 30 Days",
+        value: "last30Days",
+        filter: { lastNDays: 30 },
+      },
+    ],
+    [],
+  );
+
+  const [selectedTimespan, setSelectedTimespan] = useState<string>(
+    `timespan-select-${timespanOptions[0].value}`,
+  );
+
+  const selectedTimespanFilter = useMemo(() => {
+    const option = timespanOptions.find(
+      (option) => `timespan-select-${option.value}` === selectedTimespan,
+    );
+
+    return option?.filter || null;
+  }, [selectedTimespan, timespanOptions]);
+
+  const url = useMemo(() => {
+    const searchParams = new URLSearchParams();
+
+    if (selectedTimespanFilter) {
+      searchParams.set("lastNDays", String(selectedTimespanFilter.lastNDays));
+    }
+
+    return `/kmc/stats?${searchParams.toString()}`;
+  }, [selectedTimespanFilter]);
+
   const { data, isLoading, error } = useSWR<
     {
       cvms: {
@@ -262,7 +305,7 @@ export default function Stats() {
         averageScore: number;
         imports: {
           total: number;
-          totalLast7Days: number;
+          totalLastNDays: number;
           history: {
             date: string;
             count: number;
@@ -270,7 +313,7 @@ export default function Stats() {
         };
         registrations: {
           total: number;
-          totalLast7Days: number;
+          totalLastNDays: number;
           history: {
             date: string;
             count: number;
@@ -281,7 +324,7 @@ export default function Stats() {
         total: number;
         upvotes: {
           total: number;
-          totalLast7Days: number;
+          totalLastNDays: number;
           history: {
             date: string;
             count: number;
@@ -289,7 +332,7 @@ export default function Stats() {
         };
         downvotes: {
           total: number;
-          totalLast7Days: number;
+          totalLastNDays: number;
           history: {
             date: string;
             count: number;
@@ -299,7 +342,7 @@ export default function Stats() {
       idents: {
         total: number;
         averageCredibility: number;
-        totalNewLast7Days: number;
+        totalNewLastNDays: number;
         newHistory: {
           date: string;
           count: number;
@@ -314,7 +357,7 @@ export default function Stats() {
           failed: number;
           orphaned: number;
         };
-        totalRunLast7Days: number;
+        totalRunLastNDays: number;
         runHistory: {
           date: string;
           count: number;
@@ -323,7 +366,7 @@ export default function Stats() {
     },
     unknown,
     string | null
-  >("/kmc/stats", (url) => api.get(url).then((res) => res.data));
+  >(url, (url) => api.get(url).then((res) => res.data));
 
   return (
     <div className="flex grow flex-col gap-4 bg-slate-50 dark:bg-slate-800">
@@ -333,6 +376,27 @@ export default function Stats() {
             <Sidebar />
           </div>
           <div className="flex w-full flex-col space-y-4 p-4">
+            <section className="flex flex-col gap-4 md:flex-row">
+              <Select
+                label="Timespan"
+                items={timespanOptions}
+                selectedKey={selectedTimespan}
+                onSelectionChange={(property) =>
+                  setSelectedTimespan(property as string)
+                }
+                className="w-64 max-w-full"
+              >
+                {timespanOptions.map((option) => (
+                  <SelectItem
+                    id={`timespan-select-${option.value}`}
+                    key={option.value}
+                    textValue={option.value}
+                  >
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </Select>
+            </section>
             <section
               id="section-cvm-stats"
               className="flex w-full flex-col gap-4"
@@ -351,32 +415,16 @@ export default function Stats() {
                 </div>
                 <div className="col-span-12 h-48 w-full md:col-span-6 lg:col-span-3">
                   <Kpi
-                    title="Total CVMs Imported"
-                    value={data?.cvms.imports.total || 0}
+                    title="CVM Registrations"
+                    value={data?.cvms.registrations.totalLastNDays || 0}
                     loading={isLoading}
                     errored={!!error}
                   />
                 </div>
                 <div className="col-span-12 h-48 w-full md:col-span-6 lg:col-span-3">
                   <Kpi
-                    title="Total CVMs Registered"
-                    value={data?.cvms.registrations.total || 0}
-                    loading={isLoading}
-                    errored={!!error}
-                  />
-                </div>
-                <div className="col-span-12 h-48 w-full md:col-span-6 lg:col-span-3">
-                  <Kpi
-                    title="Total CVMs Registered Last 7 Days"
-                    value={data?.cvms.registrations.totalLast7Days || 0}
-                    loading={isLoading}
-                    errored={!!error}
-                  />
-                </div>
-                <div className="col-span-12 h-48 w-full md:col-span-6 lg:col-span-3">
-                  <Kpi
-                    title="Total CVMs Imported Last 7 Days"
-                    value={data?.cvms.imports.totalLast7Days || 0}
+                    title="CVM Imports"
+                    value={data?.cvms.imports.totalLastNDays || 0}
                     loading={isLoading}
                     errored={!!error}
                   />
@@ -439,32 +487,16 @@ export default function Stats() {
                 </div>
                 <div className="col-span-12 h-48 w-full md:col-span-6 lg:col-span-3">
                   <Kpi
-                    title="Total Upvotes"
-                    value={data?.votes.upvotes.totalLast7Days || 0}
+                    title="Upvotes"
+                    value={data?.votes.upvotes.totalLastNDays || 0}
                     loading={isLoading}
                     errored={!!error}
                   />
                 </div>
                 <div className="col-span-12 h-48 w-full md:col-span-6 lg:col-span-3">
                   <Kpi
-                    title="Total Downvotes"
-                    value={data?.votes.downvotes.totalLast7Days || 0}
-                    loading={isLoading}
-                    errored={!!error}
-                  />
-                </div>
-                <div className="col-span-12 h-48 w-full md:col-span-6 lg:col-span-3">
-                  <Kpi
-                    title="Total Upvotes Last 7 Days"
-                    value={data?.votes.upvotes.totalLast7Days || 0}
-                    loading={isLoading}
-                    errored={!!error}
-                  />
-                </div>
-                <div className="col-span-12 h-48 w-full md:col-span-6 lg:col-span-3">
-                  <Kpi
-                    title="Total Downvotes Last 7 Days"
-                    value={data?.votes.downvotes.totalLast7Days || 0}
+                    title="Downvotes"
+                    value={data?.votes.downvotes.totalLastNDays || 0}
                     loading={isLoading}
                     errored={!!error}
                   />
@@ -515,8 +547,8 @@ export default function Stats() {
                 </div>
                 <div className="col-span-12 h-48 w-full md:col-span-6 lg:col-span-3">
                   <Kpi
-                    title="Total New Idents Last 7 Days"
-                    value={data?.idents.totalNewLast7Days || 0}
+                    title="New Idents"
+                    value={data?.idents.totalNewLastNDays || 0}
                     loading={isLoading}
                     errored={!!error}
                   />
@@ -556,7 +588,7 @@ export default function Stats() {
               <div className="grid w-full grid-cols-12 gap-4">
                 <div className="col-span-12 h-48 w-full md:col-span-6 lg:col-span-3">
                   <Kpi
-                    title="Total Jobs Run"
+                    title="Total Job Runs"
                     value={data?.jobs.total || 0}
                     loading={isLoading}
                     errored={!!error}
@@ -564,8 +596,8 @@ export default function Stats() {
                 </div>
                 <div className="col-span-12 h-48 w-full md:col-span-6 lg:col-span-3">
                   <Kpi
-                    title="Total Jobs Run Last 7 Days"
-                    value={data?.jobs.totalRunLast7Days || 0}
+                    title="Job Runs"
+                    value={data?.jobs.totalRunLastNDays || 0}
                     loading={isLoading}
                     errored={!!error}
                   />
@@ -621,7 +653,7 @@ export default function Stats() {
               <h1 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
                 Analytics Statistics
               </h1>
-              <AnalyticsSection />
+              <AnalyticsSection nDaysAgo={selectedTimespanFilter?.lastNDays} />
             </section>
           </div>
         </div>
