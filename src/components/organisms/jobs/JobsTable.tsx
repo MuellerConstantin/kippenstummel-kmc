@@ -89,7 +89,8 @@ export function JobsTable(props: JobsTableProps) {
           }
 
           const job = data?.content.find(
-            (job) => `ident-table-${job.queue}-${job.jobId}` === key,
+            (job) =>
+              `ident-table-${job.queue}-${job.jobId}-${job.createdAt}` === key,
           );
 
           if (job) {
@@ -97,7 +98,7 @@ export function JobsTable(props: JobsTableProps) {
           }
         } else {
           const idents = data?.content.filter((job) =>
-            key.has(`ident-table-${job.queue}-${job.jobId}`),
+            key.has(`ident-table-${job.queue}-${job.jobId}-${job.createdAt}`),
           );
 
           onSelect?.(idents);
