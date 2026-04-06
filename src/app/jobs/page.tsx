@@ -4,13 +4,13 @@ import { useState } from "react";
 import { Switch } from "@/components/atoms/Switch";
 import { JobsTable } from "@/components/organisms/jobs/JobsTable";
 import { Button } from "@/components/atoms/Button";
-import { JobInfoDialog } from "@/components/organisms/jobs/JobInfoDialog";
 import { Info } from "lucide-react";
-import { AnimatedDialogModal } from "@/components/molecules/AnimatedDialogModal";
+import { useRouter } from "next/navigation";
 
 export default function Jobs() {
+  const router = useRouter();
+
   const [distinct, setDistinct] = useState(false);
-  const [showInfoDialog, setShowInfoDialog] = useState(false);
   const [selected, setSelected] = useState<
     | {
         jobId: string;
@@ -36,7 +36,11 @@ export default function Jobs() {
       <div className="mx-auto flex w-full max-w-screen-2xl grow flex-col gap-4 p-4">
         <div className="flex justify-start gap-4">
           <Button
-            onPress={() => setShowInfoDialog(true)}
+            onPress={() =>
+              router.push(
+                `/jobs/queues/${selected?.[0].queue}/runs/${selected?.[0].jobId}`,
+              )
+            }
             isDisabled={!selected || selected.length === 0}
           >
             <div className="flex items-center gap-2">
@@ -47,15 +51,6 @@ export default function Jobs() {
           <Switch isSelected={distinct} onChange={setDistinct}>
             Distinct
           </Switch>
-          {selected && (
-            <AnimatedDialogModal
-              isOpen={showInfoDialog}
-              onOpenChange={setShowInfoDialog}
-              className="!max-w-2xl"
-            >
-              <JobInfoDialog job={selected![0]} />
-            </AnimatedDialogModal>
-          )}
         </div>
         <div className="space-y-4">
           <h4 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
