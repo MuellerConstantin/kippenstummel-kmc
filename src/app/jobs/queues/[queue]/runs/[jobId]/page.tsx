@@ -141,7 +141,7 @@ function JobLogsSection(props: JobLogsSectionProps) {
         <div className="font-semibold text-green-600">Logs</div>
       </div>
       {show && (
-        <div className="text-sm">
+        <div className="rounded-md bg-white p-2 text-sm dark:bg-slate-900">
           <TextArea
             rows={10}
             isReadOnly
@@ -192,7 +192,7 @@ function JobInputOutputSection(props: JobInputOutputSectionProps) {
         <div className="font-semibold text-green-600">Input/Output</div>
       </div>
       {show && (
-        <div className="space-y-2">
+        <div className="space-y-2 rounded-md bg-white p-2 dark:bg-slate-900">
           <div className="space-y-2 text-sm">
             <div className="font-semibold">Data:</div>
             <TextArea
@@ -280,46 +280,57 @@ export default function JobDetails() {
   }, []);
 
   return (
-    <div className="flex grow flex-col">
-      <div className="mx-auto flex w-full max-w-screen-2xl grow flex-col gap-4 p-4 text-slate-800 dark:text-white">
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-2">
-            <Button onPress={() => router.push("/jobs")} variant="icon">
-              <ArrowLeft className="h-6 w-6" />
-            </Button>
-            <h1 slot="title" className="my-0 text-xl leading-6 font-semibold">
-              Job Info
-            </h1>
-          </div>
-          <hr className="border-slate-200 dark:border-slate-700" />
-        </div>
-        {isLoading ? (
-          <div className="space-y-2">
-            <div className="h-4 w-1/4 animate-pulse rounded-md bg-slate-300 dark:bg-slate-700" />
-            <div className="h-3 w-1/6 animate-pulse rounded-md bg-slate-300 dark:bg-slate-700" />
-          </div>
-        ) : error ? (
-          <div className="space-y-2">
-            <div className="h-4 w-1/4 rounded-md bg-red-300 dark:bg-red-800" />
-            <div className="h-3 w-1/6 rounded-md bg-red-300 dark:bg-red-800" />
-          </div>
-        ) : (
-          <div className="space-y-2">
-            <div>{`${data!.queue}/${data!.name}`}</div>
-            <div
-              className={`w-fit rounded-md px-1 py-0.5 text-xs text-white capitalize ${getBadgeColor(data!.status)}`}
+    <div className="flex grow flex-col gap-4 bg-slate-50 dark:bg-slate-800">
+      <div className="mx-auto flex w-full max-w-screen-2xl grow flex-col gap-4">
+        <div className="flex w-full grow flex-col text-slate-800 lg:flex-row lg:gap-8 dark:text-white">
+          <div className="w-full min-w-[15rem] shrink-0 space-y-4 overflow-hidden border-r border-slate-200 bg-white p-4 lg:w-[20rem] dark:border-slate-700 dark:bg-slate-800">
+            <Button
+              onPress={() => router.push("/jobs")}
+              variant="icon"
+              className="flex items-center gap-1"
             >
-              {data!.status}
-            </div>
+              <ArrowLeft className="h-4 w-4" />
+              <span>Jobs</span>
+            </Button>
+            <hr className="border-slate-200 dark:border-slate-700" />
+            {isLoading ? (
+              <div className="space-y-2">
+                <div className="h-4 w-1/4 animate-pulse rounded-md bg-slate-300 dark:bg-slate-700" />
+                <div className="h-3 w-1/6 animate-pulse rounded-md bg-slate-300 dark:bg-slate-700" />
+              </div>
+            ) : error ? (
+              <div className="space-y-2">
+                <div className="h-4 w-1/4 rounded-md bg-red-300 dark:bg-red-800" />
+                <div className="h-3 w-1/6 rounded-md bg-red-300 dark:bg-red-800" />
+              </div>
+            ) : (
+              <div className="space-y-2 text-sm">
+                <div className="overflow-x-auto text-nowrap">{`${data!.queue}/${data!.name}`}</div>
+                <div
+                  className={`w-fit rounded-md px-1 py-0.5 text-xs text-white capitalize ${getBadgeColor(data!.status)}`}
+                >
+                  {data!.status}
+                </div>
+              </div>
+            )}
           </div>
-        )}
-        <JobMetadataSection job={data!} isLoading={isLoading} error={error} />
-        <JobLogsSection job={data!} isLoading={isLoading} error={error} />
-        <JobInputOutputSection
-          job={data!}
-          isLoading={isLoading}
-          error={error}
-        />
+          <div className="flex w-full flex-col gap-4 p-4">
+            <h1 className="text-xl font-semibold">Job Details</h1>
+            <div className="rounded-md bg-white p-2 dark:bg-slate-900">
+              <JobMetadataSection
+                job={data!}
+                isLoading={isLoading}
+                error={error}
+              />
+            </div>
+            <JobLogsSection job={data!} isLoading={isLoading} error={error} />
+            <JobInputOutputSection
+              job={data!}
+              isLoading={isLoading}
+              error={error}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
