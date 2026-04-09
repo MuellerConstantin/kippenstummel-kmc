@@ -43,6 +43,7 @@ export function IdentTable(props: IdentTableProps) {
         identity: string;
         createdAt?: string;
         updatedAt?: string;
+        lastActiveAt: string;
         credibility: number;
         karma: number;
         displayName?: string;
@@ -109,8 +110,9 @@ export function IdentTable(props: IdentTableProps) {
               <Column id="displayName" isRowHeader>
                 Display Name
               </Column>
-              <Column id="type">Issued At</Column>
-              <Column id="date">Credibility</Column>
+              <Column id="issuedAt">Issued At</Column>
+              <Column id="lastActiveAt">Last Active At</Column>
+              <Column id="credibility">Credibility</Column>
               <Column id="karma">Karma</Column>
             </TableHeader>
             <TableBody
@@ -120,6 +122,9 @@ export function IdentTable(props: IdentTableProps) {
                 <Row key={row.key} id={`ident-table-${row.key}`}>
                   <Cell>
                     <div className="rounde-md h-3 w-24 animate-pulse bg-slate-200 dark:bg-slate-700" />
+                  </Cell>
+                  <Cell>
+                    <div className="h-3 w-24 animate-pulse rounded-md bg-slate-200 dark:bg-slate-700" />
                   </Cell>
                   <Cell>
                     <div className="h-3 w-24 animate-pulse rounded-md bg-slate-200 dark:bg-slate-700" />
@@ -148,8 +153,9 @@ export function IdentTable(props: IdentTableProps) {
               <Column id="displayName" isRowHeader>
                 Display Name
               </Column>
-              <Column id="type">Issued At</Column>
-              <Column id="date">Credibility</Column>
+              <Column id="issuedAt">Issued At</Column>
+              <Column id="lastActiveAt">Last Active At</Column>
+              <Column id="credibility">Credibility</Column>
               <Column id="karma">Karma</Column>
             </TableHeader>
             <TableBody
@@ -157,6 +163,9 @@ export function IdentTable(props: IdentTableProps) {
             >
               {(row) => (
                 <Row key={row.key} id={`ident-table-${row.key}`}>
+                  <Cell>
+                    <div className="h-3 w-24 rounded-md bg-red-300 dark:bg-red-800" />
+                  </Cell>
                   <Cell>
                     <div className="h-3 w-24 rounded-md bg-red-300 dark:bg-red-800" />
                   </Cell>
@@ -191,8 +200,9 @@ export function IdentTable(props: IdentTableProps) {
               <Column id="displayName" isRowHeader>
                 Display Name
               </Column>
-              <Column id="type">Issued At</Column>
-              <Column id="date">Credibility</Column>
+              <Column id="issuedAt">Issued At</Column>
+              <Column id="lastActiveAt">Last Active At</Column>
+              <Column id="credibility">Credibility</Column>
               <Column id="karma">Karma</Column>
             </TableHeader>
             <TableBody items={data.content}>
@@ -201,6 +211,7 @@ export function IdentTable(props: IdentTableProps) {
                   <Cell>{row.identity}</Cell>
                   <Cell>{row.displayName}</Cell>
                   <Cell>{new Date(row.createdAt!).toLocaleDateString()}</Cell>
+                  <Cell>{new Date(row.lastActiveAt).toLocaleDateString()}</Cell>
                   <Cell>{row.credibility}</Cell>
                   <Cell>{row.karma}</Cell>
                 </Row>
