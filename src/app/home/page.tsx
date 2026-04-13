@@ -8,6 +8,7 @@ import CalendarHeatmap, {
 } from "react-calendar-heatmap";
 import useApi from "@/hooks/useApi";
 import { ListBox, ListBoxItem } from "@/components/atoms/ListBox";
+import { AggregatedCvmStats, AggregatedVoteStats } from "@/lib/types/stats";
 
 import "react-calendar-heatmap/dist/styles.css";
 
@@ -97,78 +98,25 @@ function ScopeCard(props: {
 export default function Home() {
   const api = useApi();
 
-  const { data } = useSWR<
-    {
-      cvms: {
-        total: number;
-        averageScore: number;
-        imports: {
-          total: number;
-          totalLast7Days: number;
-          history: {
-            date: string;
-            count: number;
-          }[];
-        };
-        registrations: {
-          total: number;
-          totalLast7Days: number;
-          history: {
-            date: string;
-            count: number;
-          }[];
-        };
-      };
-      votes: {
-        total: number;
-        upvotes: {
-          total: number;
-          totalLast7Days: number;
-          history: {
-            date: string;
-            count: number;
-          }[];
-        };
-        downvotes: {
-          total: number;
-          totalLast7Days: number;
-          history: {
-            date: string;
-            count: number;
-          }[];
-        };
-      };
-      idents: {
-        total: number;
-        averageCredibility: number;
-        totalNewLast7Days: number;
-        newHistory: {
-          date: string;
-          count: number;
-        }[];
-      };
-      jobs: {
-        total: number;
-        differentTypes: number;
-        statusCounts: {
-          running: number;
-          completed: number;
-          failed: number;
-        };
-        totalRunLast7Days: number;
-        runHistory: {
-          date: string;
-          count: number;
-        }[];
-      };
-    },
+  const { data: cvmStatsData } = useSWR<
+    AggregatedCvmStats,
     unknown,
     string | null
-  >("/kmc/stats?lastNDays=365", (url) => api.get(url).then((res) => res.data));
+  >("/kmc/stats/cvms?lastNDays=365", (url) =>
+    api.get(url).then((res) => res.data),
+  );
+
+  const { data: voteStatsData } = useSWR<
+    AggregatedVoteStats,
+    unknown,
+    string | null
+  >("/kmc/stats/votes?lastNDays=365", (url) =>
+    api.get(url).then((res) => res.data),
+  );
 
   const registrationHistory = useMemo(() => {
-    if (data) {
-      return data?.cvms.registrations.history
+    if (cvmStatsData) {
+      return cvmStatsData.registrations.history
         .map((h) => {
           return {
             date: h.date,
@@ -179,11 +127,11 @@ export default function Home() {
     }
 
     return [];
-  }, [data]);
+  }, [cvmStatsData]);
 
   const votingHistory = useMemo(() => {
-    if (data) {
-      return data?.votes.upvotes.history
+    if (voteStatsData) {
+      return voteStatsData.upvotes.history
         .map((h) => {
           return {
             date: h.date,
@@ -194,7 +142,7 @@ export default function Home() {
     }
 
     return [];
-  }, [data]);
+  }, [voteStatsData]);
 
   const getHistoryColor = useCallback(
     (value?: ReactCalendarHeatmapValue<string>) => {

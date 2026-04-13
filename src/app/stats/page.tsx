@@ -17,6 +17,12 @@ import { PieChart } from "@/components/molecules/visualizations/PieChart";
 import useAckeeClient from "@/hooks/useAckeeClient";
 import { gql } from "urql";
 import { Select, SelectItem } from "@/components/atoms/Select";
+import {
+  AggregatedCvmStats,
+  AggregatedIdentStats,
+  AggregatedJobStats,
+  AggregatedVoteStats,
+} from "@/lib/types/stats";
 
 const Kpi = dynamic(
   () =>
@@ -288,85 +294,78 @@ export default function Stats() {
     return option?.filter || null;
   }, [selectedTimespan, timespanOptions]);
 
-  const url = useMemo(() => {
+  const cvmStatsUrl = useMemo(() => {
     const searchParams = new URLSearchParams();
 
     if (selectedTimespanFilter) {
       searchParams.set("lastNDays", String(selectedTimespanFilter.lastNDays));
     }
 
-    return `/kmc/stats?${searchParams.toString()}`;
+    return `/kmc/stats/cvms?${searchParams.toString()}`;
   }, [selectedTimespanFilter]);
 
-  const { data, isLoading, error } = useSWR<
-    {
-      cvms: {
-        total: number;
-        averageScore: number;
-        imports: {
-          total: number;
-          totalLastNDays: number;
-          history: {
-            date: string;
-            count: number;
-          }[];
-        };
-        registrations: {
-          total: number;
-          totalLastNDays: number;
-          history: {
-            date: string;
-            count: number;
-          }[];
-        };
-      };
-      votes: {
-        total: number;
-        upvotes: {
-          total: number;
-          totalLastNDays: number;
-          history: {
-            date: string;
-            count: number;
-          }[];
-        };
-        downvotes: {
-          total: number;
-          totalLastNDays: number;
-          history: {
-            date: string;
-            count: number;
-          }[];
-        };
-      };
-      idents: {
-        total: number;
-        averageCredibility: number;
-        totalNewLastNDays: number;
-        newHistory: {
-          date: string;
-          count: number;
-        }[];
-      };
-      jobs: {
-        total: number;
-        differentTypes: number;
-        statusCounts: {
-          running: number;
-          completed: number;
-          failed: number;
-          orphaned: number;
-        };
-        totalRunLastNDays: number;
-        runHistory: {
-          date: string;
-          count: number;
-        }[];
-      };
-    },
-    unknown,
-    string | null
-  >(url, (url) => api.get(url).then((res) => res.data));
+  const voteStatsUrl = useMemo(() => {
+    const searchParams = new URLSearchParams();
+
+    if (selectedTimespanFilter) {
+      searchParams.set("lastNDays", String(selectedTimespanFilter.lastNDays));
+    }
+
+    return `/kmc/stats/votes?${searchParams.toString()}`;
+  }, [selectedTimespanFilter]);
+
+  const identStatsUrl = useMemo(() => {
+    const searchParams = new URLSearchParams();
+
+    if (selectedTimespanFilter) {
+      searchParams.set("lastNDays", String(selectedTimespanFilter.lastNDays));
+    }
+
+    return `/kmc/stats/idents?${searchParams.toString()}`;
+  }, [selectedTimespanFilter]);
+
+  const jobStatsUrl = useMemo(() => {
+    const searchParams = new URLSearchParams();
+
+    if (selectedTimespanFilter) {
+      searchParams.set("lastNDays", String(selectedTimespanFilter.lastNDays));
+    }
+
+    return `/kmc/stats/jobs?${searchParams.toString()}`;
+  }, [selectedTimespanFilter]);
+
+  const {
+    data: cvmStatsData,
+    isLoading: isCvmStatsLoading,
+    error: cvmStatsError,
+  } = useSWR<AggregatedCvmStats, unknown, string | null>(cvmStatsUrl, (url) =>
+    api.get(url).then((res) => res.data),
+  );
+
+  const {
+    data: voteStatsData,
+    isLoading: isVoteStatsLoading,
+    error: voteStatsError,
+  } = useSWR<AggregatedVoteStats, unknown, string | null>(voteStatsUrl, (url) =>
+    api.get(url).then((res) => res.data),
+  );
+
+  const {
+    data: identStatsData,
+    isLoading: isIdentStatsLoading,
+    error: identStatsError,
+  } = useSWR<AggregatedIdentStats, unknown, string | null>(
+    identStatsUrl,
+    (url) => api.get(url).then((res) => res.data),
+  );
+
+  const {
+    data: jobStatsData,
+    isLoading: isJobStatsLoading,
+    error: jobStatsError,
+  } = useSWR<AggregatedJobStats, unknown, string | null>(jobStatsUrl, (url) =>
+    api.get(url).then((res) => res.data),
+  );
 
   return (
     <div className="flex grow flex-col gap-4 bg-slate-50 dark:bg-slate-800">
@@ -408,37 +407,37 @@ export default function Stats() {
                 <div className="col-span-12 h-48 w-full md:col-span-6 lg:col-span-3">
                   <Kpi
                     title="Total CVMs"
-                    value={data?.cvms.total || 0}
-                    loading={isLoading}
-                    errored={!!error}
+                    value={cvmStatsData?.total || 0}
+                    loading={isCvmStatsLoading}
+                    errored={!!cvmStatsError}
                   />
                 </div>
                 <div className="col-span-12 h-48 w-full md:col-span-6 lg:col-span-3">
                   <Kpi
                     title="CVM Registrations"
-                    value={data?.cvms.registrations.totalLastNDays || 0}
-                    loading={isLoading}
-                    errored={!!error}
+                    value={cvmStatsData?.registrations.totalLastNDays || 0}
+                    loading={isCvmStatsLoading}
+                    errored={!!cvmStatsError}
                   />
                 </div>
                 <div className="col-span-12 h-48 w-full md:col-span-6 lg:col-span-3">
                   <Kpi
                     title="CVM Imports"
-                    value={data?.cvms.imports.totalLastNDays || 0}
-                    loading={isLoading}
-                    errored={!!error}
+                    value={cvmStatsData?.imports.totalLastNDays || 0}
+                    loading={isCvmStatsLoading}
+                    errored={!!cvmStatsError}
                   />
                 </div>
                 <div className="col-span-12 h-48 w-full md:col-span-6 lg:col-span-3">
                   <Kpi
                     title="Average CVM Score"
                     value={
-                      data?.cvms.averageScore
-                        ? Number((data.cvms.averageScore / 100).toFixed(1))
+                      cvmStatsData?.averageScore
+                        ? Number((cvmStatsData.averageScore / 100).toFixed(1))
                         : 0
                     }
-                    loading={isLoading}
-                    errored={!!error}
+                    loading={isCvmStatsLoading}
+                    errored={!!cvmStatsError}
                   />
                 </div>
                 <div className="col-span-12 h-96 w-full">
@@ -447,24 +446,29 @@ export default function Stats() {
                     traces={[
                       {
                         x:
-                          data?.cvms.registrations.history.map((r) => r.date) ||
-                          [],
+                          cvmStatsData?.registrations.history.map(
+                            (r) => r.date,
+                          ) || [],
                         y:
-                          data?.cvms.registrations.history.map(
+                          cvmStatsData?.registrations.history.map(
                             (r) => r.count,
                           ) || [],
                         lineColor: "#65a30d",
                         name: "Registrations",
                       },
                       {
-                        x: data?.cvms.imports.history.map((r) => r.date) || [],
-                        y: data?.cvms.imports.history.map((r) => r.count) || [],
+                        x:
+                          cvmStatsData?.imports.history.map((r) => r.date) ||
+                          [],
+                        y:
+                          cvmStatsData?.imports.history.map((r) => r.count) ||
+                          [],
                         lineColor: "#f59e0b",
                         name: "Imports",
                       },
                     ]}
-                    loading={isLoading}
-                    errored={!!error}
+                    loading={isCvmStatsLoading}
+                    errored={!!cvmStatsError}
                   />
                 </div>
               </div>
@@ -480,25 +484,25 @@ export default function Stats() {
                 <div className="col-span-12 h-48 w-full md:col-span-6 lg:col-span-3">
                   <Kpi
                     title="Total Votes"
-                    value={data?.votes.upvotes.total || 0}
-                    loading={isLoading}
-                    errored={!!error}
+                    value={voteStatsData?.upvotes.total || 0}
+                    loading={isVoteStatsLoading}
+                    errored={!!voteStatsError}
                   />
                 </div>
                 <div className="col-span-12 h-48 w-full md:col-span-6 lg:col-span-3">
                   <Kpi
                     title="Upvotes"
-                    value={data?.votes.upvotes.totalLastNDays || 0}
-                    loading={isLoading}
-                    errored={!!error}
+                    value={voteStatsData?.upvotes.totalLastNDays || 0}
+                    loading={isVoteStatsLoading}
+                    errored={!!voteStatsError}
                   />
                 </div>
                 <div className="col-span-12 h-48 w-full md:col-span-6 lg:col-span-3">
                   <Kpi
                     title="Downvotes"
-                    value={data?.votes.downvotes.totalLastNDays || 0}
-                    loading={isLoading}
-                    errored={!!error}
+                    value={voteStatsData?.downvotes.totalLastNDays || 0}
+                    loading={isVoteStatsLoading}
+                    errored={!!voteStatsError}
                   />
                 </div>
                 <div className="col-span-12 h-96 w-full">
@@ -506,25 +510,29 @@ export default function Stats() {
                     title="CVMs Voted Last Days"
                     traces={[
                       {
-                        x: data?.votes.upvotes.history.map((r) => r.date) || [],
+                        x:
+                          voteStatsData?.upvotes.history.map((r) => r.date) ||
+                          [],
                         y:
-                          data?.votes.upvotes.history.map((r) => r.count) || [],
+                          voteStatsData?.upvotes.history.map((r) => r.count) ||
+                          [],
                         lineColor: "#65a30d",
                         name: "Upvotes",
                       },
                       {
                         x:
-                          data?.votes.downvotes.history.map((r) => r.date) ||
+                          voteStatsData?.downvotes.history.map((r) => r.date) ||
                           [],
                         y:
-                          data?.votes.downvotes.history.map((r) => r.count) ||
-                          [],
+                          voteStatsData?.downvotes.history.map(
+                            (r) => r.count,
+                          ) || [],
                         lineColor: "#dc2626",
                         name: "Downvotes",
                       },
                     ]}
-                    loading={isLoading}
-                    errored={!!error}
+                    loading={isVoteStatsLoading}
+                    errored={!!voteStatsError}
                   />
                 </div>
               </div>
@@ -540,25 +548,25 @@ export default function Stats() {
                 <div className="col-span-12 h-48 w-full md:col-span-6 lg:col-span-3">
                   <Kpi
                     title="Total Idents"
-                    value={data?.idents.total || 0}
-                    loading={isLoading}
-                    errored={!!error}
+                    value={identStatsData?.total || 0}
+                    loading={isIdentStatsLoading}
+                    errored={!!identStatsError}
                   />
                 </div>
                 <div className="col-span-12 h-48 w-full md:col-span-6 lg:col-span-3">
                   <Kpi
                     title="New Idents"
-                    value={data?.idents.totalNewLastNDays || 0}
-                    loading={isLoading}
-                    errored={!!error}
+                    value={identStatsData?.totalNewLastNDays || 0}
+                    loading={isIdentStatsLoading}
+                    errored={!!identStatsError}
                   />
                 </div>
                 <div className="col-span-12 h-48 w-full md:col-span-6 lg:col-span-3">
                   <Kpi
                     title="Average Credibility"
-                    value={data?.idents.averageCredibility || 0}
-                    loading={isLoading}
-                    errored={!!error}
+                    value={identStatsData?.averageCredibility || 0}
+                    loading={isIdentStatsLoading}
+                    errored={!!identStatsError}
                   />
                 </div>
                 <div className="col-span-12 h-96 w-full">
@@ -566,14 +574,14 @@ export default function Stats() {
                     title="New Idents Last Days"
                     traces={[
                       {
-                        x: data?.idents.newHistory.map((r) => r.date) || [],
-                        y: data?.idents.newHistory.map((r) => r.count) || [],
+                        x: identStatsData?.newHistory.map((r) => r.date) || [],
+                        y: identStatsData?.newHistory.map((r) => r.count) || [],
                         lineColor: "#65a30d",
                         name: "New Idents",
                       },
                     ]}
-                    loading={isLoading}
-                    errored={!!error}
+                    loading={isIdentStatsLoading}
+                    errored={!!identStatsError}
                   />
                 </div>
               </div>
@@ -589,25 +597,25 @@ export default function Stats() {
                 <div className="col-span-12 h-48 w-full md:col-span-6 lg:col-span-3">
                   <Kpi
                     title="Total Job Runs"
-                    value={data?.jobs.total || 0}
-                    loading={isLoading}
-                    errored={!!error}
+                    value={jobStatsData?.total || 0}
+                    loading={isJobStatsLoading}
+                    errored={!!jobStatsError}
                   />
                 </div>
                 <div className="col-span-12 h-48 w-full md:col-span-6 lg:col-span-3">
                   <Kpi
                     title="Job Runs"
-                    value={data?.jobs.totalRunLastNDays || 0}
-                    loading={isLoading}
-                    errored={!!error}
+                    value={jobStatsData?.totalRunLastNDays || 0}
+                    loading={isJobStatsLoading}
+                    errored={!!jobStatsError}
                   />
                 </div>
                 <div className="col-span-12 h-48 w-full md:col-span-6 lg:col-span-3">
                   <Kpi
                     title="Number of Different Job Types"
-                    value={data?.jobs.differentTypes || 0}
-                    loading={isLoading}
-                    errored={!!error}
+                    value={jobStatsData?.differentTypes || 0}
+                    loading={isJobStatsLoading}
+                    errored={!!jobStatsError}
                   />
                 </div>
                 <div className="col-span-12 h-96 w-full">
@@ -615,14 +623,14 @@ export default function Stats() {
                     title="Jobs Run Last Days"
                     traces={[
                       {
-                        x: data?.jobs.runHistory.map((r) => r.date) || [],
-                        y: data?.jobs.runHistory.map((r) => r.count) || [],
+                        x: jobStatsData?.runHistory.map((r) => r.date) || [],
+                        y: jobStatsData?.runHistory.map((r) => r.count) || [],
                         lineColor: "#65a30d",
                         name: "Jobs Run",
                       },
                     ]}
-                    loading={isLoading}
-                    errored={!!error}
+                    loading={isJobStatsLoading}
+                    errored={!!jobStatsError}
                   />
                 </div>
                 <div className="col-span-12 h-96 w-full md:col-span-6">
@@ -632,16 +640,16 @@ export default function Stats() {
                       {
                         labels: ["Completed", "Failed", "Running", "Orphaned"],
                         values: [
-                          data?.jobs.statusCounts.completed || 0,
-                          data?.jobs.statusCounts.failed || 0,
-                          data?.jobs.statusCounts.running || 0,
-                          data?.jobs.statusCounts.orphaned || 0,
+                          jobStatsData?.statusCounts.completed || 0,
+                          jobStatsData?.statusCounts.failed || 0,
+                          jobStatsData?.statusCounts.running || 0,
+                          jobStatsData?.statusCounts.orphaned || 0,
                         ],
                         colors: ["#16a34a", "#dc2626", "#94a3b8", "#eab308"],
                       },
                     ]}
-                    loading={isLoading}
-                    errored={!!error}
+                    loading={isJobStatsLoading}
+                    errored={!!jobStatsError}
                   />
                 </div>
               </div>
