@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import dynamic from "next/dynamic";
 import useSWR from "swr";
 import { ListBox, ListBoxItem } from "@/components/atoms/ListBox";
 import { useEnv } from "@/contexts/RuntimeConfigProvider";
@@ -13,6 +12,8 @@ import {
   ListTodo,
   ChartNoAxesCombined,
 } from "lucide-react";
+import { Kpi } from "@/components/molecules/visualizations/Kpi";
+import { LineChart } from "@/components/molecules/visualizations/LineChart";
 import { PieChart } from "@/components/molecules/visualizations/PieChart";
 import useAckeeClient from "@/hooks/useAckeeClient";
 import { gql } from "urql";
@@ -23,24 +24,6 @@ import {
   AggregatedJobStats,
   AggregatedVoteStats,
 } from "@/lib/types/stats";
-
-const Kpi = dynamic(
-  () =>
-    import("@/components/molecules/visualizations/Kpi").then((mod) => mod.Kpi),
-  {
-    ssr: false,
-  },
-);
-
-const LineChart = dynamic(
-  () =>
-    import("@/components/molecules/visualizations/LineChart").then(
-      (mod) => mod.LineChart,
-    ),
-  {
-    ssr: false,
-  },
-);
 
 function Sidebar() {
   const navigation = useMemo(() => {

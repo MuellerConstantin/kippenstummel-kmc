@@ -1,13 +1,14 @@
 "use client";
 
-import createPlotlyComponent from "react-plotly.js/factory";
-import Plotly from "plotly.js/lib/core";
-import Indicator from "plotly.js/lib/indicator";
+import dynamic from "next/dynamic";
 import { useAppSelector } from "@/store";
 
-Plotly.register([Indicator]);
-
-const Plot = createPlotlyComponent(Plotly);
+const Plot = dynamic(
+  () => import("@/lib/visualization").then((mod) => mod.Plot),
+  {
+    ssr: false,
+  },
+);
 
 export interface KpiProps {
   title: string;

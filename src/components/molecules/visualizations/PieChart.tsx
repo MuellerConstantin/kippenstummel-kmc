@@ -1,13 +1,14 @@
 "use client";
 
-import createPlotlyComponent from "react-plotly.js/factory";
-import Plotly from "plotly.js/lib/core";
-import Pie from "plotly.js/lib/pie";
+import dynamic from "next/dynamic";
 import { useAppSelector } from "@/store";
 
-Plotly.register([Pie]);
-
-const Plot = createPlotlyComponent(Plotly);
+const Plot = dynamic(
+  () => import("@/lib/visualization").then((mod) => mod.Plot),
+  {
+    ssr: false,
+  },
+);
 
 export interface PieChartProps {
   title: string;
