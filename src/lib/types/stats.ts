@@ -64,3 +64,9 @@ export interface AggregatedJobStats {
     count: number;
   }[];
 }
+
+export interface CvmDensityStatsPoint {
+  longitude: number;
+  latitude: number;
+  count: number;
+}

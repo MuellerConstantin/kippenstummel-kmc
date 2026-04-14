@@ -9,7 +9,7 @@
   "private": true,
   "license": "AGPL-3.0-only",
   "scripts": {
-    "dev": "next dev --turbopack -p 4000",
+    "dev": "next dev -p 4000",
     "build": "next build",
     "build:staging": "env-cmd --no-override --silent -f .env.staging.local env-cmd --no-override --silent -f .env.staging next build",
     "start": "next start -p 4000",

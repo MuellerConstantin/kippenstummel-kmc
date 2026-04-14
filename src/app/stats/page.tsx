@@ -15,6 +15,7 @@ import {
 import { Kpi } from "@/components/molecules/visualizations/Kpi";
 import { LineChart } from "@/components/molecules/visualizations/LineChart";
 import { PieChart } from "@/components/molecules/visualizations/PieChart";
+import { DensityMap } from "@/components/molecules/visualizations/DensityMap";
 import useAckeeClient from "@/hooks/useAckeeClient";
 import { gql } from "urql";
 import { Select, SelectItem } from "@/components/atoms/Select";
@@ -23,6 +24,7 @@ import {
   AggregatedIdentStats,
   AggregatedJobStats,
   AggregatedVoteStats,
+  CvmDensityStatsPoint,
 } from "@/lib/types/stats";
 
 function Sidebar() {
@@ -246,6 +248,53 @@ function AnalyticsSection({ nDaysAgo = 7 }: AnalyticsSectionProps) {
   );
 }
 
+function CvmRegistrationDensityMap() {
+  const api = useApi();
+
+  const cvmDensityUrl = useMemo(() => {
+    const searchParams = new URLSearchParams();
+
+    searchParams.set("bottomLeft", "47.27, 5.87");
+    searchParams.set("topRight", "55.06, 15.04");
+    searchParams.set("zoom", "17");
+
+    return `/kmc/stats/cvms/density?${searchParams.toString()}`;
+  }, []);
+
+  const {
+    data: cvmDensityData,
+    isLoading: isCvmDensityLoading,
+    error: cvmDensityError,
+  } = useSWR<CvmDensityStatsPoint[], unknown, string | null>(
+    cvmDensityUrl,
+    (url) => api.get(url).then((res) => res.data),
+  );
+
+  return (
+    <DensityMap
+      title="CVM Registration Density"
+      loading={isCvmDensityLoading}
+      errored={!!cvmDensityError}
+      data={[
+        {
+          type: "densitymap",
+          lat: cvmDensityData?.map((point) => point.latitude) || [],
+          lon: cvmDensityData?.map((point) => point.longitude) || [],
+          z: cvmDensityData?.map((point) => point.count) || [],
+          colorscale: [
+            [0, "#f0fdf4"], // green-50
+            [0.25, "#bbf7d0"], // green-200
+            [0.5, "#4ade80"], // green-400
+            [0.75, "#16a34a"], // green-600
+            [1, "#14532d"], // green-950
+          ],
+          showscale: true,
+        },
+      ]}
+    />
+  );
+}
+
 export default function Stats() {
   const api = useApi();
 
@@ -453,6 +502,9 @@ export default function Stats() {
                     loading={isCvmStatsLoading}
                     errored={!!cvmStatsError}
                   />
+                </div>
+                <div className="col-span-6 h-96 w-full">
+                  <CvmRegistrationDensityMap />
                 </div>
               </div>
             </section>
