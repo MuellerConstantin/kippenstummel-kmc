@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import useSWR from "swr";
 import { ListBox, ListBoxItem } from "@/components/atoms/ListBox";
 import { useEnv } from "@/contexts/RuntimeConfigProvider";
@@ -248,49 +248,180 @@ function AnalyticsSection({ nDaysAgo = 7 }: AnalyticsSectionProps) {
   );
 }
 
-function CvmRegistrationDensityMap() {
+interface CvmDensityMapProps {
+  nDaysAgo?: number;
+}
+
+function CvmRegistrationDensityMap({ nDaysAgo = 7 }: CvmDensityMapProps) {
   const api = useApi();
+
+  const [viewport, setViewport] = useState<{
+    bottomLeft: { latitude: number; longitude: number };
+    topRight: { latitude: number; longitude: number };
+    zoom: number;
+  }>({
+    bottomLeft: { latitude: 47.27, longitude: 5.87 },
+    topRight: { latitude: 55.06, longitude: 15.04 },
+    zoom: 4,
+  });
+
+  const handleViewportChange = useCallback(
+    (data: {
+      bottomLeft: { latitude: number; longitude: number };
+      topRight: { latitude: number; longitude: number };
+      zoom: number;
+    }) => {
+      setViewport(data);
+    },
+    [],
+  );
 
   const cvmDensityUrl = useMemo(() => {
     const searchParams = new URLSearchParams();
 
-    searchParams.set("bottomLeft", "47.27, 5.87");
-    searchParams.set("topRight", "55.06, 15.04");
-    searchParams.set("zoom", "17");
+    searchParams.set(
+      "bottomLeft",
+      `${viewport.bottomLeft.latitude},${viewport.bottomLeft.longitude}`,
+    );
+    searchParams.set(
+      "topRight",
+      `${viewport.topRight.latitude},${viewport.topRight.longitude}`,
+    );
+    searchParams.set("zoom", String(viewport.zoom));
+    searchParams.set(
+      "filter",
+      `createdAt>=${new Date(Date.now() - nDaysAgo * 24 * 60 * 60 * 1000).toISOString()}`,
+    );
 
     return `/kmc/stats/cvms/density?${searchParams.toString()}`;
-  }, []);
+  }, [viewport, nDaysAgo]);
 
-  const {
-    data: cvmDensityData,
-    isLoading: isCvmDensityLoading,
-    error: cvmDensityError,
-  } = useSWR<CvmDensityStatsPoint[], unknown, string | null>(
-    cvmDensityUrl,
-    (url) => api.get(url).then((res) => res.data),
+  const { data: cvmDensityData, error: cvmDensityError } = useSWR<
+    CvmDensityStatsPoint[],
+    unknown,
+    string | null
+  >(cvmDensityUrl, (url) => api.get(url).then((res) => res.data), {
+    keepPreviousData: true,
+  });
+
+  const visualizationData = useMemo(
+    () => [
+      {
+        type: "densitymap" as const,
+        lat: cvmDensityData?.map((p) => p.latitude) || [],
+        lon: cvmDensityData?.map((p) => p.longitude) || [],
+        z: cvmDensityData?.map((p) => p.count) || [],
+        colorscale: [
+          [0, "rgba(240,253,244,0)"],
+          [0.05, "#bbf7d0"],
+          [0.15, "#4ade80"],
+          [0.4, "#16a34a"],
+          [1, "#14532d"],
+        ] as Array<[number, string]>,
+        showscale: true,
+      },
+    ],
+    [cvmDensityData],
   );
 
   return (
     <DensityMap
       title="CVM Registration Density"
-      loading={isCvmDensityLoading}
       errored={!!cvmDensityError}
-      data={[
-        {
-          type: "densitymap",
-          lat: cvmDensityData?.map((point) => point.latitude) || [],
-          lon: cvmDensityData?.map((point) => point.longitude) || [],
-          z: cvmDensityData?.map((point) => point.count) || [],
-          colorscale: [
-            [0, "#f0fdf4"], // green-50
-            [0.25, "#bbf7d0"], // green-200
-            [0.5, "#4ade80"], // green-400
-            [0.75, "#16a34a"], // green-600
-            [1, "#14532d"], // green-950
-          ],
-          showscale: true,
+      onViewportChange={handleViewportChange}
+      data={visualizationData}
+      layout={{
+        map: {
+          style: "/tiles/default.json",
+          center: { lat: 51.1657, lon: 10.4515 },
+          zoom: 4,
         },
-      ]}
+      }}
+    />
+  );
+}
+
+function CvmDensityMap() {
+  const api = useApi();
+
+  const [viewport, setViewport] = useState<{
+    bottomLeft: { latitude: number; longitude: number };
+    topRight: { latitude: number; longitude: number };
+    zoom: number;
+  }>({
+    bottomLeft: { latitude: 47.27, longitude: 5.87 },
+    topRight: { latitude: 55.06, longitude: 15.04 },
+    zoom: 4,
+  });
+
+  const handleViewportChange = useCallback(
+    (data: {
+      bottomLeft: { latitude: number; longitude: number };
+      topRight: { latitude: number; longitude: number };
+      zoom: number;
+    }) => {
+      setViewport(data);
+    },
+    [],
+  );
+
+  const cvmDensityUrl = useMemo(() => {
+    const searchParams = new URLSearchParams();
+
+    searchParams.set(
+      "bottomLeft",
+      `${viewport.bottomLeft.latitude},${viewport.bottomLeft.longitude}`,
+    );
+    searchParams.set(
+      "topRight",
+      `${viewport.topRight.latitude},${viewport.topRight.longitude}`,
+    );
+    searchParams.set("zoom", String(viewport.zoom));
+
+    return `/kmc/stats/cvms/density?${searchParams.toString()}`;
+  }, [viewport]);
+
+  const { data: cvmDensityData, error: cvmDensityError } = useSWR<
+    CvmDensityStatsPoint[],
+    unknown,
+    string | null
+  >(cvmDensityUrl, (url) => api.get(url).then((res) => res.data), {
+    keepPreviousData: true,
+  });
+
+  const visualizationData = useMemo(
+    () => [
+      {
+        type: "densitymap" as const,
+        lat: cvmDensityData?.map((p) => p.latitude) || [],
+        lon: cvmDensityData?.map((p) => p.longitude) || [],
+        z: cvmDensityData?.map((p) => p.count) || [],
+        colorscale: [
+          [0, "rgba(240,253,244,0)"],
+          [0.05, "#bbf7d0"],
+          [0.15, "#4ade80"],
+          [0.4, "#16a34a"],
+          [1, "#14532d"],
+        ] as Array<[number, string]>,
+        showscale: true,
+      },
+    ],
+    [cvmDensityData],
+  );
+
+  return (
+    <DensityMap
+      title="CVM Density"
+      errored={!!cvmDensityError}
+      onViewportChange={handleViewportChange}
+      data={visualizationData}
+      layout={{
+        map: {
+          style: "/tiles/default.json",
+          center: { lat: 51.1657, lon: 10.4515 },
+          zoom: 4,
+        },
+      }}
     />
   );
 }
@@ -502,6 +633,9 @@ export default function Stats() {
                     loading={isCvmStatsLoading}
                     errored={!!cvmStatsError}
                   />
+                </div>
+                <div className="col-span-6 h-96 w-full">
+                  <CvmDensityMap />
                 </div>
                 <div className="col-span-6 h-96 w-full">
                   <CvmRegistrationDensityMap />

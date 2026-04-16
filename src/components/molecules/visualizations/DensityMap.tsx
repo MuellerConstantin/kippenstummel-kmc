@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useCallback } from "react";
+import { useRef, useEffect, useCallback, useMemo } from "react";
 import type { Data, Layout, Config } from "plotly.js";
 import { useAppSelector } from "@/store";
 
@@ -9,7 +9,6 @@ export interface DensityMapProps {
   data: Data[];
   layout?: Partial<Layout>;
   config?: Partial<Config>;
-  loading: boolean;
   errored: boolean;
   className?: string;
   onViewportChange?: ({
@@ -28,15 +27,17 @@ export function DensityMap({
   data,
   layout,
   config,
-  loading,
   errored,
   className,
   onViewportChange,
 }: DensityMapProps) {
   const darkMode = useAppSelector((state) => state.theme.darkMode);
+
+  const mounted = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const plotlyRef = useRef<typeof import("plotly.js/lib/core") | null>(null);
-  const initialized = useRef(false);
+
+  const tickColor = darkMode ? "#f1f5f9" : "#0f172a";
 
   const defaultLayout: Partial<Layout> = {
     map: {
@@ -53,26 +54,45 @@ export function DensityMap({
   const mergedLayout = { ...defaultLayout, ...layout };
   const mergedConfig: Partial<Config> = { responsive: true, ...config };
 
+  const mergedData = useMemo(
+    () =>
+      data.map((trace) => ({
+        ...trace,
+        colorbar: {
+          ...("colorbar" in trace ? trace.colorbar : {}),
+          tickfont: { color: tickColor },
+          title: {
+            ...("colorbar" in trace ? trace.colorbar?.title : {}),
+            font: { color: tickColor },
+          },
+        },
+      })),
+    [data, tickColor],
+  );
+
+  // Mount plotly plot on initial render
   useEffect(() => {
-    if (loading || errored) {
+    if (errored) {
       return;
     }
 
-    let cancelled = false;
-
     (async () => {
       const { default: Plotly } = await import("@/lib/visualization");
-      if (cancelled || !containerRef.current) return;
+
+      if (!containerRef.current) {
+        return;
+      }
+
       plotlyRef.current = Plotly;
 
       const element = await Plotly.newPlot(
         containerRef.current,
-        data,
+        mergedData,
         mergedLayout,
         mergedConfig,
       );
 
-      initialized.current = true;
+      mounted.current = true;
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       element.on("plotly_relayout", (eventData: any) => {
@@ -101,37 +121,48 @@ export function DensityMap({
     })();
 
     return () => {
-      cancelled = true;
       if (containerRef.current && plotlyRef.current) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
         plotlyRef.current.purge(containerRef.current);
-        initialized.current = false;
+        mounted.current = false;
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, errored]);
+  }, [errored]);
 
+  // Update plotly plot when data or layout changes
   useEffect(() => {
-    if (!initialized.current || !containerRef.current || !plotlyRef.current)
+    if (!mounted.current || !containerRef.current || !plotlyRef.current) {
       return;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const currentLayout = (containerRef.current as any).layout;
+
     plotlyRef.current.react(
       containerRef.current,
-      data,
-      mergedLayout,
+      mergedData,
+      currentLayout ?? mergedLayout,
       mergedConfig,
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, layout, config, darkMode]);
+  }, [mergedData, layout, config, darkMode]);
 
   const handleResize = useCallback(() => {
-    if (!containerRef.current || !plotlyRef.current || !initialized.current)
+    if (!containerRef.current || !plotlyRef.current || !mounted.current) {
       return;
+    }
+
     plotlyRef.current.Plots.resize(containerRef.current);
   }, []);
 
   useEffect(() => {
     const observer = new ResizeObserver(handleResize);
-    if (containerRef.current) observer.observe(containerRef.current);
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
     return () => observer.disconnect();
   }, [handleResize]);
 
@@ -142,10 +173,10 @@ export function DensityMap({
       <h5 className="truncate font-semibold text-slate-900 dark:text-slate-100">
         {title}
       </h5>
-      {loading ? (
-        <div className="w-full grow animate-pulse rounded-md bg-slate-300 dark:bg-slate-700" />
-      ) : errored ? (
+      {errored ? (
         <div className="w-full grow rounded-md bg-red-300 dark:bg-red-800" />
+      ) : !data || data.length === 0 ? (
+        <div className="w-full grow animate-pulse rounded-md bg-slate-300 dark:bg-slate-700" />
       ) : (
         <div className="w-full grow overflow-hidden rounded-md">
           <div ref={containerRef} className="h-full w-full" />
