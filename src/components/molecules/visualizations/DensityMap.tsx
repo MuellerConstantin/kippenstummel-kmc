@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useCallback, useMemo } from "react";
+import { useRef, useEffect, useCallback, useMemo, useState } from "react";
 import type { Data, Layout, Config } from "plotly.js";
 import { useAppSelector } from "@/store";
 
@@ -20,6 +20,8 @@ export interface DensityMapProps {
     topRight: { latitude: number; longitude: number };
     zoom: number;
   }) => void;
+  maxZoom?: number;
+  minZoom?: number;
 }
 
 export function DensityMap({
@@ -30,29 +32,59 @@ export function DensityMap({
   errored,
   className,
   onViewportChange,
+  maxZoom = 18,
+  minZoom = 1,
 }: DensityMapProps) {
   const darkMode = useAppSelector((state) => state.theme.darkMode);
 
-  const mounted = useRef(false);
+  const [mounted, setMounted] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const plotlyRef = useRef<typeof import("plotly.js/lib/core") | null>(null);
 
-  const tickColor = darkMode ? "#f1f5f9" : "#0f172a";
+  const minZoomRef = useRef(minZoom);
+  const maxZoomRef = useRef(maxZoom);
+  const onViewportChangeRef = useRef(onViewportChange);
 
-  const defaultLayout: Partial<Layout> = {
-    map: {
-      style: "/tiles/default.json",
-      center: { lat: 51.1657, lon: 10.4515 },
-      zoom: 4,
-    },
-    autosize: true,
-    margin: { t: 0, b: 0, l: 0, r: 0 },
-    paper_bgcolor: "transparent",
-    font: { color: darkMode ? "#f1f5f9" : "#0f172a" },
-  };
+  useEffect(() => {
+    onViewportChangeRef.current = onViewportChange;
+  }, [onViewportChange]);
 
-  const mergedLayout = { ...defaultLayout, ...layout };
-  const mergedConfig: Partial<Config> = { responsive: true, ...config };
+  useEffect(() => {
+    minZoomRef.current = minZoom;
+  }, [minZoom]);
+
+  useEffect(() => {
+    maxZoomRef.current = maxZoom;
+  }, [maxZoom]);
+
+  const tickColor = useMemo(
+    () => (darkMode ? "#f1f5f9" : "#0f172a"),
+    [darkMode],
+  );
+
+  const defaultLayout: Partial<Layout> = useMemo(
+    () => ({
+      map: {
+        style: "/tiles/default.json",
+        center: { lat: 51.1657, lon: 10.4515 },
+        zoom: 4,
+      },
+      autosize: true,
+      margin: { t: 0, b: 0, l: 0, r: 0 },
+      paper_bgcolor: "transparent",
+      font: { color: darkMode ? "#f1f5f9" : "#0f172a" },
+    }),
+    [darkMode],
+  );
+
+  const mergedLayout = useMemo(
+    () => ({ ...defaultLayout, ...layout }),
+    [layout, defaultLayout],
+  );
+  const mergedConfig: Partial<Config> = useMemo(
+    () => ({ responsive: true, ...config }),
+    [config],
+  );
 
   const mergedData = useMemo(
     () =>
@@ -92,7 +124,7 @@ export function DensityMap({
         mergedConfig,
       );
 
-      mounted.current = true;
+      setMounted(true);
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       element.on("plotly_relayout", (eventData: any) => {
@@ -100,6 +132,22 @@ export function DensityMap({
           | [number, number][]
           | undefined;
         const zoom = eventData["map.zoom"] as number | undefined;
+
+        if (zoom !== undefined) {
+          const clamped = Math.min(
+            Math.max(zoom, minZoomRef.current),
+            maxZoomRef.current,
+          );
+
+          if (clamped !== zoom && containerRef.current && plotlyRef.current) {
+            plotlyRef.current.relayout(containerRef.current, {
+              "map.zoom": clamped,
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            } as any);
+
+            return;
+          }
+        }
 
         if (coords && zoom) {
           const lons = coords.map((c) => c[0]);
@@ -113,8 +161,8 @@ export function DensityMap({
             longitude: Math.max(...lons),
           };
 
-          if (onViewportChange) {
-            onViewportChange({ bottomLeft, topRight, zoom });
+          if (onViewportChangeRef.current) {
+            onViewportChangeRef.current({ bottomLeft, topRight, zoom });
           }
         }
       });
@@ -124,7 +172,7 @@ export function DensityMap({
       if (containerRef.current && plotlyRef.current) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
         plotlyRef.current.purge(containerRef.current);
-        mounted.current = false;
+        setMounted(false);
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -132,7 +180,7 @@ export function DensityMap({
 
   // Update plotly plot when data or layout changes
   useEffect(() => {
-    if (!mounted.current || !containerRef.current || !plotlyRef.current) {
+    if (!mounted || !containerRef.current || !plotlyRef.current) {
       return;
     }
 
@@ -145,16 +193,15 @@ export function DensityMap({
       currentLayout ?? mergedLayout,
       mergedConfig,
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mergedData, layout, config, darkMode]);
+  }, [mergedData, mergedLayout, mergedConfig, mounted]);
 
   const handleResize = useCallback(() => {
-    if (!containerRef.current || !plotlyRef.current || !mounted.current) {
+    if (!containerRef.current || !plotlyRef.current || !mounted) {
       return;
     }
 
     plotlyRef.current.Plots.resize(containerRef.current);
-  }, []);
+  }, [mounted]);
 
   useEffect(() => {
     const observer = new ResizeObserver(handleResize);
