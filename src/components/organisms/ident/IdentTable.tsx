@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
 import useApi from "@/hooks/useApi";
 import {
   Table,
@@ -10,6 +10,7 @@ import {
   Row,
   Cell,
 } from "@/components/atoms/Table";
+import { Checkbox } from "@/components/atoms/Checkbox";
 import { Pagination } from "@/components/molecules/Pagination";
 import { Key, Selection, TableBody } from "react-aria-components";
 import { IdentFilterSection } from "./IdentFilterSection";
@@ -31,6 +32,7 @@ export function IdentTable(props: IdentTableProps) {
   const { onSelect } = props;
 
   const api = useApi();
+  const { mutate } = useSWRConfig();
 
   const [selected, setSelected] = useState<"all" | Iterable<Key> | undefined>();
   const [page, setPage] = useState(1);
@@ -46,6 +48,7 @@ export function IdentTable(props: IdentTableProps) {
         lastActiveAt: string;
         credibility: number;
         karma: number;
+        trusted: boolean;
         displayName?: string;
       }[];
       info: {
@@ -60,6 +63,14 @@ export function IdentTable(props: IdentTableProps) {
   >(
     `/kmc/ident?page=${page - 1}&perPage=${perPage}${filter ? `&filter=${filter}` : ""}`,
     (url) => api.get(url).then((res) => res.data),
+  );
+
+  const handleToggleTrusted = useCallback(
+    async (identity: string, trusted: boolean) => {
+      await api.patch(`/kmc/ident/${identity}`, { trusted });
+      mutate((key) => typeof key === "string" && /\/kmc\/ident/.test(key));
+    },
+    [api, mutate],
   );
 
   const handleSelect = useCallback(
@@ -114,6 +125,7 @@ export function IdentTable(props: IdentTableProps) {
               <Column id="lastActiveAt">Last Active At</Column>
               <Column id="credibility">Credibility</Column>
               <Column id="karma">Karma</Column>
+              <Column id="trusted">Trusted</Column>
             </TableHeader>
             <TableBody
               items={Array.from(Array(10).keys()).map((key) => ({ key }))}
@@ -138,6 +150,9 @@ export function IdentTable(props: IdentTableProps) {
                   <Cell>
                     <div className="h-3 w-24 animate-pulse rounded-md bg-slate-200 dark:bg-slate-700" />
                   </Cell>
+                  <Cell>
+                    <div className="h-3 w-12 animate-pulse rounded-md bg-slate-200 dark:bg-slate-700" />
+                  </Cell>
                 </Row>
               )}
             </TableBody>
@@ -157,6 +172,7 @@ export function IdentTable(props: IdentTableProps) {
               <Column id="lastActiveAt">Last Active At</Column>
               <Column id="credibility">Credibility</Column>
               <Column id="karma">Karma</Column>
+              <Column id="trusted">Trusted</Column>
             </TableHeader>
             <TableBody
               items={Array.from(Array(10).keys()).map((key) => ({ key }))}
@@ -181,6 +197,9 @@ export function IdentTable(props: IdentTableProps) {
                   <Cell>
                     <div className="h-3 w-24 rounded-md bg-red-300 dark:bg-red-800" />
                   </Cell>
+                  <Cell>
+                    <div className="h-3 w-12 rounded-md bg-red-300 dark:bg-red-800" />
+                  </Cell>
                 </Row>
               )}
             </TableBody>
@@ -204,6 +223,7 @@ export function IdentTable(props: IdentTableProps) {
               <Column id="lastActiveAt">Last Active At</Column>
               <Column id="credibility">Credibility</Column>
               <Column id="karma">Karma</Column>
+              <Column id="trusted">Trusted</Column>
             </TableHeader>
             <TableBody items={data.content}>
               {(row) => (
@@ -214,6 +234,14 @@ export function IdentTable(props: IdentTableProps) {
                   <Cell>{new Date(row.lastActiveAt).toLocaleDateString()}</Cell>
                   <Cell>{row.credibility}</Cell>
                   <Cell>{row.karma}</Cell>
+                  <Cell>
+                    <Checkbox
+                      isSelected={row.trusted}
+                      onChange={(value) =>
+                        handleToggleTrusted(row.identity, value)
+                      }
+                    />
+                  </Cell>
                 </Row>
               )}
             </TableBody>
