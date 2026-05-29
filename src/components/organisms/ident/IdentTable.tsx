@@ -14,6 +14,7 @@ import { Checkbox } from "@/components/atoms/Checkbox";
 import { Pagination } from "@/components/molecules/Pagination";
 import { Key, Selection, TableBody } from "react-aria-components";
 import { IdentFilterSection } from "./IdentFilterSection";
+import { Ident } from "@/lib/types/ident";
 
 export interface IdentTableProps {
   onSelect?: (
@@ -41,16 +42,7 @@ export function IdentTable(props: IdentTableProps) {
 
   const { data, isLoading, error } = useSWR<
     {
-      content: {
-        identity: string;
-        createdAt?: string;
-        updatedAt?: string;
-        lastActiveAt: string;
-        credibility: number;
-        karma: number;
-        trusted: boolean;
-        displayName?: string;
-      }[];
+      content: Ident[];
       info: {
         page: number;
         perPage: number;
