@@ -6,6 +6,7 @@ import useApi from "@/hooks/useApi";
 import { Kpi } from "@/components/molecules/visualizations/Kpi";
 import { LineChart } from "@/components/molecules/visualizations/LineChart";
 import { AggregatedIdentStats } from "@/lib/types/stats";
+import { filteredScope, fixedScope } from "@/lib/stats-scope";
 
 export interface IdentStatisticsSectionProps {
   lastNDays?: number;
@@ -35,11 +36,15 @@ export function IdentStatisticsSection({
     (url) => api.get(url).then((res) => res.data),
   );
 
+  const filtered = filteredScope(lastNDays ?? 7);
+  const allTime = fixedScope("All time");
+
   return (
     <div className="grid w-full grid-cols-12 gap-4">
       <div className="col-span-12 h-48 w-full md:col-span-6 lg:col-span-3">
         <Kpi
           title="Total Idents"
+          scope={allTime}
           value={identStatsData?.total || 0}
           loading={isIdentStatsLoading}
           errored={!!identStatsError}
@@ -48,6 +53,7 @@ export function IdentStatisticsSection({
       <div className="col-span-12 h-48 w-full md:col-span-6 lg:col-span-3">
         <Kpi
           title="New Idents"
+          scope={filtered}
           value={identStatsData?.totalNewLastNDays || 0}
           loading={isIdentStatsLoading}
           errored={!!identStatsError}
@@ -56,6 +62,7 @@ export function IdentStatisticsSection({
       <div className="col-span-12 h-48 w-full md:col-span-6 lg:col-span-3">
         <Kpi
           title="Average Credibility"
+          scope={allTime}
           value={identStatsData?.averageCredibility || 0}
           loading={isIdentStatsLoading}
           errored={!!identStatsError}
@@ -64,6 +71,7 @@ export function IdentStatisticsSection({
       <div className="col-span-12 h-96 w-full">
         <LineChart
           title="New Idents Last Days"
+          scope={filtered}
           traces={[
             {
               x: identStatsData?.newHistory.map((r) => r.date) || [],

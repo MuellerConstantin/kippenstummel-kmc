@@ -3,6 +3,7 @@
 import { useRef, useEffect, useCallback, useMemo, useState } from "react";
 import type { Data, Layout, Config } from "plotly.js";
 import { useAppSelector } from "@/store";
+import { ScopeBadge, ScopeBadgeProps } from "@/components/atoms/ScopeBadge";
 
 export interface DensityMapProps {
   title: string;
@@ -22,6 +23,7 @@ export interface DensityMapProps {
   }) => void;
   maxZoom?: number;
   minZoom?: number;
+  scope?: ScopeBadgeProps;
 }
 
 export function DensityMap({
@@ -34,6 +36,7 @@ export function DensityMap({
   onViewportChange,
   maxZoom = 18,
   minZoom = 1,
+  scope,
 }: DensityMapProps) {
   const darkMode = useAppSelector((state) => state.theme.darkMode);
 
@@ -217,9 +220,12 @@ export function DensityMap({
     <div
       className={`flex h-full w-full flex-col gap-2 overflow-hidden rounded-md border border-slate-200 bg-white p-2 dark:border-slate-700 dark:bg-slate-900 ${className ?? ""}`}
     >
-      <h5 className="truncate font-semibold text-slate-900 dark:text-slate-100">
-        {title}
-      </h5>
+      <div className="flex items-center justify-between gap-2">
+        <h5 className="truncate font-semibold text-slate-900 dark:text-slate-100">
+          {title}
+        </h5>
+        {scope && <ScopeBadge {...scope} />}
+      </div>
       {errored ? (
         <div className="w-full grow rounded-md bg-red-300 dark:bg-red-800" />
       ) : !data || data.length === 0 ? (

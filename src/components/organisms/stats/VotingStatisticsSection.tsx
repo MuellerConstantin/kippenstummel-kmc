@@ -7,6 +7,7 @@ import { Kpi } from "@/components/molecules/visualizations/Kpi";
 import { LineChart } from "@/components/molecules/visualizations/LineChart";
 import { DensityMap } from "@/components/molecules/visualizations/DensityMap";
 import { AggregatedVoteStats, CvmDensityStatsPoint } from "@/lib/types/stats";
+import { filteredScope, fixedScope } from "@/lib/stats-scope";
 
 interface CvmVotingDensityMapProps {
   nDaysAgo?: number;
@@ -87,6 +88,7 @@ function CvmVotingDensityMap({ nDaysAgo = 7 }: CvmVotingDensityMapProps) {
   return (
     <DensityMap
       title="CVM Voting Density"
+      scope={filteredScope(nDaysAgo)}
       errored={!!cvmDensityError}
       onViewportChange={handleViewportChange}
       data={visualizationData}
@@ -128,11 +130,15 @@ export function VotingStatisticsSection({
     api.get(url).then((res) => res.data),
   );
 
+  const filtered = filteredScope(lastNDays ?? 7);
+  const allTime = fixedScope("All time");
+
   return (
     <div className="grid w-full grid-cols-12 gap-4">
       <div className="col-span-12 h-48 w-full md:col-span-6 lg:col-span-3">
         <Kpi
           title="Total Votes"
+          scope={allTime}
           value={voteStatsData?.upvotes.total || 0}
           loading={isVoteStatsLoading}
           errored={!!voteStatsError}
@@ -141,6 +147,7 @@ export function VotingStatisticsSection({
       <div className="col-span-12 h-48 w-full md:col-span-6 lg:col-span-3">
         <Kpi
           title="Upvotes"
+          scope={filtered}
           value={voteStatsData?.upvotes.totalLastNDays || 0}
           loading={isVoteStatsLoading}
           errored={!!voteStatsError}
@@ -149,6 +156,7 @@ export function VotingStatisticsSection({
       <div className="col-span-12 h-48 w-full md:col-span-6 lg:col-span-3">
         <Kpi
           title="Downvotes"
+          scope={filtered}
           value={voteStatsData?.downvotes.totalLastNDays || 0}
           loading={isVoteStatsLoading}
           errored={!!voteStatsError}
@@ -157,6 +165,7 @@ export function VotingStatisticsSection({
       <div className="col-span-12 h-96 w-full">
         <LineChart
           title="CVMs Voted Last Days"
+          scope={filtered}
           traces={[
             {
               x: voteStatsData?.upvotes.history.map((r) => r.date) || [],

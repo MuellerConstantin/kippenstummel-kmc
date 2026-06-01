@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useAppSelector } from "@/store";
+import { ScopeBadge, ScopeBadgeProps } from "@/components/atoms/ScopeBadge";
 
 const Plot = dynamic(
   () => import("@/lib/visualization").then((mod) => mod.Plot),
@@ -17,6 +18,7 @@ export interface LineChartProps {
   errored: boolean;
   yAxis?: Partial<Plotly.Layout["yaxis"]>;
   xAxis?: Partial<Plotly.Layout["xaxis"]>;
+  scope?: ScopeBadgeProps;
 }
 
 export function LineChart(props: LineChartProps) {
@@ -24,9 +26,12 @@ export function LineChart(props: LineChartProps) {
 
   return (
     <div className="flex h-full w-full flex-col gap-2 overflow-hidden rounded-md border border-slate-200 bg-white p-2 dark:border-slate-700 dark:bg-slate-900">
-      <h5 className="truncate font-semibold text-slate-900 dark:text-slate-100">
-        {props.title}
-      </h5>
+      <div className="flex items-center justify-between gap-2">
+        <h5 className="truncate font-semibold text-slate-900 dark:text-slate-100">
+          {props.title}
+        </h5>
+        {props.scope && <ScopeBadge {...props.scope} />}
+      </div>
       {props.loading ? (
         <div className="w-full grow animate-pulse rounded-md bg-slate-300 dark:bg-slate-700" />
       ) : props.errored ? (

@@ -8,6 +8,7 @@ import {
   Fingerprint,
   ListTodo,
   ChartNoAxesCombined,
+  Filter,
 } from "lucide-react";
 import { Select, SelectItem } from "@/components/atoms/Select";
 import { CvmStatisticsSection } from "@/components/organisms/stats/CvmStatisticsSection";
@@ -137,7 +138,7 @@ export default function Stats() {
             <Sidebar />
           </div>
           <div className="flex w-full flex-col gap-4 p-4">
-            <section className="flex flex-col gap-4 md:flex-row">
+            <section className="flex flex-col gap-4">
               <Select
                 label="Timespan"
                 items={timespanOptions}
@@ -157,6 +158,11 @@ export default function Stats() {
                   </SelectItem>
                 ))}
               </Select>
+              <p className="flex items-center gap-1.5 pb-2 text-xs text-slate-500 dark:text-slate-400">
+                <Filter className="h-3 w-3" />
+                The selected timespan only applies to KPIs marked with this
+                icon.
+              </p>
             </section>
             <section
               id="section-cvm-stats"

@@ -7,6 +7,7 @@ import { Kpi } from "@/components/molecules/visualizations/Kpi";
 import { LineChart } from "@/components/molecules/visualizations/LineChart";
 import { DensityMap } from "@/components/molecules/visualizations/DensityMap";
 import { AggregatedCvmStats, CvmDensityStatsPoint } from "@/lib/types/stats";
+import { filteredScope, fixedScope } from "@/lib/stats-scope";
 
 interface CvmRegistrationDensityMapProps {
   nDaysAgo?: number;
@@ -89,6 +90,7 @@ function CvmRegistrationDensityMap({
   return (
     <DensityMap
       title="CVM Registration Density"
+      scope={filteredScope(nDaysAgo)}
       errored={!!cvmDensityError}
       onViewportChange={handleViewportChange}
       data={visualizationData}
@@ -128,11 +130,15 @@ export function CvmStatisticsSection({ lastNDays }: CvmStatisticsSectionProps) {
     api.get(url).then((res) => res.data),
   );
 
+  const filtered = filteredScope(lastNDays ?? 7);
+  const allTime = fixedScope("All time");
+
   return (
     <div className="grid w-full grid-cols-12 gap-4">
       <div className="col-span-12 h-48 w-full md:col-span-6 lg:col-span-3">
         <Kpi
           title="Total CVMs"
+          scope={allTime}
           value={cvmStatsData?.total || 0}
           loading={isCvmStatsLoading}
           errored={!!cvmStatsError}
@@ -141,6 +147,7 @@ export function CvmStatisticsSection({ lastNDays }: CvmStatisticsSectionProps) {
       <div className="col-span-12 h-48 w-full md:col-span-6 lg:col-span-3">
         <Kpi
           title="CVM Registrations"
+          scope={filtered}
           value={cvmStatsData?.registrations.totalLastNDays || 0}
           loading={isCvmStatsLoading}
           errored={!!cvmStatsError}
@@ -149,6 +156,7 @@ export function CvmStatisticsSection({ lastNDays }: CvmStatisticsSectionProps) {
       <div className="col-span-12 h-48 w-full md:col-span-6 lg:col-span-3">
         <Kpi
           title="CVM Imports"
+          scope={filtered}
           value={cvmStatsData?.imports.totalLastNDays || 0}
           loading={isCvmStatsLoading}
           errored={!!cvmStatsError}
@@ -157,6 +165,7 @@ export function CvmStatisticsSection({ lastNDays }: CvmStatisticsSectionProps) {
       <div className="col-span-12 h-48 w-full md:col-span-6 lg:col-span-3">
         <Kpi
           title="Average CVM Score"
+          scope={allTime}
           value={
             cvmStatsData?.averageScore
               ? Number((cvmStatsData.averageScore / 100).toFixed(1))
@@ -169,6 +178,7 @@ export function CvmStatisticsSection({ lastNDays }: CvmStatisticsSectionProps) {
       <div className="col-span-12 h-96 w-full">
         <LineChart
           title="CVMs Registered Last Days"
+          scope={filtered}
           traces={[
             {
               x: cvmStatsData?.registrations.history.map((r) => r.date) || [],

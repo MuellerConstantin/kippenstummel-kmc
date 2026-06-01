@@ -6,6 +6,7 @@ import { Kpi } from "@/components/molecules/visualizations/Kpi";
 import { LineChart } from "@/components/molecules/visualizations/LineChart";
 import useAckeeClient from "@/hooks/useAckeeClient";
 import { gql } from "urql";
+import { filteredScope, fixedScope } from "@/lib/stats-scope";
 
 interface UsageStatisticsSectionProps {
   lastNDays?: number;
@@ -103,6 +104,7 @@ export function UsageStatisticsSection({
       <div className="col-span-12 h-48 md:col-span-6 lg:col-span-3">
         <Kpi
           title="Views Today"
+          scope={fixedScope("Today")}
           value={viewsToday}
           loading={isLoading}
           errored={!!error}
@@ -111,6 +113,7 @@ export function UsageStatisticsSection({
       <div className="col-span-12 h-48 md:col-span-6 lg:col-span-3">
         <Kpi
           title="Views this Month"
+          scope={fixedScope("This month")}
           value={viewsMonth}
           loading={isLoading}
           errored={!!error}
@@ -119,6 +122,7 @@ export function UsageStatisticsSection({
       <div className="col-span-12 h-48 md:col-span-6 lg:col-span-3">
         <Kpi
           title="Views this Year"
+          scope={fixedScope("This year")}
           value={viewsYear}
           loading={isLoading}
           errored={!!error}
@@ -127,6 +131,7 @@ export function UsageStatisticsSection({
       <div className="col-span-12 h-96 w-full">
         <LineChart
           title="Unique Views"
+          scope={filteredScope(lastNDays)}
           traces={[
             {
               x: dailyViews.map((d) => d.date),
