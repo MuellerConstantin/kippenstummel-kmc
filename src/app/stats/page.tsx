@@ -105,21 +105,41 @@ export default function Stats() {
   const timespanOptions = useMemo(
     () => [
       {
+        label: "Last 24 hours",
+        value: "last24Hours",
+        filter: { lastNDays: 1 },
+      },
+      {
         label: "Last 7 Days",
         value: "last7Days",
         filter: { lastNDays: 7 },
+      },
+      {
+        label: "Last 14 Days",
+        value: "last14Days",
+        filter: { lastNDays: 14 },
       },
       {
         label: "Last 30 Days",
         value: "last30Days",
         filter: { lastNDays: 30 },
       },
+      {
+        label: "Last 60 Days",
+        value: "last60Days",
+        filter: { lastNDays: 60 },
+      },
+      {
+        label: "Last 90 Days",
+        value: "last90Days",
+        filter: { lastNDays: 90 },
+      },
     ],
     [],
   );
 
   const [selectedTimespan, setSelectedTimespan] = useState<string>(
-    `timespan-select-${timespanOptions[0].value}`,
+    `timespan-select-last7Days`,
   );
 
   const selectedTimespanFilter = useMemo(() => {

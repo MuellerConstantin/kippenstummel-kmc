@@ -1,7 +1,7 @@
 import type { ScopeBadgeProps } from "@/components/atoms/ScopeBadge";
 
 export const filteredScope = (lastNDays: number): ScopeBadgeProps => ({
-  label: `Last ${lastNDays} days`,
+  label: lastNDays === 1 ? "Last 24 hours" : `Last ${lastNDays} days`,
   filtered: true,
 });
 
