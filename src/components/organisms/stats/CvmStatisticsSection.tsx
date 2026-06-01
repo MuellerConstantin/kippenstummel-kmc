@@ -40,6 +40,15 @@ function CvmRegistrationDensityMap({
   );
 
   const cvmDensityUrl = useMemo(() => {
+    const now = new Date();
+    const startDate = new Date(
+      Date.UTC(
+        now.getUTCFullYear(),
+        now.getUTCMonth(),
+        now.getUTCDate() - nDaysAgo + 1,
+      ),
+    );
+
     const searchParams = new URLSearchParams();
 
     searchParams.set(
@@ -53,7 +62,7 @@ function CvmRegistrationDensityMap({
     searchParams.set("zoom", String(viewport.zoom));
     searchParams.set(
       "filter",
-      `createdAt>=${new Date(Date.now() - nDaysAgo * 24 * 60 * 60 * 1000).toISOString()}`,
+      `createdAt>=${startDate.toISOString()} and imported==false`,
     );
 
     return `/kmc/stats/cvms/density?${searchParams.toString()}`;
