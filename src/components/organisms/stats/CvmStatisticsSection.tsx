@@ -8,6 +8,7 @@ import { LineChart } from "@/components/molecules/visualizations/LineChart";
 import { DensityMap } from "@/components/molecules/visualizations/DensityMap";
 import { AggregatedCvmStats, CvmDensityStatsPoint } from "@/lib/types/stats";
 import { filteredScope, fixedScope } from "@/lib/stats-scope";
+import { buildDensityTrace } from "@/lib/visualization";
 
 interface CvmRegistrationDensityMapProps {
   nDaysAgo?: number;
@@ -77,22 +78,7 @@ function CvmRegistrationDensityMap({
   });
 
   const visualizationData = useMemo(
-    () => [
-      {
-        type: "densitymap" as const,
-        lat: cvmDensityData?.map((p) => p.latitude) || [],
-        lon: cvmDensityData?.map((p) => p.longitude) || [],
-        z: cvmDensityData?.map((p) => p.count) || [],
-        colorscale: [
-          [0, "rgba(240,253,244,0)"],
-          [0.05, "#bbf7d0"],
-          [0.15, "#4ade80"],
-          [0.4, "#16a34a"],
-          [1, "#14532d"],
-        ] as Array<[number, string]>,
-        showscale: true,
-      },
-    ],
+    () => [buildDensityTrace(cvmDensityData ?? [])],
     [cvmDensityData],
   );
 

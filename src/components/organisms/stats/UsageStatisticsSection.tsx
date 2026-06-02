@@ -11,6 +11,7 @@ import useSWR from "swr";
 import useApi from "@/hooks/useApi";
 import { DensityMap } from "@/components/molecules/visualizations/DensityMap";
 import { UsageLOcationDensityStatsPoint } from "@/lib/types/stats";
+import { buildDensityTrace } from "@/lib/visualization";
 
 interface UsageLocationDensityMapProps {
   nDaysAgo?: number;
@@ -68,22 +69,7 @@ function UsageLocationDensityMap({
   });
 
   const visualizationData = useMemo(
-    () => [
-      {
-        type: "densitymap" as const,
-        lat: data?.map((p) => p.latitude) || [],
-        lon: data?.map((p) => p.longitude) || [],
-        z: data?.map((p) => p.count) || [],
-        colorscale: [
-          [0, "rgba(240,253,244,0)"],
-          [0.05, "#bbf7d0"],
-          [0.15, "#4ade80"],
-          [0.4, "#16a34a"],
-          [1, "#14532d"],
-        ] as Array<[number, string]>,
-        showscale: true,
-      },
-    ],
+    () => [buildDensityTrace(data ?? [])],
     [data],
   );
 
