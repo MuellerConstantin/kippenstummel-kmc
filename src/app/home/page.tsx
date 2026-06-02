@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { cloneElement, ReactElement, useCallback, useMemo } from "react";
 import useSWR from "swr";
 import { Cigarette, Fingerprint, ListTodo, ChartArea } from "lucide-react";
 import CalendarHeatmap, {
@@ -163,6 +163,21 @@ export default function Home() {
     [],
   );
 
+  const renderDayElement = useCallback(
+    (
+      element: ReactElement,
+      value: ReactCalendarHeatmapValue<string> | undefined,
+    ) => {
+      if (!value?.date) return element;
+      return cloneElement(
+        element,
+        undefined,
+        <title>{`${value.date}: ${value.count}`}</title>,
+      );
+    },
+    [],
+  );
+
   return (
     <div className="flex grow flex-col">
       <div className="mx-auto flex w-full max-w-screen-2xl grow flex-col gap-4 p-4">
@@ -194,6 +209,7 @@ export default function Home() {
                   endDate={new Date()}
                   values={registrationHistory}
                   classForValue={getHistoryColor}
+                  transformDayElement={renderDayElement as never}
                 />
               </div>
               <div className="flex w-full max-w-screen-md flex-col gap-1 overflow-hidden">
@@ -209,6 +225,7 @@ export default function Home() {
                   endDate={new Date()}
                   values={votingHistory}
                   classForValue={getHistoryColor}
+                  transformDayElement={renderDayElement as never}
                 />
               </div>
             </section>
