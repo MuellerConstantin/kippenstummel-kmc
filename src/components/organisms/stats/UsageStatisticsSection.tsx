@@ -1,12 +1,109 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { useEnv } from "@/contexts/RuntimeConfigProvider";
 import { Kpi } from "@/components/molecules/visualizations/Kpi";
 import { LineChart } from "@/components/molecules/visualizations/LineChart";
 import useAckeeClient from "@/hooks/useAckeeClient";
 import { gql } from "urql";
 import { filteredScope, fixedScope } from "@/lib/stats-scope";
+import useSWR from "swr";
+import useApi from "@/hooks/useApi";
+import { DensityMap } from "@/components/molecules/visualizations/DensityMap";
+import { UsageLOcationDensityStatsPoint } from "@/lib/types/stats";
+
+interface UsageLocationDensityMapProps {
+  nDaysAgo?: number;
+}
+
+function UsageLocationDensityMap({
+  nDaysAgo = 7,
+}: UsageLocationDensityMapProps) {
+  const api = useApi();
+
+  const [viewport, setViewport] = useState<{
+    bottomLeft: { latitude: number; longitude: number };
+    topRight: { latitude: number; longitude: number };
+    zoom: number;
+  }>({
+    bottomLeft: { latitude: 47.27, longitude: 5.87 },
+    topRight: { latitude: 55.06, longitude: 15.04 },
+    zoom: 4,
+  });
+
+  const handleViewportChange = useCallback(
+    (data: {
+      bottomLeft: { latitude: number; longitude: number };
+      topRight: { latitude: number; longitude: number };
+      zoom: number;
+    }) => {
+      setViewport(data);
+    },
+    [],
+  );
+
+  const usageLocationDensityUrl = useMemo(() => {
+    const searchParams = new URLSearchParams();
+
+    searchParams.set(
+      "bottomLeft",
+      `${viewport.bottomLeft.latitude},${viewport.bottomLeft.longitude}`,
+    );
+    searchParams.set(
+      "topRight",
+      `${viewport.topRight.latitude},${viewport.topRight.longitude}`,
+    );
+    searchParams.set("zoom", String(viewport.zoom));
+    searchParams.set("lastNDays", String(nDaysAgo));
+
+    return `/kmc/stats/usage-density?${searchParams.toString()}`;
+  }, [viewport, nDaysAgo]);
+
+  const { data, error } = useSWR<
+    UsageLOcationDensityStatsPoint[],
+    unknown,
+    string | null
+  >(usageLocationDensityUrl, (url) => api.get(url).then((res) => res.data), {
+    keepPreviousData: true,
+  });
+
+  const visualizationData = useMemo(
+    () => [
+      {
+        type: "densitymap" as const,
+        lat: data?.map((p) => p.latitude) || [],
+        lon: data?.map((p) => p.longitude) || [],
+        z: data?.map((p) => p.count) || [],
+        colorscale: [
+          [0, "rgba(240,253,244,0)"],
+          [0.05, "#bbf7d0"],
+          [0.15, "#4ade80"],
+          [0.4, "#16a34a"],
+          [1, "#14532d"],
+        ] as Array<[number, string]>,
+        showscale: true,
+      },
+    ],
+    [data],
+  );
+
+  return (
+    <DensityMap
+      title="Usage Location Density"
+      scope={filteredScope(nDaysAgo)}
+      errored={!!error}
+      onViewportChange={handleViewportChange}
+      data={visualizationData}
+      layout={{
+        map: {
+          style: "/tiles/default.json",
+          center: { lat: 51.1657, lon: 10.4515 },
+          zoom: 4,
+        },
+      }}
+    />
+  );
+}
 
 interface UsageStatisticsSectionProps {
   lastNDays?: number;
@@ -146,6 +243,9 @@ export function UsageStatisticsSection({
           loading={isLoading}
           errored={!!error}
         />
+      </div>
+      <div className="col-span-6 h-96 w-full">
+        <UsageLocationDensityMap nDaysAgo={lastNDays} />
       </div>
     </div>
   );

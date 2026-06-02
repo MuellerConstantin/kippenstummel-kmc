@@ -70,3 +70,9 @@ export interface CvmDensityStatsPoint {
   latitude: number;
   count: number;
 }
+
+export interface UsageLOcationDensityStatsPoint {
+  longitude: number;
+  latitude: number;
+  count: number;
+}
