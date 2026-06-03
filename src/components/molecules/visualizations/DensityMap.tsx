@@ -221,7 +221,10 @@ export function DensityMap({
       className={`flex h-full w-full flex-col gap-2 overflow-hidden rounded-md border border-slate-200 bg-white p-2 dark:border-slate-700 dark:bg-slate-900 ${className ?? ""}`}
     >
       <div className="flex items-center justify-between gap-2">
-        <h5 className="truncate font-semibold text-slate-900 dark:text-slate-100">
+        <h5
+          className="truncate font-semibold text-slate-900 dark:text-slate-100"
+          title={title}
+        >
           {title}
         </h5>
         {scope && <ScopeBadge {...scope} />}

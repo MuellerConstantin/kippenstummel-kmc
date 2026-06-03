@@ -163,7 +163,7 @@ export function CvmStatisticsSection({ lastNDays }: CvmStatisticsSectionProps) {
           scope={allTime}
           value={
             cvmStatsData?.averageScore
-              ? Number((cvmStatsData.averageScore / 100).toFixed(1))
+              ? Number(cvmStatsData.averageScore.toFixed(2))
               : 0
           }
           loading={isCvmStatsLoading}
