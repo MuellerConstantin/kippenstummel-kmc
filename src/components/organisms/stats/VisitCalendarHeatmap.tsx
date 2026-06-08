@@ -4,6 +4,7 @@ import {
   useEffect,
   useState,
   useCallback,
+  useMemo,
   cloneElement,
   ReactElement,
 } from "react";
@@ -13,6 +14,7 @@ import { gql } from "urql";
 import CalendarHeatmap, {
   ReactCalendarHeatmapValue,
 } from "react-calendar-heatmap";
+import { getHeatmapColorClass } from "@/lib/heatmap";
 
 import "react-calendar-heatmap/dist/styles.css";
 
@@ -91,25 +93,15 @@ export function VisitCalendarHeatmap() {
     };
   }, [client, ACKEE_DOMAIN_ID]);
 
-  const getHistoryColor = useCallback(
-    (value?: ReactCalendarHeatmapValue<string>) => {
-      if (!value) {
-        return "fill-slate-100 dark:fill-slate-900";
-      }
+  const maxCount = useMemo(
+    () => dailyViews.reduce((m, h) => Math.max(m, h.count), 0),
+    [dailyViews],
+  );
 
-      if (!value.count) {
-        return "fill-slate-100 dark:fill-slate-900";
-      } else if (value.count > 10) {
-        return "fill-[#8cc665]";
-      } else if (value.count > 100) {
-        return "fill-[#44a340]";
-      } else if (value.count > 1000) {
-        return "fill-[#1e6823]";
-      } else {
-        return "fill-[#d6e685]";
-      }
-    },
-    [],
+  const getHistoryColor = useCallback(
+    (value?: ReactCalendarHeatmapValue<string>) =>
+      getHeatmapColorClass(value?.count ?? 0, maxCount),
+    [maxCount],
   );
 
   const renderDayElement = useCallback(
