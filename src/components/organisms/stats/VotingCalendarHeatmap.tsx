@@ -42,7 +42,9 @@ export function VotingCalendarHeatmap() {
         return "fill-slate-100 dark:fill-slate-900";
       }
 
-      if (value.count > 10) {
+      if (!value.count) {
+        return "fill-slate-100 dark:fill-slate-900";
+      } else if (value.count > 10) {
         return "fill-[#8cc665]";
       } else if (value.count > 100) {
         return "fill-[#44a340]";

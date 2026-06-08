@@ -5,6 +5,7 @@ import { Cigarette, Fingerprint, ListTodo, ChartArea } from "lucide-react";
 import { ListBox, ListBoxItem } from "@/components/atoms/ListBox";
 import { VotingCalendarHeatmap } from "@/components/organisms/stats/VotingCalendarHeatmap";
 import { RegistrationCalendarHeatmap } from "@/components/organisms/stats/RegistrationCalendarHeatmap";
+import { VisitCalendarHeatmap } from "@/components/organisms/stats/VisitCalendarHeatmap";
 
 function Sidebar() {
   const navigation = useMemo(() => {
@@ -119,6 +120,12 @@ export default function Home() {
                   Voting Activity
                 </div>
                 <VotingCalendarHeatmap />
+              </div>
+              <div className="flex w-full max-w-screen-md flex-col gap-1 overflow-hidden">
+                <div className="text-sm text-slate-600 dark:text-slate-400">
+                  Visit Activity
+                </div>
+                <VisitCalendarHeatmap />
               </div>
             </section>
             <section className="w-full space-y-4">
