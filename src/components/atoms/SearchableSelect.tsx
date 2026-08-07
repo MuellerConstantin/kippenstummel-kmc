@@ -34,8 +34,10 @@ const styles = tv({
   },
 });
 
-export interface SearchableSelectProps<T extends object>
-  extends Omit<SelectProps<T>, "children"> {
+export interface SearchableSelectProps<T extends object> extends Omit<
+  SelectProps<T>,
+  "children"
+> {
   label?: string;
   description?: string;
   searchPlaceholder?: string;

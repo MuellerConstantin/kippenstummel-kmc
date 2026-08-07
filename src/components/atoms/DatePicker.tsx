@@ -14,8 +14,9 @@ import { Description, FieldError, FieldGroup, Label } from "./Field";
 import { Popover } from "./Popover";
 import { composeTailwindRenderProps } from "@/components/utils";
 
-export interface DatePickerProps<T extends DateValue>
-  extends AriaDatePickerProps<T> {
+export interface DatePickerProps<
+  T extends DateValue,
+> extends AriaDatePickerProps<T> {
   label?: string;
   description?: string;
   errorMessage?: string | ((validation: ValidationResult) => string);

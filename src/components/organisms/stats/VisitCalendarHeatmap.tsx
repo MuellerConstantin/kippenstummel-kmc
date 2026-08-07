@@ -27,7 +27,9 @@ export function VisitCalendarHeatmap() {
     { date: string; count: number }[]
   >([]);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isLoading, setIsLoading] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [error, setError] = useState<Error | null>(null);
 
   function dateFromDaysAgo(daysAgo: number) {

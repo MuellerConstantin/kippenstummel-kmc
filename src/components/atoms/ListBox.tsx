@@ -15,8 +15,10 @@ import { tv } from "tailwind-variants";
 import { composeTailwindRenderProps, focusRing } from "@/components/utils";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-interface ListBoxProps<T>
-  extends Omit<AriaListBoxProps<T>, "layout" | "orientation"> {}
+interface ListBoxProps<T> extends Omit<
+  AriaListBoxProps<T>,
+  "layout" | "orientation"
+> {}
 
 export function ListBox<T extends object>({
   children,

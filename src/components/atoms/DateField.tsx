@@ -12,8 +12,9 @@ import { tv } from "tailwind-variants";
 import { Description, FieldError, Label, fieldGroupStyles } from "./Field";
 import { composeTailwindRenderProps } from "@/components/utils";
 
-export interface DateFieldProps<T extends DateValue>
-  extends AriaDateFieldProps<T> {
+export interface DateFieldProps<
+  T extends DateValue,
+> extends AriaDateFieldProps<T> {
   label?: string;
   description?: string;
   errorMessage?: string | ((validation: ValidationResult) => string);
