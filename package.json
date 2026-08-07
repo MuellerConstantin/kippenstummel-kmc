@@ -16,6 +16,7 @@
     "start:staging": "env-cmd --no-override --silent -f .env.staging.local env-cmd --no-override --silent -f .env.staging next start -p 4000",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
+    "typecheck": "next typegen && tsc --noEmit",
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
     "storybook": "storybook dev -p 6006",

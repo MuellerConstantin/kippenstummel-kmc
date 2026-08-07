@@ -1,0 +1,28 @@
+name: Validate
+
+# Reusable workflow. Called by both ci.yml (branch/PR) and
+# build-and-publish.yml (release tag) so the checks are defined once.
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci
+      - name: Check formatting
+        run: npm run format
+      - name: Lint
+        run: npm run lint
+      - name: Type check
+        run: npm run typecheck
+      - name: Build
+        run: npm run build
