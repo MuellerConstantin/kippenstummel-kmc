@@ -1,57 +1,22 @@
 import { GeoCoordinates } from "@/lib/types/geo";
+import { GeocodedAddress } from "@/lib/types/geocoding";
 import { useCallback, useMemo } from "react";
 import useSWR from "swr";
 import axios from "axios";
 import pLimit from "p-limit";
 import { Cvm } from "@/lib/types/cvm";
 
-interface UseOsmAddressesProps {
+interface UseGeocodedAddressesProps {
   cvms: Cvm[] | null;
 }
 
-type OsmAddress = {
-  place_id: number;
-  licence: string;
-  osm_type: "node" | "way" | "relation";
-  osm_id: number;
-  lat: string;
-  lon: string;
-  class: string;
-  type: string;
-  place_rank: number;
-  importance: number;
-  addresstype: string;
-  name: string;
-  display_name: string;
-  address: {
-    amenity?: string;
-    road?: string;
-    neighbourhood?: string;
-    suburb?: string;
-    city?: string;
-    town?: string;
-    village?: string;
-    state?: string;
-    ISO3166_2_lvl4?: string;
-    postcode?: string;
-    country?: string;
-    country_code?: string;
-  };
-  boundingbox: [
-    string, // south latitude
-    string, // north latitude
-    string, // west longitude
-    string, // east longitude
-  ];
-};
-
-export function useOsmAddresses({ cvms }: UseOsmAddressesProps) {
+export function useGeocodedAddresses({ cvms }: UseGeocodedAddressesProps) {
   const limit = pLimit(3);
 
-  const fetchOsmAddress = useCallback(async (key: GeoCoordinates) => {
+  const fetchGeocodedAddress = useCallback(async (key: GeoCoordinates) => {
     const url = "/api/geocoding/reverse";
 
-    return await axios.get<OsmAddress>(url, {
+    return await axios.get<GeocodedAddress>(url, {
       params: {
         lat: key.latitude,
         lon: key.longitude,
@@ -63,14 +28,14 @@ export function useOsmAddresses({ cvms }: UseOsmAddressesProps) {
     });
   }, []);
 
-  const { data: osmAddresses } = useSWR<
-    (OsmAddress | null)[],
+  const { data: geocodedAddresses } = useSWR<
+    (GeocodedAddress | null)[],
     unknown,
-    ["osmAddresses", GeoCoordinates[]] | null
+    ["geocodedAddresses", GeoCoordinates[]] | null
   >(
     cvms
       ? [
-          "osmAddresses",
+          "geocodedAddresses",
           cvms.map((cvm) => ({
             latitude: cvm.latitude,
             longitude: cvm.longitude,
@@ -79,7 +44,7 @@ export function useOsmAddresses({ cvms }: UseOsmAddressesProps) {
       : null,
     (key) =>
       Promise.allSettled(
-        key[1].map((coords) => limit(() => fetchOsmAddress(coords))),
+        key[1].map((coords) => limit(() => fetchGeocodedAddress(coords))),
       ).then((responses) =>
         responses.map((res) =>
           res.status === "fulfilled" ? res.value.data : null,
@@ -92,7 +57,7 @@ export function useOsmAddresses({ cvms }: UseOsmAddressesProps) {
   );
 
   const formattedAddresses = useMemo(() => {
-    return osmAddresses?.map((addr) => {
+    return geocodedAddresses?.map((addr) => {
       if (!addr) return null;
 
       const { road, city, town, village, postcode } = addr.address ?? {};
@@ -100,7 +65,7 @@ export function useOsmAddresses({ cvms }: UseOsmAddressesProps) {
         .filter(Boolean)
         .join(", ");
     });
-  }, [osmAddresses]);
+  }, [geocodedAddresses]);
 
   return formattedAddresses;
 }

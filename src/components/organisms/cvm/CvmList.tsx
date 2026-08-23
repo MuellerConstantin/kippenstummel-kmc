@@ -11,7 +11,7 @@ import {
   SCORING_GOOD_LOWER_LIMIT,
   SCORING_NEUTRAL_LOWER_LIMIT,
 } from "@/lib/constants";
-import { useOsmAddresses } from "@/hooks/useOsmAddresses";
+import { useGeocodedAddresses } from "@/hooks/useGeocodedAddresses";
 import { CvmSource } from "@/lib/types/cvm";
 
 export interface CvmListProps {
@@ -75,7 +75,9 @@ export function CvmList(props: CvmListProps) {
     (url) => api.get(url).then((res) => res.data),
   );
 
-  const formattedAddresses = useOsmAddresses({ cvms: data?.content || null });
+  const formattedAddresses = useGeocodedAddresses({
+    cvms: data?.content || null,
+  });
 
   const handleSelect = useCallback(
     (key: string) => {

@@ -49,5 +49,6 @@ requires a restart of the web server.
 | NEXTAUTH_URL          | Canonical Url of the Kippenstummel KMC web client. (e.g. `http://<HOST>:<PORT>`).                        | Yes      |
 | NEXTAUTH_SECRET       | Secret used to encrypt the session cookie.                                                               | Yes      |
 | JWT_SECRET            | Symmetric secret used to sign the JWT access token used for admin API access.                            | Yes      |
+| REDIS_URL             | Url of a Redis instance used to cache geocoding lookups across restarts. (e.g. `redis://<HOST>:<PORT>`)  | No       |
 | ACKEE_API_URL         | Url of the Ackee API.                                                                                    | No       |
 | ACKEE_API_TOKEN       | Token used to access the Ackee API.                                                                      | No       |
