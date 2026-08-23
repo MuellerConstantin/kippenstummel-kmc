@@ -12,6 +12,7 @@ import {
   SCORING_NEUTRAL_LOWER_LIMIT,
 } from "@/lib/constants";
 import { useOsmAddresses } from "@/hooks/useOsmAddresses";
+import { CvmSource } from "@/lib/types/cvm";
 
 export interface CvmListProps {
   filter?: string | null;
@@ -21,6 +22,7 @@ export interface CvmListProps {
     longitude: number;
     score: number;
     imported: boolean;
+    source: CvmSource;
     recentlyReported: {
       missing: number;
       spam: number;
@@ -49,6 +51,7 @@ export function CvmList(props: CvmListProps) {
         longitude: number;
         score: number;
         imported: boolean;
+        source: CvmSource;
         recentlyReported: {
           missing: number;
           spam: number;

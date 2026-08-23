@@ -3,12 +3,18 @@ import { DialogProps, Heading } from "react-aria-components";
 import { Dialog } from "@/components/atoms/Dialog";
 import { Button } from "@/components/atoms/Button";
 import { Check, ChevronDown, ChevronUp, Copy, Equal, X } from "lucide-react";
-import { Cvm } from "@/lib/types/cvm";
+import { Cvm, CvmSource } from "@/lib/types/cvm";
 import {
   SCORING_DELETION_UPPER_LIMIT,
   SCORING_GOOD_LOWER_LIMIT,
   SCORING_NEUTRAL_LOWER_LIMIT,
 } from "@/lib/constants";
+
+const SOURCE_LABELS: Record<CvmSource, string> = {
+  osm: "OpenStreetMap",
+  operator: "Operator",
+  community: "Community",
+};
 
 interface CopyButtonProps {
   text: string;
@@ -97,6 +103,9 @@ export function CvmDetailsDialog(props: CvmDetailsDialogProps) {
 
                   <div className="font-semibold">Imported:</div>
                   <div>{props.cvm.imported ? "Yes" : "No"}</div>
+
+                  <div className="font-semibold">Source:</div>
+                  <div>{SOURCE_LABELS[props.cvm.source]}</div>
 
                   <div className="font-semibold">Created At:</div>
                   <div>{new Date(props.cvm.createdAt).toLocaleString()}</div>
