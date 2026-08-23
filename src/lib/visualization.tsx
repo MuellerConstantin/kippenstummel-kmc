@@ -30,6 +30,12 @@ const DENSITY_COLORSCALE: Array<[number, string]> = [
   [1, "#14532d"],
 ];
 
+// Kernel radius in pixels. The API rolls density points up into a grid whose
+// cells are a fixed 16 px on screen, so a radius in that order of magnitude
+// makes neighbouring cells blend without smearing several of them into one
+// blob — which is what the plotly default of 30 px did.
+const DENSITY_RADIUS = 16;
+
 function buildDensityColorbarTicks(maxCount: number): {
   tickvals: number[];
   ticktext: string[];
@@ -76,6 +82,7 @@ export function buildDensityTrace(points: DensityPoint[]): Data {
     lat: points.map((p) => p.latitude),
     lon: points.map((p) => p.longitude),
     z: counts.map((c) => Math.log1p(c)),
+    radius: DENSITY_RADIUS,
     customdata: counts,
     hovertemplate: "%{customdata}<br>(%{lat:.4f}°, %{lon:.4f}°)<extra></extra>",
     colorscale: DENSITY_COLORSCALE,

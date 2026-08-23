@@ -12,6 +12,7 @@ import useApi from "@/hooks/useApi";
 import { DensityMap } from "@/components/molecules/visualizations/DensityMap";
 import { UsageLOcationDensityStatsPoint } from "@/lib/types/stats";
 import { buildDensityTrace } from "@/lib/visualization";
+import { isSameViewport } from "@/lib/geo";
 
 interface UsageLocationDensityMapProps {
   nDaysAgo?: number;
@@ -38,7 +39,9 @@ function UsageLocationDensityMap({
       topRight: { latitude: number; longitude: number };
       zoom: number;
     }) => {
-      setViewport(data);
+      setViewport((current) =>
+        isSameViewport(current, data) ? current : data,
+      );
     },
     [],
   );

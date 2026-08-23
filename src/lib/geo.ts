@@ -1,4 +1,14 @@
-import { GeoCoordinates } from "./types/geo";
+import { GeoCoordinates, MapViewport } from "./types/geo";
+
+export function isSameViewport(a: MapViewport, b: MapViewport): boolean {
+  return (
+    a.zoom === b.zoom &&
+    a.bottomLeft.latitude === b.bottomLeft.latitude &&
+    a.bottomLeft.longitude === b.bottomLeft.longitude &&
+    a.topRight.latitude === b.topRight.latitude &&
+    a.topRight.longitude === b.topRight.longitude
+  );
+}
 
 export function tileToLatLon(x: number, y: number, z: number): GeoCoordinates {
   const longitude = (x / Math.pow(2, z)) * 360 - 180;

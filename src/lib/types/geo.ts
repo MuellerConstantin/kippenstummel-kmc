@@ -8,6 +8,10 @@ export interface GeoViewport {
   bottomLeft: GeoCoordinates;
 }
 
+export interface MapViewport extends GeoViewport {
+  zoom: number;
+}
+
 export interface GeoTile {
   x: number;
   y: number;

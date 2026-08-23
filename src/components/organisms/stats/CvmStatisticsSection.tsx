@@ -9,6 +9,7 @@ import { DensityMap } from "@/components/molecules/visualizations/DensityMap";
 import { AggregatedCvmStats, CvmDensityStatsPoint } from "@/lib/types/stats";
 import { filteredScope, fixedScope } from "@/lib/stats-scope";
 import { buildDensityTrace } from "@/lib/visualization";
+import { isSameViewport } from "@/lib/geo";
 
 interface CvmRegistrationDensityMapProps {
   nDaysAgo?: number;
@@ -35,7 +36,9 @@ function CvmRegistrationDensityMap({
       topRight: { latitude: number; longitude: number };
       zoom: number;
     }) => {
-      setViewport(data);
+      setViewport((current) =>
+        isSameViewport(current, data) ? current : data,
+      );
     },
     [],
   );

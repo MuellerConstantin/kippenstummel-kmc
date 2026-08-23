@@ -9,6 +9,7 @@ import { DensityMap } from "@/components/molecules/visualizations/DensityMap";
 import { AggregatedVoteStats, CvmDensityStatsPoint } from "@/lib/types/stats";
 import { filteredScope, fixedScope } from "@/lib/stats-scope";
 import { buildDensityTrace } from "@/lib/visualization";
+import { isSameViewport } from "@/lib/geo";
 
 interface CvmVotingDensityMapProps {
   nDaysAgo?: number;
@@ -33,12 +34,23 @@ function CvmVotingDensityMap({ nDaysAgo = 7 }: CvmVotingDensityMapProps) {
       topRight: { latitude: number; longitude: number };
       zoom: number;
     }) => {
-      setViewport(data);
+      setViewport((current) =>
+        isSameViewport(current, data) ? current : data,
+      );
     },
     [],
   );
 
   const cvmDensityUrl = useMemo(() => {
+    const now = new Date();
+    const startDate = new Date(
+      Date.UTC(
+        now.getUTCFullYear(),
+        now.getUTCMonth(),
+        now.getUTCDate() - nDaysAgo + 1,
+      ),
+    );
+
     const searchParams = new URLSearchParams();
 
     searchParams.set(
@@ -50,10 +62,7 @@ function CvmVotingDensityMap({ nDaysAgo = 7 }: CvmVotingDensityMapProps) {
       `${viewport.topRight.latitude},${viewport.topRight.longitude}`,
     );
     searchParams.set("zoom", String(viewport.zoom));
-    searchParams.set(
-      "filter",
-      `lastVotedAt>=${new Date(Date.now() - nDaysAgo * 24 * 60 * 60 * 1000).toISOString()}`,
-    );
+    searchParams.set("filter", `lastVotedAt>=${startDate.toISOString()}`);
 
     return `/kmc/stats/cvms/density?${searchParams.toString()}`;
   }, [viewport, nDaysAgo]);
