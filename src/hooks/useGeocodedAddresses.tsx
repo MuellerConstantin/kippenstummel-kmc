@@ -60,10 +60,18 @@ export function useGeocodedAddresses({ cvms }: UseGeocodedAddressesProps) {
     return geocodedAddresses?.map((addr) => {
       if (!addr) return null;
 
-      const { road, city, town, village, postcode } = addr.address ?? {};
-      return [road, postcode, city || town || village]
-        .filter(Boolean)
-        .join(", ");
+      const { road, city, town, village, hamlet, municipality, postcode } =
+        addr.address ?? {};
+
+      /*
+       * Which field carries the place name depends on how it is classified in
+       * OSM. Municipalities that are only an administrative unit — Albstadt,
+       * for one — carry none of the settlement fields, so falling back to
+       * `municipality` is what keeps the place name from dropping out.
+       */
+      const locality = city || town || village || hamlet || municipality;
+
+      return [road, postcode, locality].filter(Boolean).join(", ");
     });
   }, [geocodedAddresses]);
 
