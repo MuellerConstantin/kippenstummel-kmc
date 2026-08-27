@@ -11,8 +11,24 @@ import {
   SCORING_GOOD_LOWER_LIMIT,
   SCORING_NEUTRAL_LOWER_LIMIT,
 } from "@/lib/constants";
-import { useGeocodedAddresses } from "@/hooks/useGeocodedAddresses";
-import { CvmSource } from "@/lib/types/cvm";
+import { useCvmAddress } from "@/hooks/useCvmAddress";
+import { Cvm, CvmSource } from "@/lib/types/cvm";
+
+interface CvmAddressProps {
+  cvm: Cvm;
+}
+
+function CvmAddress({ cvm }: CvmAddressProps) {
+  const { address } = useCvmAddress(cvm.id);
+
+  return address ? (
+    <div className="truncate text-xs">{address}</div>
+  ) : (
+    <div className="truncate text-xs">
+      {cvm.latitude} / {cvm.longitude} (lat/lng)
+    </div>
+  );
+}
 
 export interface CvmListProps {
   filter?: string | null;
@@ -75,10 +91,6 @@ export function CvmList(props: CvmListProps) {
     (url) => api.get(url).then((res) => res.data),
   );
 
-  const formattedAddresses = useGeocodedAddresses({
-    cvms: data?.content || null,
-  });
-
   const handleSelect = useCallback(
     (key: string) => {
       setSelected(key);
@@ -140,9 +152,7 @@ export function CvmList(props: CvmListProps) {
               handleSelect([...(keys as Set<string>)][0])
             }
           >
-            {data?.content.map((cvm, index) => {
-              const formattedAddress = formattedAddresses?.[index];
-
+            {data?.content.map((cvm) => {
               return (
                 <ListBoxItem id={`cvm-list-item-${cvm.id}`} key={cvm.id}>
                   <div className="flex cursor-pointer gap-2 overflow-hidden">
@@ -171,15 +181,7 @@ export function CvmList(props: CvmListProps) {
                         {cvm.id}
                       </div>
                       <div>
-                        {formattedAddress ? (
-                          <div className="truncate text-xs">
-                            {formattedAddress}
-                          </div>
-                        ) : (
-                          <div className="truncate text-xs">
-                            {cvm.latitude} / {cvm.longitude} (lat/lng)
-                          </div>
-                        )}
+                        <CvmAddress cvm={cvm} />
                       </div>
                       <div className="flex items-center gap-1 text-xs">
                         <div>Score:</div>
