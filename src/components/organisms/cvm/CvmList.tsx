@@ -38,7 +38,7 @@ export interface CvmListProps {
     longitude: number;
     score: number;
     imported: boolean;
-    source: CvmSource;
+    sources: CvmSource[];
     recentlyReported: {
       missing: number;
       spam: number;
@@ -67,7 +67,7 @@ export function CvmList(props: CvmListProps) {
         longitude: number;
         score: number;
         imported: boolean;
-        source: CvmSource;
+        sources: CvmSource[];
         recentlyReported: {
           missing: number;
           spam: number;

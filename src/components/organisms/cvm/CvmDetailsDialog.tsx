@@ -104,8 +104,12 @@ export function CvmDetailsDialog(props: CvmDetailsDialogProps) {
                   <div className="font-semibold">Imported:</div>
                   <div>{props.cvm.imported ? "Yes" : "No"}</div>
 
-                  <div className="font-semibold">Source:</div>
-                  <div>{SOURCE_LABELS[props.cvm.source]}</div>
+                  <div className="font-semibold">Sources:</div>
+                  <div>
+                    {props.cvm.sources
+                      .map((source) => SOURCE_LABELS[source])
+                      .join(", ")}
+                  </div>
 
                   <div className="font-semibold">Created At:</div>
                   <div>{new Date(props.cvm.createdAt).toLocaleString()}</div>

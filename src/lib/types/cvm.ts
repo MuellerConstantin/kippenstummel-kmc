@@ -1,7 +1,7 @@
 /**
- * Where the data a CVM currently holds originates from. This is the origin of
- * the data itself, not the channel it arrived through — imports and
- * synchronisations overwrite it.
+ * An origin data about a CVM can come from. This is the origin of the data
+ * itself, not the channel it arrived through — a file a moderator uploads may
+ * well hold an OpenStreetMap extract.
  */
 export type CvmSource = "osm" | "operator" | "community";
 
@@ -18,7 +18,12 @@ export interface Cvm {
   };
   alreadyVoted?: "upvote" | "downvote";
   imported: boolean;
-  source: CvmSource;
+  /**
+   * Every origin that has contributed data to this CVM. The set only ever
+   * grows, so it says what has flowed into the record rather than who wrote it
+   * last.
+   */
+  sources: CvmSource[];
   createdAt: string;
   updatedAt: string;
 }
