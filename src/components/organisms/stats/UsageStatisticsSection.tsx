@@ -1,11 +1,8 @@
 "use client";
 
-import { useEffect, useState, useCallback, useMemo } from "react";
-import { useEnv } from "@/contexts/RuntimeConfigProvider";
+import { useState, useCallback, useMemo } from "react";
 import { Kpi } from "@/components/molecules/visualizations/Kpi";
 import { LineChart } from "@/components/molecules/visualizations/LineChart";
-import useAckeeClient from "@/hooks/useAckeeClient";
-import { gql } from "urql";
 import { filteredScope, fixedScope } from "@/lib/stats-scope";
 import useSWR from "swr";
 import useApi from "@/hooks/useApi";
@@ -13,6 +10,14 @@ import { DensityMap } from "@/components/molecules/visualizations/DensityMap";
 import { UsageLOcationDensityStatsPoint } from "@/lib/types/stats";
 import { buildDensityTrace } from "@/lib/visualization";
 import { isSameViewport } from "@/lib/geo";
+import type { UmamiPageviews, UmamiStats } from "@/lib/types/analytics";
+import {
+  dailySeriesParams,
+  mergePageviews,
+  rangeParams,
+  startOfDay,
+  toDailySeries,
+} from "@/lib/analytics";
 
 interface UsageLocationDensityMapProps {
   nDaysAgo?: number;
@@ -101,89 +106,43 @@ interface UsageStatisticsSectionProps {
 export function UsageStatisticsSection({
   lastNDays = 7,
 }: UsageStatisticsSectionProps) {
-  const client = useAckeeClient();
+  const api = useApi();
 
-  const ACKEE_DOMAIN_ID = useEnv("NEXT_PUBLIC_ACKEE_DOMAIN_ID");
+  const fetcher = useCallback(
+    (url: string) => api.get(url).then((res) => res.data),
+    [api],
+  );
 
-  const [viewsToday, setViewsToday] = useState(0);
-  const [viewsMonth, setViewsMonth] = useState(0);
-  const [viewsYear, setViewsYear] = useState(0);
-  const [dailyViews, setDailyViews] = useState<
-    { date: string; count: number }[]
-  >([]);
+  // Ranges are fixed on mount, otherwise every render would yield a new key.
+  const { todayUrl, monthUrl, yearUrl } = useMemo(() => {
+    const now = new Date();
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-
-  function dateFromDaysAgo(daysAgo: number) {
-    const d = new Date();
-    d.setDate(d.getDate() - daysAgo);
-    return d.toISOString().slice(0, 10);
-  }
-
-  useEffect(() => {
-    let cancelled = false;
-
-    setIsLoading(true);
-    setError(null);
-
-    client
-      .query(
-        gql`
-          query ($id: ID!) {
-            domain(id: $id) {
-              facts {
-                viewsToday
-                viewsMonth
-                viewsYear
-              }
-              statistics {
-                views(interval: DAILY, type: UNIQUE, limit: ${String(lastNDays)}) {
-                  id
-                  count
-                }
-              }
-            }
-          }
-        `,
-        {
-          id: ACKEE_DOMAIN_ID,
-        },
-      )
-      .toPromise()
-      .then((result) => {
-        if (cancelled) return;
-
-        if (result.error) {
-          setError(result.error);
-          return;
-        }
-
-        const domain = result.data?.domain;
-        const facts = domain?.facts;
-        const views = domain?.statistics?.views ?? [];
-
-        setViewsToday(facts?.viewsToday ?? 0);
-        setViewsMonth(facts?.viewsMonth ?? 0);
-        setViewsYear(facts?.viewsYear ?? 0);
-        setDailyViews(
-          views.map((value: { count: number }, index: number) => ({
-            date: dateFromDaysAgo(index),
-            count: value.count,
-          })),
-        );
-      })
-      .catch((err) => {
-        if (!cancelled) setError(err);
-      })
-      .finally(() => {
-        if (!cancelled) setIsLoading(false);
-      });
-
-    return () => {
-      cancelled = true;
+    return {
+      todayUrl: `/umami/stats?${rangeParams(startOfDay(now))}`,
+      monthUrl: `/umami/stats?${rangeParams(new Date(now.getFullYear(), now.getMonth(), 1))}`,
+      yearUrl: `/umami/stats?${rangeParams(new Date(now.getFullYear(), 0, 1))}`,
     };
-  }, [client, ACKEE_DOMAIN_ID, lastNDays]);
+  }, []);
+
+  const dailyUrls = useMemo(
+    () =>
+      dailySeriesParams(lastNDays).map(
+        (params) => `/umami/pageviews?${params}`,
+      ),
+    [lastNDays],
+  );
+
+  const today = useSWR<UmamiStats, unknown, string>(todayUrl, fetcher);
+  const month = useSWR<UmamiStats, unknown, string>(monthUrl, fetcher);
+  const year = useSWR<UmamiStats, unknown, string>(yearUrl, fetcher);
+  const daily = useSWR<UmamiPageviews, unknown, string[]>(dailyUrls, (urls) =>
+    Promise.all(urls.map(fetcher)).then(mergePageviews),
+  );
+
+  const dailyVisitors = useMemo(
+    () => toDailySeries(daily.data?.sessions ?? [], lastNDays),
+    [daily.data, lastNDays],
+  );
 
   return (
     <div className="grid w-full grid-cols-12 gap-4">
@@ -191,46 +150,46 @@ export function UsageStatisticsSection({
         <Kpi
           title="Views Today"
           scope={fixedScope("Today")}
-          value={viewsToday}
-          loading={isLoading}
-          errored={!!error}
+          value={today.data?.pageviews ?? 0}
+          loading={today.isLoading}
+          errored={!!today.error}
         />
       </div>
       <div className="col-span-12 h-48 md:col-span-6 lg:col-span-3">
         <Kpi
           title="Views this Month"
           scope={fixedScope("This month")}
-          value={viewsMonth}
-          loading={isLoading}
-          errored={!!error}
+          value={month.data?.pageviews ?? 0}
+          loading={month.isLoading}
+          errored={!!month.error}
         />
       </div>
       <div className="col-span-12 h-48 md:col-span-6 lg:col-span-3">
         <Kpi
           title="Views this Year"
           scope={fixedScope("This year")}
-          value={viewsYear}
-          loading={isLoading}
-          errored={!!error}
+          value={year.data?.pageviews ?? 0}
+          loading={year.isLoading}
+          errored={!!year.error}
         />
       </div>
       <div className="col-span-12 h-96 w-full">
         <LineChart
-          title="Unique Views"
+          title="Unique Visitors"
           scope={filteredScope(lastNDays)}
           traces={[
             {
-              x: dailyViews.map((d) => d.date),
-              y: dailyViews.map((d) => d.count),
+              x: dailyVisitors.map((d) => d.date),
+              y: dailyVisitors.map((d) => d.count),
               lineColor: "#65a30d",
-              name: "Unique Views",
+              name: "Unique Visitors",
             },
           ]}
           yAxis={{
             rangemode: "tozero",
           }}
-          loading={isLoading}
-          errored={!!error}
+          loading={daily.isLoading}
+          errored={!!daily.error}
         />
       </div>
       <div className="col-span-6 h-96 w-full">

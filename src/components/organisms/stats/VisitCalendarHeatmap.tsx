@@ -1,99 +1,42 @@
 "use client";
 
-import {
-  useEffect,
-  useState,
-  useCallback,
-  useMemo,
-  cloneElement,
-  ReactElement,
-} from "react";
-import { useEnv } from "@/contexts/RuntimeConfigProvider";
-import useAckeeClient from "@/hooks/useAckeeClient";
-import { gql } from "urql";
+import { useCallback, useMemo, cloneElement, ReactElement } from "react";
+import useSWR from "swr";
+import useApi from "@/hooks/useApi";
 import CalendarHeatmap, {
   ReactCalendarHeatmapValue,
 } from "react-calendar-heatmap";
 import { getHeatmapColorClass } from "@/lib/heatmap";
+import type { UmamiPageviews } from "@/lib/types/analytics";
+import {
+  dailySeriesParams,
+  mergePageviews,
+  toDailySeries,
+} from "@/lib/analytics";
 
 import "react-calendar-heatmap/dist/styles.css";
 
+const DAYS = 365;
+
 export function VisitCalendarHeatmap() {
-  const client = useAckeeClient();
+  const api = useApi();
 
-  const ACKEE_DOMAIN_ID = useEnv("NEXT_PUBLIC_ACKEE_DOMAIN_ID");
+  // Fixed on mount, otherwise every render would yield a new key.
+  const urls = useMemo(
+    () => dailySeriesParams(DAYS).map((params) => `/umami/pageviews?${params}`),
+    [],
+  );
 
-  const [dailyViews, setDailyViews] = useState<
-    { date: string; count: number }[]
-  >([]);
+  const { data } = useSWR<UmamiPageviews, unknown, string[]>(urls, (urls) =>
+    Promise.all(
+      urls.map((url) => api.get<UmamiPageviews>(url).then((res) => res.data)),
+    ).then(mergePageviews),
+  );
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [isLoading, setIsLoading] = useState(true);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [error, setError] = useState<Error | null>(null);
-
-  function dateFromDaysAgo(daysAgo: number) {
-    const d = new Date();
-    d.setDate(d.getDate() - daysAgo);
-    return d.toISOString().slice(0, 10);
-  }
-
-  useEffect(() => {
-    let cancelled = false;
-
-    client
-      .query(
-        gql`
-          query ($id: ID!) {
-            domain(id: $id) {
-              facts {
-                viewsToday
-                viewsMonth
-                viewsYear
-              }
-              statistics {
-                views(interval: DAILY, type: UNIQUE, limit: 365) {
-                  id
-                  count
-                }
-              }
-            }
-          }
-        `,
-        {
-          id: ACKEE_DOMAIN_ID,
-        },
-      )
-      .toPromise()
-      .then((result) => {
-        if (cancelled) return;
-
-        if (result.error) {
-          setError(result.error);
-          return;
-        }
-
-        const domain = result.data?.domain;
-        const views = domain?.statistics?.views ?? [];
-
-        setDailyViews(
-          views.map((value: { count: number }, index: number) => ({
-            date: dateFromDaysAgo(index),
-            count: value.count,
-          })),
-        );
-      })
-      .catch((err) => {
-        if (!cancelled) setError(err);
-      })
-      .finally(() => {
-        if (!cancelled) setIsLoading(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [client, ACKEE_DOMAIN_ID]);
+  const dailyViews = useMemo(
+    () => toDailySeries(data?.sessions ?? [], DAYS),
+    [data],
+  );
 
   const maxCount = useMemo(
     () => dailyViews.reduce((m, h) => Math.max(m, h.count), 0),

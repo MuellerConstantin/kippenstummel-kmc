@@ -32,11 +32,10 @@ here for the sake of completeness.
 Build time configuration variables are in general prefixed with `NEXT_PUBLIC_`. Changing these variables
 requires a rebuild of the web client. These variables are loaded and hardcoded at build time.
 
-| Environment Variable        | Description                                                                  | Required |
-| --------------------------- | ---------------------------------------------------------------------------- | -------- |
-| NEXT_PUBLIC_IS_TEST_SYSTEM  | Indicates if the web client is running in a test system. Default is `false`. | No       |
-| NEXT_PUBLIC_IS_PRE_RELEASE  | Indicates if the web client is a pre-release. Default is `false`.            | No       |
-| NEXT_PUBLIC_ACKEE_DOMAIN_ID | Domain ID of the [Ackee](https://ackee.software/) instance.                  | No       |
+| Environment Variable       | Description                                                                  | Required |
+| -------------------------- | ---------------------------------------------------------------------------- | -------- |
+| NEXT_PUBLIC_IS_TEST_SYSTEM | Indicates if the web client is running in a test system. Default is `false`. | No       |
+| NEXT_PUBLIC_IS_PRE_RELEASE | Indicates if the web client is a pre-release. Default is `false`.            | No       |
 
 ### Runtime configuration
 
@@ -50,5 +49,7 @@ requires a restart of the web server.
 | NEXTAUTH_SECRET       | Secret used to encrypt the session cookie.                                                               | Yes      |
 | JWT_SECRET            | Symmetric secret used to sign the JWT access token used for admin API access.                            | Yes      |
 | REDIS_URL             | Url of a Redis instance used to cache geocoding lookups across restarts. (e.g. `redis://<HOST>:<PORT>`)  | No       |
-| ACKEE_API_URL         | Url of the Ackee API.                                                                                    | No       |
-| ACKEE_API_TOKEN       | Token used to access the Ackee API.                                                                      | No       |
+| UMAMI_API_URL         | Url of the [Umami](https://umami.is/) API. Including the api prefix. (e.g. `http://<HOST>:<PORT>/api`)   | No       |
+| UMAMI_WEBSITE_ID      | Website id of the Kippenstummel web client in Umami.                                                     | No       |
+| UMAMI_USERNAME        | Username of the Umami user used to read the statistics. A view-only user is sufficient.                  | No       |
+| UMAMI_PASSWORD        | Password of the Umami user used to read the statistics.                                                  | No       |
