@@ -9,7 +9,10 @@ import {
   ListTodo,
   ChartNoAxesCombined,
   Filter,
+  ExternalLink,
 } from "lucide-react";
+import { useEnv } from "@/contexts/RuntimeConfigProvider";
+import { Link } from "@/components/atoms/Link";
 import { Select, SelectItem } from "@/components/atoms/Select";
 import { CvmStatisticsSection } from "@/components/organisms/stats/CvmStatisticsSection";
 import { VotingStatisticsSection } from "@/components/organisms/stats/VotingStatisticsSection";
@@ -150,6 +153,8 @@ export default function Stats() {
     return option?.filter || null;
   }, [selectedTimespan, timespanOptions]);
 
+  const umamiDashboardUrl = useEnv("NEXT_PUBLIC_UMAMI_DASHBOARD_URL");
+
   return (
     <div className="flex grow flex-col gap-4 bg-slate-50 dark:bg-slate-800">
       <div className="mx-auto flex w-full max-w-screen-2xl grow flex-col gap-4">
@@ -232,9 +237,22 @@ export default function Stats() {
               id="section-usage-stats"
               className="flex w-full flex-col gap-4"
             >
-              <h1 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-                Usage Statistics
-              </h1>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <h1 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+                  Usage Statistics
+                </h1>
+                {umamiDashboardUrl && (
+                  <Link
+                    href={umamiDashboardUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 text-sm"
+                  >
+                    More Stats in Umami
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </Link>
+                )}
+              </div>
               <UsageStatisticsSection
                 lastNDays={selectedTimespanFilter?.lastNDays}
               />
