@@ -132,8 +132,7 @@ export function DensityMap({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       element.on("plotly_relayout", (eventData: any) => {
         const coords = eventData["map._derived"]?.coordinates as
-          | [number, number][]
-          | undefined;
+          [number, number][] | undefined;
         const zoom = eventData["map.zoom"] as number | undefined;
 
         if (zoom !== undefined) {
